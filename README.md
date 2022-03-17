@@ -7,9 +7,8 @@ Firstly, install a python virtual environment. We use pipenv, but feel free to u
 So on the main directory run:
 ```bash
 sudo apt install pipenv
+pipenv install
 pipenv shell
-pipenv install django
-pipenv install celery
 ```
 
 Run the server locally as follows:
