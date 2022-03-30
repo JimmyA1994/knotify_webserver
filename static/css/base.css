@@ -1,0 +1,49 @@
+body {
+    background-color: #B3CEE5;
+}
+
+.wallpaper {
+    background-color: #B3CEE5;
+}
+
+.navigator {
+    background-color: #7A7978;
+}
+
+#logo {
+    background-color: #C4C4C4;
+}
+
+.nav-row{
+    font-family: "Aldrich";
+    color: white;
+}
+
+.nav-title {
+    font-size: 48px;
+}
+
+.nav-subtitle {
+    font-size: 16px;
+}
+
+.outer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.footer {
+    height: 40px;
+    background-color: #7A7978;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.card-decor {
+    background-color: #B3CEE5;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+}

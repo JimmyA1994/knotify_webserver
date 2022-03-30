@@ -1,9 +1,36 @@
-<HTML>
-    <HEAD>
-        <TITLE>Results</TITLE>
-    </HEAD>
-    <BODY BGCOLOR="FEFAFB">
-        <h2>Predict the sequence: {{ sequence }}</h2>
-        <h2>Answer: {{ answer }}</h2>
-    </BODY>
-</HTML>
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+    <title>Results</title>
+    <link rel="stylesheet" href="{% static 'css/results.css' %}">
+    <script src="{% static 'results.js' %}"></script>  
+{% endblock %}
+
+{% block body %}
+    <!-- <div class="row my-2 result-card"> -->
+    <div class="row my-2 card-decor">
+        <div class="row">
+            <u class="card-title col-2 text-center">Results</u>
+        </div>
+        <div class="row">
+            <h2 class="results">{{ sequence }}</h2>
+            <h2 class="results">{{ answer }}</h2>
+        </div>
+        <hr>
+        <div class="row">
+            <p>More information about the prediction:</p>
+            <ul class="ps-5">
+                <li></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- <div class="row my-2 result-card"> -->
+    <div class="row my-2 card-decor">
+        <div class="row">
+            <u class="card-title col-2 text-center">Graphics</u>
+        </div>
+        <p>Below is a 2D representation of the predicted rna secondary structure:</p>
+        <div style="background-color:blueviolet; width:100px; height:100px"></div>
+    </div>
+{% endblock %}
