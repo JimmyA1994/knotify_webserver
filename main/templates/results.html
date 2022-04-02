@@ -3,7 +3,7 @@
 {% block head %}
     <title>Results</title>
     <link rel="stylesheet" href="{% static 'css/results.css' %}">
-    <script src="{% static 'results.js' %}"></script>  
+    <script src="{% static 'js/results.js' %}"></script>  
 {% endblock %}
 
 {% block body %}
@@ -12,9 +12,11 @@
         <div class="row">
             <u class="card-title col-2 text-center">Results</u>
         </div>
-        <div class="row">
-            <h2 class="results">{{ sequence }}</h2>
-            <h2 class="results">{{ answer }}</h2>
+        <div id="root" class="row">
+            <!-- <p id="sequence" class="results text-wrap text-break">{{ sequence }}</p>
+            <p id="dot-bracket" class="results text-wrap">{{ answer }}</p> -->
+            <p id="sequence" class="results">{{ sequence }}</p>
+            <p id="dot-bracket" class="results">{{ answer }}</p>
         </div>
         <hr>
         <div class="row">
