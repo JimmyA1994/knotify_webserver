@@ -1,4 +1,9 @@
 function init(){
+    // Enable popover
+    var popover = new bootstrap.Popover(document.querySelector('#copy-btn'), {
+        trigger: 'focus'
+      })
+
     window['sequence'] = document.querySelector('#sequence').textContent;
     window['dot-bracket'] = document.querySelector('#dot-bracket').textContent;
     window['input-size'] = window['sequence'].length
@@ -60,6 +65,11 @@ function reportWindowSize() {
 
         count++;
     }
+}
+
+function copyOutput(){
+    console.log('Copied!');
+    navigator.clipboard.writeText(window['dot-bracket'])
 }
 
 window.onload = init;

@@ -3,7 +3,7 @@
 {% block head %}
     <title>Results</title>
     <link rel="stylesheet" href="{% static 'css/results.css' %}">
-    <script src="{% static 'js/results.js' %}"></script>  
+    <script src="{% static 'js/results.js' %}"></script>
 {% endblock %}
 
 {% block body %}
@@ -15,6 +15,13 @@
         <div id="root" class="row">
             <div id="sequence" class="results invisible">{{ sequence }}</div>
             <div id="dot-bracket" class="results invisible">{{ answer }}</div>
+        </div>
+        <div class="row">
+            <div class="d-flex flex-row-reverse">
+                <a  tabindex="0" role="button" id="copy-btn" class="copy btn btn-link" onclick="copyOutput()" 
+                    data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus" 
+                    data-bs-placement="top" data-bs-content="Copied!">(copy output)</a>
+            </div>
         </div>
         <hr>
         <div class="row">

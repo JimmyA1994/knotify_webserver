@@ -47,3 +47,13 @@
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Edge, Opera and Firefox */
   }
+
+.copy {
+    width: 100px;
+    font-size: 12px;
+}
+
+.copy:focus {
+    outline: unset;
+    box-shadow: unset;
+}
