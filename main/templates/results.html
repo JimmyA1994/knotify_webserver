@@ -1,25 +1,28 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block head %}
     <title>Results</title>
     <link rel="stylesheet" href="{% static 'css/results.css' %}">
-    <script src="{% static 'js/results.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/fornac.css' %}">
+    <script src="https://unpkg.com/d3@3.5"></script>
+    <!-- <script src="{% static 'js/results.js' %}"></script> -->
+    <script src="{% static 'js/fornac.js' %}"></script>
 {% endblock %}
 
 {% block body %}
-    <!-- <div class="row my-2 result-card"> -->
     <div class="row my-2 card-decor">
         <div class="row">
             <u class="card-title col-2 text-center">Results</u>
         </div>
         <div id="root" class="row">
             <div id="sequence" class="results invisible">{{ sequence }}</div>
-            <div id="dot-bracket" class="results invisible">{{ answer }}</div>
+            <div id="structure" class="results invisible">{{ answer }}</div>
         </div>
         <div class="row">
             <div class="d-flex flex-row-reverse">
-                <a  tabindex="0" role="button" id="copy-btn" class="copy btn btn-link" onclick="copyOutput()" 
-                    data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus" 
+                <a  tabindex="0" role="button" id="copy-btn" class="copy btn btn-link" onclick="copyOutput()"
+                    data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus"
                     data-bs-placement="top" data-bs-content="Copied!">(copy output)</a>
             </div>
         </div>
@@ -38,6 +41,109 @@
             <u class="card-title col-2 text-center">Graphics</u>
         </div>
         <p>Below is a 2D representation of the predicted rna secondary structure:</p>
-        <div style="background-color:blueviolet; width:100px; height:100px"></div>
+        <div id='rna_ss' class="mb-2"> </div>
     </div>
+
+
+    <div class="row my-2 card-decor"></div>
+        <!-- <h4>This is the RNA container</h4> -->
+        <div id='rna_ss' class="bg-white"> </div>
+    </div>
+
+    <script type='text/javascript'>
+    "use strict"
+
+    var sequence = document.querySelector('#sequence').textContent;
+    window['sequence'] = sequence;
+    window['input-size'] = window['sequence'].length
+    var structure = document.querySelector('#structure').textContent;
+    window['structure'] = structure;
+
+    let nc = normalContainer();
+
+    window.onload = init;
+    window.addEventListener('resize', reportWindowSize);
+
+
+    // Function Definitions
+    //=============================================================================
+    function normalContainer() {
+        let container = new fornac.FornaContainer("#rna_ss",
+                {'animation': true, 'zoomable': false, 'initialSize':[400,200]});
+
+         let options = {'structure': structure,
+            'sequence': sequence
+        };
+        container.addRNA(options.structure, options);
+        return container;
+    }
+
+    function reportWindowSize() {
+        var rootElem = document.querySelector('#root');
+        const font = 15;
+        const n = Math.floor(rootElem.offsetWidth / font)
+
+        // results output root node
+        let root = document.querySelector('#root');
+        // delete all existing nodes
+        while(root.children.length > 0){
+            root.children[0].remove();
+        }
+
+        var count = 1;
+        for(let i=0; i<=window['input-size']; i+=n){
+            // create sequence line and append it
+            var seq_count = document.createElement('div');
+            seq_count.setAttribute("class", "counter results noselect")
+            seq_count.innerHTML = count + "> ";
+            var seq_content = document.createElement('div');
+            seq_content.setAttribute("class", "results");
+            seq_content.setAttribute("id", "sequence" + (count > 1 ? '-'+count : ''));
+            seq_content.innerHTML = window['sequence'].slice(i, i+n);
+
+            let seq_div = document.createElement('div');
+            seq_div.setAttribute('class', 'responsive-line')
+            seq_div.setAttribute('id', 'seq_div' + (count > 1 ? '-'+count : ''))
+
+            seq_div.appendChild(seq_count);
+            seq_div.appendChild(seq_content);
+            root.appendChild(seq_div)
+
+            // create structure line and append it
+            var dot_count = document.createElement('div');
+            dot_count.setAttribute("class", "counter results noselect")
+            dot_count.innerHTML = count + "> ";
+            var dot_content = document.createElement('div');
+            dot_content.setAttribute("class", "results");
+            dot_content.setAttribute("id", "structure" + (count > 1 ? '-'+count : ''))
+            dot_content.innerHTML = window['structure'].slice(i, i+n);
+
+            let dot_div = document.createElement('div');
+            dot_div.setAttribute('class', 'responsive-line')
+            dot_div.setAttribute('id', 'dot_div' + (count > 1 ? '-'+count : ''))
+
+            dot_div.appendChild(dot_count);
+            dot_div.appendChild(dot_content);
+            root.appendChild(dot_div)
+
+
+            count++;
+        }
+    }
+
+
+    function init(){
+        var popover = new bootstrap.Popover(document.querySelector('#copy-btn'), {
+            trigger: 'focus'
+        })
+
+        reportWindowSize()
+    }
+
+    function copyOutput(){
+        console.log('Copied!');
+        navigator.clipboard.writeText(window['structure'])
+    }
+
+    </script>
 {% endblock %}
