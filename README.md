@@ -15,3 +15,13 @@ Run the server locally as follows:
 ```
 python manage.py runserver
 ```
+
+
+
+## To Do List
+
+### HomePage
+
+### Results Page
+
+### Backend

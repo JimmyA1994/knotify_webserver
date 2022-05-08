@@ -11,10 +11,6 @@ path.fornac-directionArrow {
   stroke-width: 0.8px;
 }
 
-g.fornac-plot {
-    /* outline: 1px solid red; */
-}
-
 circle.fornac-node[base_type="a"] {
   fill: #dbdb8d;
 }
@@ -167,10 +163,6 @@ text.fornac-plotLabel {
 	color: #fefefe;
 }
 
-/*
-	Header
-*/
-
 .d3-context-menu ul li.is-header
 .d3-context-menu ul li.is-header:hover {
 	background-color: #f2f2f2;
@@ -179,10 +171,6 @@ text.fornac-plotLabel {
 	font-style: italic;
 }
 
-/*
-	Disabled
-*/
-
 .d3-context-menu ul li.is-disabled
 .d3-context-menu ul li.is-disabled:hover {
 	background-color: #f2f2f2;
@@ -190,9 +178,6 @@ text.fornac-plotLabel {
 	cursor: not-allowed;
 }
 
-/*
-	Divider
-*/
 
 .d3-context-menu ul li.is-divider {
 	padding: 0px 0px;
@@ -208,5 +193,3 @@ text.fornac-plotLabel {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
-
-/*# sourceMappingURL=fornac.css.map*/

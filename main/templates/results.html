@@ -8,9 +8,12 @@
     <script src="https://unpkg.com/d3@3.5"></script>
     <!-- <script src="{% static 'js/results.js' %}"></script> -->
     <script src="{% static 'js/fornac.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
 {% endblock %}
 
 {% block body %}
+    <div style="display:none;" id="css_text">{{css}}</div>
     <div class="row my-2 card-decor">
         <div class="row">
             <u class="card-title col-2 text-center">Results</u>
@@ -28,9 +31,11 @@
         </div>
         <hr>
         <div class="row">
-            <p>More information about the prediction:</p>
+            <div>More information about the prediction:</div>
             <ul class="ps-5">
-                <li></li>
+                <li id="request_id">Request id: {{ uuid }}</li>
+                <li>Sequence length: {{ sequence | length }}</li>
+                <li>Number of pseudoknots: {{ num_of_pseudoknots }}</li>
             </ul>
         </div>
     </div>
@@ -42,12 +47,140 @@
         </div>
         <p>Below is a 2D representation of the predicted rna secondary structure:</p>
         <div id='rna_ss' class="mb-2"> </div>
+        <!-- also include hidden svg container for different size containers -->
+        <!-- <div class="row">
+            <div id="interactive_options_title" class="col-6" style="visibility: hidden;">Customize the plot</div>
+            <div class="col-6 text-end"></div>
+            <div class="col-6 text-end"><a id="togglePlotButton" href="#" onclick="togglePlot()">Try interactive!</a></div>
+        </div> -->
+        <div class="row my-2">
+            <div class="col-6 text-end"></div>
+            <div class="col-6 text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
+            </div>
+        </div>
+        <!-- <div id="interactive_options" class="mb-3" style="visibility: hidden;">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                <label class="form-check-label" for="inlineCheckbox1">Animate</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                <label class="form-check-label" for="inlineCheckbox2">Display Numbering</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
+                <label class="form-check-label" for="inlineCheckbox3">Node outline</label>
+            </div>
+            <a href="#" onclick="centerMolecules()">Center molecules</a>
+            <div class="dropup d-inline">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  Color Scheme
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="#" id="dropdown-item1" onclick="window.container.changeColorScheme('sequence'); selectDropdown(1);" style="background: #7A7978; color: #FFFFFF">Sequence</a></li>
+                    <li><a class="dropdown-item" href="#" id="dropdown-item2" onclick="window.container.changeColorScheme('positions'); selectDropdown(2);">Positions</a></li>
+                    <li><a class="dropdown-item" href="#" id="dropdown-item3" onclick="window.container.changeColorScheme('structure'); selectDropdown(3);">Structure</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">
+                Download
+            </button>
+
+        </div> -->
     </div>
 
 
-    <div class="row my-2 card-decor"></div>
-        <!-- <h4>This is the RNA container</h4> -->
-        <div id='rna_ss' class="bg-white"> </div>
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Download Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Adjust the options to your liking and press download
+                    <div class="row">
+                        <div class="col-3" style="border-right: 1px black solid">
+                            <div class="ms-1 mt-2">Format:</div>
+                            <div class="form-check ms-1">
+                                <input class="form-check-input" type="radio" name="svg" id="svg-radio" checked>
+                                <label class="form-check-label" for="svg-radio">svg</label>
+                            </div>
+                            <div class="form-check ms-1">
+                                <input class="form-check-input" type="radio" name="png" id="img-radio1">
+                                <label class="form-check-label" for="img-radio1">png</label>
+                            </div>
+                            <div class="form-check ms-1">
+                                <input class="form-check-input" type="radio" name="ps" id="img-radio2">
+                                <label class="form-check-label" for="img-radio2">ps</label>
+                            </div>
+                            <div class="form-check ms-1">
+                                <input class="form-check-input" type="radio" name="pdf" id="img-radio3">
+                                <label class="form-check-label" for="img-radio3">pdf</label>
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <div class="form-check ms-1 mt-2" style="display: block;" id="download-svg-options">
+                                <input class="form-check-input" type="checkbox" id="background-check" name="background-check" checked>
+                                <label class="form-check-label">Background</label>
+                            </div>
+                            <div style="display: none;" id="download-img-options">
+                                <div class="ms-1 mt-2">Resolution:</div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="1280x720" id="size-radio1" checked>
+                                    <label class="form-check-label" for="size-radio1">720p</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="1920x1080" id="size-radio2">
+                                    <label class="form-check-label" for="size-radio2">1080p</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="2560x1440" id="size-radio3">
+                                    <label class="form-check-label" for="size-radio3">2k</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="3840x2160" id="size-radio4">
+                                    <label class="form-check-label" for="size-radio4">4k</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input d-inline-block" type="radio" name="custom" id="size-radio5">
+                                    <label class="form-check-label d-inline-block" for="size-radio5">Custom:</label>
+                                    <input type="text" id="size-width" style="width: 55px; height: 22px" maxlength="5">
+                                    <span style="font-size: 12px">px</span>
+                                    <input type="text" id="size-height" style="width: 55px; height: 22px" maxlength="5">
+                                    <span style="font-size: 12px">px</span>
+                                    <!-- <textarea class="d-inline-block" id="width-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
+                                    <!-- <textarea class="d-inline-block" id="height-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="d-inline-block">
+                            Name:
+                            <!-- <input type="text" id="name-input" style="width: 260px; height: 22px" maxlength="32"> -->
+                            <input type="text" id="name-input" maxlength="32">
+                            <button id="clear-name-button" onclick="clear_name()">&#10006;</button>
+                        </div>
+                        <!-- <div class="d-inline-block"> -->
+                            <!-- <textarea id="name-text-area" name="w3review" rows="1" cols="24" maxlength="24"></textarea> -->
+                        <!-- </div> -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-primary" onclick="download_svg()">Download</button> -->
+                        <button type="button" class="btn btn-primary" onclick="download_img()" id="modalDownloadButton">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type='text/javascript'>
@@ -58,23 +191,126 @@
     window['input-size'] = window['sequence'].length
     var structure = document.querySelector('#structure').textContent;
     window['structure'] = structure;
+    var request_id =  document.querySelector('#request_id').textContent.replace("Request id: ", "");
+    window.request_id = request_id;
+    window.svg_background = true;
+    window.css = document.getElementById("css_text").textContent;
+    window.img_width = 1280;
+    window.img_height = 720;
+    window.size = "1280x720"
+    window.download_format = "svg"
 
-    let nc = normalContainer();
+    createChart();
+    window['plotType'] = 'static';
+    // var nc = normalContainer();
+    // window['container'] = nc;
 
     window.onload = init;
     window.addEventListener('resize', reportWindowSize);
 
+    // document.getElementById("inlineCheckbox1").checked = true;
+    // var checkbox = document.querySelector("#inlineCheckbox1");
+    // checkbox.addEventListener('change', function() {
+    //     if (this.checked) {
+    //         window['container'].startAnimation()
+    //         console.log("Checkbox is checked..");
+    //     } else {
+    //         window['container'].stopAnimation()
+    //         console.log("Checkbox is not checked..");
+    //     }
+    // });
+
+    // document.getElementById("inlineCheckbox2").checked = true;
+    // var numberingCheckbox = document.querySelector("#inlineCheckbox2");
+    // numberingCheckbox.addEventListener('change', function() {
+    //     if (this.checked) {
+    //         window['container'].displayNumbering(true);
+    //     } else {
+    //         window['container'].displayNumbering(false);
+    //     }
+    // });
+
+    document.getElementById("background-check").checked = true;
+    var checkbox = document.querySelector("#background-check");
+    checkbox.addEventListener('change', function() {
+        toggle_svg_background();
+        if (this.checked) {
+            // window['container'].startAnimation()
+            console.log("Checkbox is checked..");
+        } else {
+            // window['container'].stopAnimation()
+            console.log("Checkbox is not checked..");
+        }
+    });
+
+    var svg_radio = document.querySelector("#svg-radio");
+    svg_radio.addEventListener('change', function() {
+        if (this.checked) {
+            display_download_svg_options();
+            for(var i = 1; i<=3; i++){
+                var radio = document.querySelector("#img-radio"+i);
+                radio.checked = false;
+            }
+            window.download_format = this.name;
+            // document.querySelector('#modalDownloadButton').onclick = download_svg
+        }
+    });
+
+    for(var i = 1; i<=3; i++){
+        var radio = document.querySelector("#img-radio"+i);
+        radio.addEventListener('change', function() {
+        if (this.checked) {
+            display_download_img_options();
+            var svg_radio = document.querySelector("#svg-radio");
+            svg_radio.checked = false;
+            for(var i = 1; i<=3; i++){
+                var radio = document.querySelector("#img-radio"+i);
+                radio.checked = false;
+            }
+            this.checked = true;
+            window.download_format = this.name;
+            // switch(this.name){
+            //     case "png":
+            //         document.querySelector('#modalDownloadButton').onclick = download_png
+            //         break;
+            //     case "ps":
+            //         document.querySelector('#modalDownloadButton').onclick = download_ps
+            //         break;
+            //     case "pdf":
+            //         document.querySelector('#modalDownloadButton').onclick = download_pdf
+            //         break;
+            // }
+        }
+    });
+    }
+    for(var i = 1; i<=5; i++){
+        var radio = document.querySelector("#size-radio"+i);
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                // unset all radio buttons
+                for(var j = 1; j<=5; j++){
+                    var temp = document.querySelector("#size-radio"+j);
+                    temp.checked = false;
+                }
+                // set the one we selected
+                this.checked = true;
+                window.size = this.name;
+            }
+        });
+    }
 
     // Function Definitions
     //=============================================================================
     function normalContainer() {
-        let container = new fornac.FornaContainer("#rna_ss",
-                {'animation': true, 'zoomable': false, 'initialSize':[400,200]});
+        var container = new fornac.FornaContainer("#rna_ss",
+                // {'animation': true, 'zoomable': true, 'initialSize':[400, 200]});
+                {'animation': true, 'zoomable': true, 'initialSize':[window.img_width, window.img_height]});
 
-         let options = {'structure': structure,
+         var options = {'structure': structure,
             'sequence': sequence
         };
         container.addRNA(options.structure, options);
+        container.changeColorScheme('sequence');
         return container;
     }
 
@@ -84,14 +320,14 @@
         const n = Math.floor(rootElem.offsetWidth / font)
 
         // results output root node
-        let root = document.querySelector('#root');
-        // delete all existing nodes
+        var root = document.querySelector('#root');
+        // devare all existing nodes
         while(root.children.length > 0){
             root.children[0].remove();
         }
 
         var count = 1;
-        for(let i=0; i<=window['input-size']; i+=n){
+        for(var i=0; i<=window['input-size']; i+=n){
             // create sequence line and append it
             var seq_count = document.createElement('div');
             seq_count.setAttribute("class", "counter results noselect")
@@ -101,7 +337,7 @@
             seq_content.setAttribute("id", "sequence" + (count > 1 ? '-'+count : ''));
             seq_content.innerHTML = window['sequence'].slice(i, i+n);
 
-            let seq_div = document.createElement('div');
+            var seq_div = document.createElement('div');
             seq_div.setAttribute('class', 'responsive-line')
             seq_div.setAttribute('id', 'seq_div' + (count > 1 ? '-'+count : ''))
 
@@ -118,7 +354,7 @@
             dot_content.setAttribute("id", "structure" + (count > 1 ? '-'+count : ''))
             dot_content.innerHTML = window['structure'].slice(i, i+n);
 
-            let dot_div = document.createElement('div');
+            var dot_div = document.createElement('div');
             dot_div.setAttribute('class', 'responsive-line')
             dot_div.setAttribute('id', 'dot_div' + (count > 1 ? '-'+count : ''))
 
@@ -131,7 +367,6 @@
         }
     }
 
-
     function init(){
         var popover = new bootstrap.Popover(document.querySelector('#copy-btn'), {
             trigger: 'focus'
@@ -143,6 +378,287 @@
     function copyOutput(){
         console.log('Copied!');
         navigator.clipboard.writeText(window['structure'])
+    }
+
+    function animate(){
+        console.log('Hello!');
+        var checked = document.getElementById("inlineCheckbox1").checked;
+        console.log("checked:", checked);
+    }
+
+    function createContainer() {
+        var seq = 'AAAACCGGGCCUUUUACCCCAAAUUGGAA';
+        var str = '......(((..[[[[[.)))....]]]]]';
+        var container = new fornac.FornaContainer("#rna_ss",
+        {'animation': true, 'zoomable': true, 'initialSize':[window.img_width, window.img_height]});
+        // {'animation': true, 'zoomable': true, 'initialSize':[200, 400]});
+
+         var options = {'structure': str,
+            'sequence': seq
+        };
+        container.addRNA(options.structure, options);
+        return container;
+    }
+
+    function createChart(elementId='rna_ss') {
+        var rna1 = {'structure': window.structure,
+                    'sequence': window.sequence,
+        };
+        var chart = fornac.rnaPlot()
+                    .width(window.img_width)
+                    .height(window.img_height)
+                    .rnaLayout('simple')
+                    .namePosition('0 0')
+                    .labelInterval(10);
+        var svg = d3.select('#'+elementId)
+                    .selectAll('svg')
+                    .data([rna1])
+                    .enter()
+                    .append('div')
+                    .classed('svg-container', true)
+                    .append('svg')
+                    .attr("preserveAspectRatio", "xMidYMid meet")
+                    .attr('viewBox', "0 0 " + window.img_width + " " + window.img_height)
+                    .call(chart);
+    }
+
+    function clearPlot(elementId='rna_ss') {
+        var rootElem = document.querySelector('#'+elementId);
+        while(rootElem.children.length > 0){
+            rootElem.children[0].remove();
+        }
+    }
+
+
+    function staticTab() {
+        clearPlot();
+        createChart();
+        // var con = createChart();
+        // window['container'] = con;
+    }
+
+    function interactiveTab() {
+        // clearPlot();
+        var nc = normalContainer()
+        window['container'] = nc
+
+    }
+
+    function get_svg(){
+
+        if(window['plotType'] == 'static'){
+            var div = document.querySelector('.svg-container');
+            var svg = div.childNodes[0];
+            // createChart(window.width, window.height, elementId);
+            // var svg = div.childNodes[0];
+        } else {
+            var div = document.querySelector('#rna_ss');
+            var svg = div.childNodes[2];
+        }
+        return svg;
+    }
+
+    function get_svg_string() {
+        // get css to incorporate into svg
+        var css = window.css
+        var svg = get_svg();
+
+        //get svg in string format
+        var serializer = new XMLSerializer();
+        var svgData = serializer.serializeToString(svg);
+
+        // add style element to svg
+        var parser = new DOMParser();
+        var xmlDoc = parser.parseFromString(svgData, "text/xml");
+        var style = xmlDoc.createElement("style");
+        style.innerHTML = css;
+        var svgNode = xmlDoc.childNodes[0];
+        var gNode = xmlDoc.childNodes[0].childNodes[0];
+        svgNode.insertBefore(style, gNode);
+
+        // enforce background
+        if(window.plotType == 'static'){
+            var rectNode = xmlDoc.createElement('rect');
+            rectNode.setAttribute("fill","white");
+            rectNode.setAttribute("style", "visibility: visible;");
+            rectNode.setAttribute("width", "100%");
+            rectNode.setAttribute("height", "100%");
+            svgNode.insertBefore(rectNode, gNode);
+        } else if(window.svg_background || window.download_format != "svg") {
+            var rectNode = xmlDoc.querySelector(".background");
+            rectNode.setAttribute("fill","white");
+            rectNode.setAttribute("style", "visibility: visible;");
+        }
+
+        // get final svg in string format
+        svgData = serializer.serializeToString(xmlDoc);
+        // XMLSerializer adds xmlns attribute in style element, remove it
+        svgData = svgData.replaceAll("xmlns=\"\"", "");
+        return svgData;
+    }
+
+    function togglePlot(){
+        var currentPlot = window['plotType'];
+        if(currentPlot == "static"){
+            interactiveTab();
+            window['plotType'] = 'interactive';
+
+            var elem = document.querySelector("#togglePlotButton");
+            elem.innerHTML = "Back to static";
+
+            // show interactive options
+            document.getElementById("interactive_options_title").style.visibility = "visible";
+            document.getElementById("interactive_options").style.visibility = "visible";
+        }
+        else if(currentPlot == "interactive"){
+            clearPlot();
+            createChart();
+            window['plotType'] = 'static';
+
+            var elem = document.querySelector("#togglePlotButton");
+            elem.innerHTML = "Try interactive!";
+
+            // hide interactive options
+            document.getElementById("interactive_options_title").style.visibility = "hidden";
+            // document.getElementById("interactive_options").style.visibility = "collapse";
+            document.getElementById("interactive_options").style.visibility = "hidden";
+        }
+    }
+
+    function centerMolecules(){
+        window["container"].centerView();
+    }
+
+    function selectDropdown(item) {
+        // unset all items
+        var item1 = document.getElementById("dropdown-item1");
+        item1.style.background = "#FFFFFF";
+        item1.style.color = "#000000";
+        var item2 = document.getElementById("dropdown-item2");
+        item2.style.background = "#FFFFFF";
+        item2.style.color = "#000000";
+        var item3 = document.getElementById("dropdown-item3");
+        item3.style.background = "#FFFFFF";
+        item3.style.color = "#000000";
+
+        // set selected item
+        var item = document.getElementById("dropdown-item"+item);
+        item.style.background = "#7A7978";
+        item.style.color = "#FFFFFF";
+    }
+
+    function addCSS(svgData, css){
+
+        parser = new DOMParser();
+        xmlDoc = parser.parseFromString(svgData,"text/xml");
+        var style = xmlDoc.createElement("style");
+        style.innerHTML = css;
+
+        var svgNode = xmlDoc.childNodes[0];
+        var gNode = xmlDoc.childNodes[0].childNodes[0];
+        svgNode.insertBefore(style, gNode);
+
+        var serializer = new XMLSerializer();
+        return serializer.serializeToString(xmlDoc);
+    }
+
+
+    function toggle_svg_background(){
+        window.svg_background = !window.svg_background;
+    }
+
+    function display_download_svg_options(){
+        var download_img_options = document.getElementById("download-img-options");
+        download_img_options.style.display = "none";
+        var download_svg_options = document.getElementById("download-svg-options");
+        download_svg_options.style.display = "block";
+    }
+
+    function display_download_img_options(){
+        var download_svg_options = document.getElementById("download-svg-options");
+        download_svg_options.style.display = "none";
+        var download_img_options = document.getElementById("download-img-options");
+        download_img_options.style.display = "block";
+    }
+
+    function clear_name(){
+        var name_field = document.getElementById("name-input");
+        name_field.value = ""
+        name_field.focus()
+    }
+
+    function get_filename(){
+        var name_input = document.getElementById("name-input").value;
+        if(name_input){ name = name_input;}
+        else{ name = window.request_id;}
+        return name;
+    }
+
+    function download_img(){
+
+        // set download_size
+        if(window.download_format != "svg"){
+            if(window.size == "custom"){
+                var width = document.querySelector("#size-width").value;
+                var height = document.querySelector("#size-height").value;
+            }else{
+                var resolution = window.size.split("x");
+                var width = resolution[0];
+                var height = resolution[1];
+            }
+            if(window.img_width != width || window.img_height != height){
+                window.img_width = width;
+                window.img_height = height;
+                clearPlot();
+                createChart();
+            }
+        }
+        var name = get_filename();
+        var format = window.download_format;
+        if(format == 'svg'){
+            var svgData = get_svg_string();
+            var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+            var svgUrl = URL.createObjectURL(svgBlob);
+            var downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = name
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+        else{
+            var data = {"svg": get_svg_string(), "format": format, 'width': width, "height": height};
+            var cookie = document.cookie;
+            var split = cookie.split("=");
+            var token = split[1];
+
+            var tuple = fetch('convert_svg',{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(b64_binary =>{
+                if(format == 'png'){
+                    var svgUrl = 'data:image/png;base64,' + b64_binary;
+                } else if(format == 'ps'){
+                    var svgUrl = 'data:application/postscript;base64,' + b64_binary;
+                    name += ".ps"
+                } else if(format == 'pdf'){
+                    var svgUrl = 'data:application/octetstream;base64,' + b64_binary;
+                    name += ".pdf"
+                } else {return;}
+                var downloadLink = document.createElement("a");
+                downloadLink.href = svgUrl;
+                downloadLink.download = name
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
+        }
     }
 
     </script>
