@@ -147,9 +147,9 @@
                                 <div class="form-check ms-1">
                                     <input class="form-check-input d-inline-block" type="radio" name="custom" id="size-radio5">
                                     <label class="form-check-label d-inline-block" for="size-radio5">Custom:</label>
-                                    <input type="text" id="size-width" style="width: 55px; height: 22px" maxlength="5">
+                                    <input type="text" id="size-width" style="width: 55px; height: 22px" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
                                     <span style="font-size: 12px">px</span>
-                                    <input type="text" id="size-height" style="width: 55px; height: 22px" maxlength="5">
+                                    <input type="text" id="size-height" style="width: 55px; height: 22px" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
                                     <span style="font-size: 12px">px</span>
                                     <!-- <textarea class="d-inline-block" id="width-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
                                     <!-- <textarea class="d-inline-block" id="height-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
@@ -161,7 +161,7 @@
                         <div class="d-inline-block">
                             Name:
                             <!-- <input type="text" id="name-input" style="width: 260px; height: 22px" maxlength="32"> -->
-                            <input type="text" id="name-input" maxlength="32">
+                            <input type="text" id="name-input" maxlength="32" oninput="this.value = this.value.replace(/[^a-zA-Z_0-9 ]/g, '')"">
                             <button id="clear-name-button" onclick="clear_name()">&#10006;</button>
                         </div>
                         <!-- <div class="d-inline-block"> -->
@@ -588,7 +588,7 @@
     }
 
     function get_filename(){
-        var name_input = document.getElementById("name-input").value;
+        var name_input = document.getElementById("name-input").value.trim();
         if(name_input){ name = name_input;}
         else{ name = window.request_id;}
         return name;
