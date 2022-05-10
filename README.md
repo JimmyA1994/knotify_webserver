@@ -9,6 +9,8 @@ So on the main directory run:
 sudo apt install pipenv
 pipenv install
 pipenv shell
+pip install knotify-0.0.1.dev71-py3-none-any.whl
+pip install -r wheels-requirements.txt
 ```
 
 Run the server locally as follows:
