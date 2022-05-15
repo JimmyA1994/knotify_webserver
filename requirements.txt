@@ -1,0 +1,6 @@
+requests==2.27.1
+django==4.0.3
+CairoSVG==2.5.2
+celery==5.2.3
+knotify-0.0.1.dev71-py3-none-any.whl
+vienna_rna_wheel-2.4.17+ubuntu2004.dslab0-cp38-cp38-linux_x86_64.whl
