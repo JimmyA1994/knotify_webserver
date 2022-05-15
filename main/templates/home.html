@@ -17,7 +17,7 @@
     <form class="p-2 mt-5 card-decor" action="results/" method="POST">{% csrf_token %}
         <div class="form-group">
             <div>Enter your RNA sequence here.</div>
-            <input type="text" class="form-control my-2" id="RNA-sequence" name="sequence" placeholder="" oninput="this.value = this.value.replace(/[^aAuUgGcC]/g, '');">
+            <input type="text" class="form-control my-2" id="RNA-sequence" name="sequence" placeholder="" oninput="this.value = this.value.replace(/[^aAuUgGcC]/g, '');" required>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
