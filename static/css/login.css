@@ -1,0 +1,115 @@
+html, body {
+    height:100%;
+}
+
+.login-background {
+    background-color:#fff7ed;
+}
+
+.login-card {
+    background-color: white;
+    height: 400px;
+    width: 590px;
+    border-radius: 32px;
+    -webkit-box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
+    -moz-box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
+    box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
+}
+
+.login-card-banner {
+    background-color: #B3CEE5;
+    border-radius: 32px;
+    height:400px;
+}
+
+.login-card-details {
+    background-color: white;
+    /* border-radius: 32px; */
+    /* height:400px; */
+}
+
+#logo {
+    width:200px;
+    height:200px;
+    margin: 0 auto;
+}
+
+.nav-row {
+    font-family: "Aldrich";
+    color: white;
+}
+
+.nav-title {
+    font-size: 39px;
+    /* font-size: 3vw; */
+}
+
+.nav-subtitle {
+    font-size: 16px;
+}
+
+.title {
+    font-family: "Aldrich";
+    font-size: 48px;
+}
+
+.login-form-inline {
+    height:24px;
+    background-color: #C4C4C4;
+    border: none;
+}
+
+.login-form-inline:focus {
+    outline: none !important;
+    border:1px solid #B3CEE5;
+    box-shadow: 0 0 10px #B3CEE5;
+}
+
+.login-form-label {
+    background-color: #fff7ed;
+    padding: 2px 4px 2px 2px;
+    color: black;
+    height: max-content;
+    font-family: "Aldrich";
+    width: 86px;
+}
+
+label {
+    margin-top: 30px;
+}
+
+button {
+    font-family: "Aldrich";
+    background-color: #B3CEE5;
+    border:none;
+    width:80px;
+}
+
+.toggle-text {
+    font-family: "Aldrich";
+}
+
+#toggle-link {
+    display: inline-block;
+    position: relative;
+    color: #B3CEE5;
+    cursor: pointer;
+}
+
+#toggle-link:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #B3CEE5;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+#toggle-link:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}

@@ -8,10 +8,11 @@ from .utils import KnotifyClient
 class HomePageView(TemplateView):
     template_name = 'home.html'
 
-
 class ResultsView(TemplateView):
     template_name = "results.html"
 
+class LoginView(TemplateView):
+    template_name = 'login.html'
 
 def results_view(request):
     sequence = request.POST['sequence'].upper()
