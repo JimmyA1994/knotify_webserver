@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -13,6 +13,15 @@ class ResultsView(TemplateView):
 
 class LoginView(TemplateView):
     template_name = 'login.html'
+
+@require_http_methods(['POST'])
+def process_signup_view(request):
+    return JsonResponse({'status':'good'})
+
+@require_http_methods(['POST'])
+def process_login_view(request):
+    return JsonResponse({'status':'good'})
+
 
 def results_view(request):
     sequence = request.POST['sequence'].upper()

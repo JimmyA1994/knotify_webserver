@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-8">
                             <div class="row"><span class="text-center title">Signup</span></div>
-                            <form>
+                            <form>{% csrf_token %}
                                 <label>
                                     <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Username</span><input type="text" class="text-input login-form-inline" id="UsernameInput">
                                 </label>
@@ -34,7 +34,7 @@
                             <div class="row" style="margin-top: 30px;">
                                 <div class="col-8"></div>
                                 <div class="col-4">
-                                    <button>Sign up!</button>
+                                    <button onclick="signup()">Sign up!</button>
                                 </div>
                             </div>
                             <div class="row">
