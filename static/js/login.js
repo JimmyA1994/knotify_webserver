@@ -20,7 +20,14 @@ function signup(){
             'X-CSRFToken': token,
         },
         body: JSON.stringify(data)
-    }).then(response => response.json()).then(data => console.log(data));
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data.hasOwnProperty('status') && data['status']=='good'){
+            window.location.replace(window.location.protocol + '//' + window.location.host + '/');
+        }
+    });
 }
 
 function login(){
@@ -42,7 +49,14 @@ function login(){
             'X-CSRFToken': token,
         },
         body: JSON.stringify(data)
-    }).then(response => response.json()).then(data => console.log(data));
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data.hasOwnProperty('status') && data['status']=='good'){
+            window.location.replace(window.location.protocol + '//' + window.location.host + '/');
+        }
+    });
 }
 
 function toggleLogin(){
