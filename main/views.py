@@ -3,6 +3,9 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from .utils import KnotifyClient
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+import json
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -16,11 +19,32 @@ class LoginView(TemplateView):
 
 @require_http_methods(['POST'])
 def process_signup_view(request):
-    return JsonResponse({'status':'good'})
+    body = json.loads(request.body.decode('UTF-8'))
+    if not {'email', 'password'}.issubset(body.keys()):
+        return HttpResponseBadRequest('No username or password was provided.')
+    email = body.get('email', '')
+    username = email.split('@')[0]
+    password = body.get('password', '')
+    user = User.objects.create_user(username=username, email=email, password=password)
+    if user:
+        return JsonResponse({'status':'good'})
+    else:
+        return JsonResponse({'status':'bad'})
+
 
 @require_http_methods(['POST'])
 def process_login_view(request):
-    return JsonResponse({'status':'good'})
+    body = json.loads(request.body.decode('UTF-8'))
+    email = body.get('email', '')
+    username = email.split('@')[0]
+    password = body.get('password', '')
+    print(f'{email = }')
+    print(f'{password = }')
+    user = authenticate(username=username, password=password)
+    if user:
+        return JsonResponse({'status':'good'})
+    else:
+        return JsonResponse({'status':'bad'})
 
 
 def results_view(request):
@@ -41,7 +65,6 @@ def results_view(request):
 @require_http_methods(['POST'])
 def convert_svg_view(request):
     import base64
-    import json
     try:
         body = json.loads(request.body.decode('UTF-8'))
         svg = body['svg']

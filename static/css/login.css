@@ -89,14 +89,19 @@ button {
     font-family: "Aldrich";
 }
 
-#toggle-link {
+.toggle-link {
     display: inline-block;
     position: relative;
     color: #B3CEE5;
     cursor: pointer;
+    text-decoration: none;
 }
 
-#toggle-link:after {
+.toggle-link:hover {
+    color: #B3CEE5;
+}
+
+.toggle-link:after {
     content: '';
     position: absolute;
     width: 100%;
@@ -109,7 +114,7 @@ button {
     transition: transform 0.25s ease-out;
 }
 
-#toggle-link:hover:after {
+.toggle-link:hover:after {
     transform: scaleX(1);
     transform-origin: bottom left;
 }

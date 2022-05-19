@@ -25,7 +25,7 @@
                             <div class="row"><span class="text-center title">Signup</span></div>
                             <form>{% csrf_token %}
                                 <label>
-                                    <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Username</span><input type="text" class="text-input login-form-inline" id="UsernameInput">
+                                    <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Email</span><input type="text" class="text-input login-form-inline" id="EmailInput">
                                 </label>
                                 <label>
                                     <span class="login-form-label login-form-inline d-inline-block" for="PasswordInput">Password</span><input type="password" class="text-input login-form-inline" id="PasswordInput">
@@ -38,7 +38,8 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <span class="toggle-text text-center mt-5">If you already have an account, <a onclick="toggleLogin()" id="toggle-link">login!</a></span>
+                                <span class="toggle-text text-center mt-5" id="toggle-login-span" style="display:visible">If you already have an account, <a onclick="toggleLogin()" class="toggle-link">login!</a></span>
+                                <span class="toggle-text text-center mt-5" id="toggle-signup-span" style="display:none">If you don't have an account, <a onclick="toggleSignup()" class="toggle-link">signup!</a></span>
                             </div>
                         </div>
                     </div>
