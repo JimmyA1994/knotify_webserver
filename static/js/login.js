@@ -28,6 +28,7 @@ function signup(){
             window.location.replace(window.location.protocol + '//' + window.location.host + '/');
         }
     });
+    return false; // ignore form submission, we handle navigation
 }
 
 function login(){
@@ -57,6 +58,7 @@ function login(){
             window.location.replace(window.location.protocol + '//' + window.location.host + '/');
         }
     });
+    return false; // ignore form submission, we handle navigation
 }
 
 function toggleLogin(){
@@ -65,9 +67,11 @@ function toggleLogin(){
     var signupSpan = document.querySelector('#toggle-signup-span');
     signupSpan.style = "display:visible";
 
-    var button = document.querySelector('button');
-    button.innerHTML = "Log in!";
-    button.onclick = login;
+    var button = document.querySelector('#button');
+    button.value = "Log in!";
+    var form = document.querySelector('form');
+    form.onclick = login;
+    // button.onclick = login;
 }
 
 function toggleSignup(){
@@ -76,7 +80,9 @@ function toggleSignup(){
     var loginSpan = document.querySelector('#toggle-login-span');
     loginSpan.style = "display:visible";
 
-    var button = document.querySelector('button');
-    button.innerHTML = "Sign up!";
-    button.onclick = signup;
+    var button = document.querySelector('#button');
+    button.value = "Sign up!";
+    var form = document.querySelector('form');
+    form.onclick = signup;
+    // button.onclick = signup;
 }

@@ -23,20 +23,26 @@
                         </div>
                         <div class="col-8">
                             <div class="row"><span class="text-center title">Signup</span></div>
-                            <form>{% csrf_token %}
+                            <form method="post" onsubmit="return signup();">{% csrf_token %}
                                 <label>
-                                    <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Email</span><input type="text" class="text-input login-form-inline" id="EmailInput">
+                                    <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Email</span><input type="email" class="text-input login-form-inline" id="EmailInput" pattern='[\w\d_+.-]+@[\w]+[.][A-Za-z]+' required>
                                 </label>
                                 <label>
-                                    <span class="login-form-label login-form-inline d-inline-block" for="PasswordInput">Password</span><input type="password" class="text-input login-form-inline" id="PasswordInput">
+                                    <span class="login-form-label login-form-inline d-inline-block" for="PasswordInput">Password</span><input type="password" class="text-input login-form-inline" id="PasswordInput" required>
                                 </label>
+                                <div class="row" style="margin-top: 30px;">
+                                    <div class="col-8"></div>
+                                    <div class="col-4">
+                                        <input type="submit" id="button" value='Sign up!'>
+                                </div>
+                            </div>
                             </form>
-                            <div class="row" style="margin-top: 30px;">
+                            {% comment %} <div class="row" style="margin-top: 30px;">
                                 <div class="col-8"></div>
                                 <div class="col-4">
                                     <button onclick="signup()">Sign up!</button>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
                             <div class="row">
                                 <span class="toggle-text text-center mt-5" id="toggle-login-span" style="display:visible">If you already have an account, <a onclick="toggleLogin()" class="toggle-link">login!</a></span>
                                 <span class="toggle-text text-center mt-5" id="toggle-signup-span" style="display:none">If you don't have an account, <a onclick="toggleSignup()" class="toggle-link">signup!</a></span>
