@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from .utils import KnotifyClient
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 import json
 
 # Create your views here.
@@ -42,10 +42,19 @@ def process_login_view(request):
     print(f'{password = }')
     user = authenticate(username=username, password=password)
     if user:
+        login(request, user)
         return JsonResponse({'status':'good'})
     else:
         return JsonResponse({'status':'bad'})
 
+@require_http_methods(['POST'])
+def logout_view(request):
+    try:
+        logout(request)
+    except:
+        return JsonResponse({'status':'bad'})
+    else:
+        return JsonResponse({'status':'good'})
 
 def results_view(request):
     sequence = request.POST['sequence'].upper()
