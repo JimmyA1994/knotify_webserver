@@ -5,13 +5,16 @@ from django.views.generic import TemplateView
 from .utils import KnotifyClient
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 import json
 
-# Create your views here.
-class HomePageView(TemplateView):
+class HomePageView(LoginRequiredMixin, TemplateView):
+    # supress passing next field in login redirect
+    redirect_field_name=None
     template_name = 'home.html'
 
-class ResultsView(TemplateView):
+class ResultsView(LoginRequiredMixin, TemplateView):
     template_name = "results.html"
 
 class LoginView(TemplateView):
@@ -47,6 +50,8 @@ def process_login_view(request):
     else:
         return JsonResponse({'status':'bad'})
 
+
+@login_required(redirect_field_name=None)
 @require_http_methods(['POST'])
 def logout_view(request):
     try:
@@ -56,6 +61,8 @@ def logout_view(request):
     else:
         return JsonResponse({'status':'good'})
 
+@login_required(redirect_field_name=None)
+@require_http_methods(['POST'])
 def results_view(request):
     sequence = request.POST['sequence'].upper()
     client = KnotifyClient()
@@ -70,7 +77,7 @@ def results_view(request):
     context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id.hex, 'css': css}
     return render(request, 'results.html', context)
 
-
+@login_required(redirect_field_name=None)
 @require_http_methods(['POST'])
 def convert_svg_view(request):
     import base64
