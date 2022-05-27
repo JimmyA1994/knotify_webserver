@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from main.models import Result, Run
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -66,15 +69,27 @@ def logout_view(request):
 def results_view(request):
     sequence = request.POST['sequence'].upper()
     client = KnotifyClient()
-    answer = client.predict(sequence)
-    num_of_pseudoknots = answer.count('[')
-    import uuid
-    id = uuid.uuid4()
+    user = request.user
+
+    try:
+        existing_result = Result.objects.get(sequence=sequence)
+    except ObjectDoesNotExist:
+        submitted = timezone.now()
+        answer = client.predict(sequence)
+        completed = timezone.now()
+        result = Result.objects.create(sequence=sequence, result=answer)
+    else:
+        result = existing_result
+        submitted = completed = timezone.now() # works also as a isCachedResult flag
+
+    run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
+    num_of_pseudoknots = result.result.count('[')
+    id = run.uuid
     with open('static/css/fornac_min.css') as f:
         lines = f.readlines()
-    css = lines[0]
+    css = lines[0] # pass css to include in svg
+    context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id, 'css': css}
 
-    context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id.hex, 'css': css}
     return render(request, 'results.html', context)
 
 @login_required(redirect_field_name=None)
