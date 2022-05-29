@@ -12,7 +12,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Athens
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y python3 python3-pip pipenv libgsl23 tzdata libcairo2
+RUN apt install -y python3 python3-pip pipenv libgsl23 tzdata libcairo2 libpq-dev postgresql postgresql-contrib
 ENV LANG=en_US.UTF-8
 ENV SHELL=/usr/bin/bash
 RUN mkdir /home/knotify_webserver
