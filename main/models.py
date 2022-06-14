@@ -1,10 +1,13 @@
-from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, CASCADE
+from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE
 from django.contrib.auth.models import User
 import uuid
 
 # Create your models here.
 class Result(Model):
-    sequence = CharField(max_length=256, unique=True)
+    sequence = CharField(max_length=256)
+    pseudoknot_options = JSONField(null=True, blank=True, default=dict)
+    hairpin_options = JSONField(null=True, blank=True, default=dict)
+    energy_options = JSONField(null=True, blank=True, default=dict)
     result = CharField(max_length=256)
 
     def __str__(self):

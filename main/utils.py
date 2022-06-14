@@ -1,5 +1,3 @@
-from logging.config import valid_ident
-from tokenize import String
 from knotify import knotify
 
 class KnotifyClient:
@@ -16,7 +14,7 @@ class KnotifyClient:
             return result.dot_bracket
         else:
             return None
-    
+
     def is_valid_input(self, sequence):
         if sequence and isinstance(sequence, str):
             return set(sequence).issubset({'G', 'C', 'A', 'U'})

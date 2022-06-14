@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from django.views import View
 from .utils import KnotifyClient
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from main.models import Result, Run
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from main.validators import pseudoknot_options_validator, hairpin_options_validator, energy_options_validator
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -64,33 +66,50 @@ def logout_view(request):
     else:
         return JsonResponse({'status':'good'})
 
-@login_required(redirect_field_name=None)
-@require_http_methods(['POST'])
-def results_view(request):
-    sequence = request.POST['sequence'].upper()
-    client = KnotifyClient()
-    user = request.user
 
-    try:
-        existing_result = Result.objects.get(sequence=sequence)
-    except ObjectDoesNotExist:
+# class ResultsView(LoginRequiredMixin, ValidateOptionsMixin, View):
+class ResultsView(LoginRequiredMixin, View):
+    redirect_field_name = None
+
+    def post(self, request):
+        try:
+            sequence = request.POST['sequence'].upper()
+        except:
+            return HttpResponseBadRequest('sequence parameter was not received.')
+        try:
+            pseudoknot_options = json.loads(request.POST.get('pseudoknot_options', '{}'))
+            pseudoknot_options_validator(pseudoknot_options)
+        except Exception as e:
+            return HttpResponseBadRequest('pseudoknot_options validation failed. Exception raised: ', e)
+        try:
+            hairpin_options = json.loads(request.POST.get('hairpin_options', '{}'))
+            hairpin_options_validator(hairpin_options)
+        except Exception as e:
+            return HttpResponseBadRequest('hairpin_options validation failed. Exception raised: ', e)
+        try:
+            energy_options = json.loads(request.POST.get('energy_options', '{}'))
+            energy_options_validator(energy_options)
+        except Exception as e:
+            return HttpResponseBadRequest('energy_options validation failed. Exception raised: ', e)
+
+        client = KnotifyClient()
+        user = request.user
+
         submitted = timezone.now()
         answer = client.predict(sequence)
         completed = timezone.now()
         result = Result.objects.create(sequence=sequence, result=answer)
-    else:
-        result = existing_result
-        submitted = completed = timezone.now() # works also as a isCachedResult flag
 
-    run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
-    num_of_pseudoknots = result.result.count('[')
-    id = run.uuid
-    with open('static/css/fornac_min.css') as f:
-        lines = f.readlines()
-    css = lines[0] # pass css to include in svg
-    context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id, 'css': css}
+        run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
+        num_of_pseudoknots = result.result.count('[')
+        id = run.uuid
+        with open('static/css/fornac_min.css') as f:
+            lines = f.readlines()
+        css = lines[0] # pass css to include in svg
+        context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id, 'css': css}
 
-    return render(request, 'results.html', context)
+        return render(request, 'results.html', context)
+
 
 @login_required(redirect_field_name=None)
 @require_http_methods(['POST'])
