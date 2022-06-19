@@ -67,7 +67,6 @@ def logout_view(request):
         return JsonResponse({'status':'good'})
 
 
-# class ResultsView(LoginRequiredMixin, ValidateOptionsMixin, View):
 class ResultsView(LoginRequiredMixin, View):
     redirect_field_name = None
 
@@ -76,24 +75,55 @@ class ResultsView(LoginRequiredMixin, View):
             sequence = request.POST['sequence'].upper()
         except:
             return HttpResponseBadRequest('sequence parameter was not received.')
-        try:
-            pseudoknot_options = json.loads(request.POST.get('pseudoknot_options', '{}'))
-            pseudoknot_options_validator(pseudoknot_options)
-        except Exception as e:
-            return HttpResponseBadRequest('pseudoknot_options validation failed. Exception raised: ', e)
-        try:
-            hairpin_options = json.loads(request.POST.get('hairpin_options', '{}'))
-            hairpin_options_validator(hairpin_options)
-        except Exception as e:
-            return HttpResponseBadRequest('hairpin_options validation failed. Exception raised: ', e)
-        try:
-            energy_options = json.loads(request.POST.get('energy_options', '{}'))
-            energy_options_validator(energy_options)
-        except Exception as e:
-            return HttpResponseBadRequest('energy_options validation failed. Exception raised: ', e)
 
-        client = KnotifyClient()
-        user = request.user
+        PSEUDOKNOT_OPTIONS_FIELDS = [
+            'parser', 'allow_ug', 'allow_skip_final_au', 'max_dd_size',
+            'min_dd_size', 'max_window_size', 'min_window_size',
+            'max_window_size_ratio', 'min_window_size_ratio',
+            'max_stem_allow_smaller', 'prune_early'
+        ]
+        PSEUDOKNOT_OPTIONS_TYPES = {
+            'parser': str, 'allow_ug': bool,
+            'allow_skip_final_au': bool, 'max_dd_size': int,
+            'min_dd_size': int, 'max_window_size': int,
+            'min_window_size': int, 'max_window_size_ratio': float,
+            'min_window_size_ratio': float, 'max_stem_allow_smaller': int,
+            'prune_early': bool
+        }
+        # Note that bool fields don't get send if their ui checkbox is not checked
+        force_pseudoknot_type = lambda key, value: PSEUDOKNOT_OPTIONS_TYPES[key](value)
+        pseudoknot_options = {key:force_pseudoknot_type(key,request.POST[key]) for key in PSEUDOKNOT_OPTIONS_FIELDS if key in request.POST}
+        print(f'{pseudoknot_options = }')
+
+
+        HAIRPIN_OPTIONS_FIELDS = [
+            'hairpin_grammar', 'hairpin_allow_ug',
+            'min_hairpin_size', 'min_hairpin_stems',
+            'max_hairpins_per_loop', 'max_hairpin_bulge'
+        ]
+        HAIRPIN_OPTIONS_TYPES = {
+            'hairpin_grammar': str, 'hairpin_allow_ug': bool,
+            'min_hairpin_size': int, 'min_hairpin_stems': int,
+            'max_hairpins_per_loop': int, 'max_hairpin_bulge': int
+        }
+        force_hairpin_type = lambda key, value: HAIRPIN_OPTIONS_TYPES[key](value)
+        hairpin_options = {key:force_hairpin_type(key,request.POST[key]) for key in HAIRPIN_OPTIONS_FIELDS if key in request.POST}
+        print(f'{hairpin_options = }')
+        if 'hairpin_grammar' in hairpin_options and not hairpin_options['hairpin_grammar']:
+            del hairpin_options['hairpin_grammar']
+
+        ENERGY_OPTIONS_FIELDS = ['energy', 'pkenergy']
+        ENERGY_OPTIONS_TYPES = { 'energy': str }
+        force_energy_type = lambda key, value: ENERGY_OPTIONS_TYPES[key](value)
+        energy_options = {key:force_energy_type(key,request.POST[key]) for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
+        print(f'{energy_options = }')
+
+        options = {**pseudoknot_options, **hairpin_options, **energy_options}
+        try:
+            client = KnotifyClient(options)
+            user = request.user
+        except:
+            return HttpResponseBadRequest('Prediction failed to run. Please try again.')
 
         submitted = timezone.now()
         answer = client.predict(sequence)

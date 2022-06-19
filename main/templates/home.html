@@ -19,6 +19,105 @@
             <div>Enter your RNA sequence here.</div>
             <input type="text" class="form-control my-2" id="RNA-sequence" name="sequence" placeholder="" oninput="this.value = this.value.replace(/[^aAuUgGcC]/g, '');" required>
         </div>
+        <div>
+            <h5>Options</h5>
+            <hr style="margin:0px;">
+        </div>
+        <div class="row mt-2 mb-3">
+            <div class="col border">
+                <span class="option-title">Pseudoknot Options</span>
+                <div style="border: 1px solid black;">
+                    <div>Parser:</div>
+                    <div>
+                        <input type="radio" name="parser" value="yaep" id="yaep" checked>
+                        <label for="yaep">yaep</label>
+                        <input type="radio" name="parser" value="bruteforce" id="bruteforce">
+                        <label for="bruteforce">bruteforce</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="allow-ug" name="allow_ug" value="True">
+                        <label for="allow-ug">allow-ug</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="allow-skip-final-au" name="allow_skip_final_au" value="True">
+                        <label for="allow-skip-final-au">allow-skip-final-au</label>
+                    </div>
+                    <div>
+                        <label for="max-dd-size">max-dd-size:</label>
+                        <input type="number" id="max-dd-size" name="max_dd_size" value="2" min="0" max="20" style="width:50px" required>
+                    </div>
+                    <div>
+                        <label for="min-dd-size">min-dd-size:</label>
+                        <input type="number" id="min-dd-size" name="min_dd_size" value="0" min="0" max="20" style="width:50px" required>
+                    </div>
+                    <div>
+                        <label for="max-window-size">max-window-size:</label>
+                        <input type="number" id="max-window-size" name="max_window_size" value="204" min="6" max="1000" style="width:70px" required>
+                    </div>
+                    <div>
+                        <label for="min-window-size">min-window-size:</label>
+                        <input type="number" id="min-window-size" name="min_window_size" value="6" min="6" max="1000" style="width:70px" required>
+                    </div>
+                    <div>
+                        <label for="max-window-size-ratio">max-window-size-ratio:</label>
+                        <input type="text" id="max-window-size-ratio" name="max_window_size_ratio" value="0" minlength="0" maxlength="10"  size="5" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" pattern="^[0]?\.[0-9]+$|^0$|^1$|^1.0$" required>
+                    </div>
+                    <div>
+                        <label for="min-window-size-ratio">min-window-size-ratio:</label>
+                        <input type="text" id="min-window-size-ratio" name="min_window_size_ratio" value="0" minlength="0" maxlength="10"  size="5" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" pattern="^[0]?\.[0-9]+$|^0$|^1$|^1.0$" required>
+                    </div>
+                    <div>
+                        <label for="max-stem-allow-smaller">max-stem-allow-smaller:</label>
+                        <input type="number" id="max-stem-allow-smaller" name="max_stem_allow_smaller" value="2" min="0" max="10" style="width:70px" required>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="prune-early" name="prune_early" value="True">
+                        <label for="prune-early">prune-early</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col border">
+                <span class="option-title">Hairpin Options</span>
+                <div style="border: 1px solid black;">
+                    <div>
+                        <label for="hairpin-grammar">hairpin-grammar:</label>
+                        <input type="text" id="hairpin-grammar" name="hairpin_grammar" value="" minlength="0" maxlength="10"  size="5">
+                    </div>
+                    <div>
+                        <input type="checkbox" id="hairpin-allow-ug" name="hairpin_allow_ug" value="True">
+                        <label for="hairpin-allow-ug">hairpin-allow-ug</label>
+                    </div>
+                    <div>
+                        <label for="min-hairpin-size">min-hairpin-size:</label>
+                        <input type="number" id="min-hairpin-size" name="min_hairpin_size" value="3" min="1" max="10" style="width:70px" required>
+                    </div>
+                    <div>
+                        <label for="min-hairpin-stems">min-hairpin-stems:</label>
+                        <input type="number" id="min-hairpin-stems" name="min_hairpin_stems" value="3" min="1" max="20" style="width:70px" required>
+                    </div>
+                    <div>
+                        <label for="max-hairpins-per-loop">max-hairpins-per-loop:</label>
+                        <input type="number" id="max-hairpins-per-loop" name="max_hairpins_per_loop" value="1" min="0" max="2" style="width:70px" required>
+                    </div>
+                    <div>
+                        <label for="max-hairpin-bulge">max-hairpin-bulge:</label>
+                        <input type="number" id="max-hairpin-bulge" name="max_hairpin_bulge" value="0" min="0" max="5" style="width:70px" required>
+                    </div>
+                </div>
+
+                <span class="option-title mt-3 d-block">Energy Options</span>
+                <div style="border: 1px solid black;">
+                    <div>energy:</div>
+                    <div>
+                        <input type="radio" name="energy" value="vienna" id="vienna" checked>
+                        <label for="vienna">vienna</label>
+                        <input type="radio" name="energy" value="pkenergy" id="pkenergy">
+                        <label for="pkenergy">pkenergy</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 {% endblock %}

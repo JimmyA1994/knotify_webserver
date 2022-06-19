@@ -10,3 +10,29 @@ function sendInput(){
     console.log("input: ", input);
     console.log('sent!!!');
 }
+
+function correctWindowSize(){
+    // window size should not exceed sequence's length.
+    // Enforce this on window-size change.
+    console.log('correcting..');
+    var sequence = document.getElementById("RNA-sequence");
+    if (!sequence) return;
+
+    var N = sequence.value.length;
+    var maxWindowSize = document.getElementById("max-window-size");
+    if (maxWindowSize.valueAsNumber > N) maxWindowSize.value = N;
+    var minWindowSize = document.getElementById("min-window-size");
+    if (minWindowSize.valueAsNumber > N) minWindowSize.value = N;
+}
+
+
+window.addEventListener('load', function() {
+    console.log('All assets are loaded')
+    var maxWindowSize = document.getElementById("max-window-size");
+    maxWindowSize.addEventListener("change", correctWindowSize);
+    var minWindowSize = document.getElementById("min-window-size");
+    minWindowSize.addEventListener("change", correctWindowSize);
+
+    var sequence = document.getElementById("RNA-sequence");
+    sequence.addEventListener("focusout", correctWindowSize);
+})
