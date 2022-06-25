@@ -10,10 +10,11 @@ class KnotifyClient:
         self.options(args=[])
 
         # validate options
-        pseudoknot_options = self.validate_pseudoknot_options(pseudoknot_options)
-        hairpin_options = self.validate_hairpin_options(hairpin_options)
-        energy_options = self.validate_energy_options(energy_options)
-        options_dict = {**pseudoknot_options, **hairpin_options, **energy_options}
+        self.validated_pseudoknot_options = self.validate_pseudoknot_options(pseudoknot_options)
+        self.validated_hairpin_options = self.validate_hairpin_options(hairpin_options)
+        self.validated_energy_options = self.validate_energy_options(energy_options)
+        options_dict = {**self.validated_pseudoknot_options, **self.validated_hairpin_options,
+                        **self.validated_energy_options}
 
         # pass the pseudoknot, hairpin and energy options
         for key, value in options_dict.items():

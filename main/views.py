@@ -10,8 +10,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from main.models import Result, Run
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
-from main.validators import pseudoknot_options_validator, hairpin_options_validator, energy_options_validator
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -105,7 +103,9 @@ class ResultsView(LoginRequiredMixin, View):
         submitted = timezone.now()
         answer = client.predict()
         completed = timezone.now()
-        result = Result.objects.create(sequence=sequence, result=answer)
+        result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
+                                       hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
+                                       result=answer)
 
         run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
         num_of_pseudoknots = result.result.count('[')
@@ -113,7 +113,11 @@ class ResultsView(LoginRequiredMixin, View):
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
-        context = {'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots, 'uuid': id, 'css': css}
+        context = {
+            'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots,
+            'uuid': id, 'css': css, 'pseudoknot_options': client.validated_pseudoknot_options,
+            'hairpin_options': client.validated_hairpin_options, 'energy_options': client.validated_energy_options
+        }
 
         return render(request, 'results.html', context)
 
