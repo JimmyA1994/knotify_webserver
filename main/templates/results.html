@@ -40,12 +40,13 @@
         </div>
         <div class="row mb-3">
             <div class="d-flex flex-row-reverse"><a data-bs-toggle="collapse" href="#prediction-options" role="button" aria-expanded="false" aria-controls="prediction-options">Prediction options</a></div>
-            <div class="collapse" id="prediction-options">
-                <div class="card card-body">
+            <div class="collapse light-background" id="prediction-options">
+                <div class="card card-body light-background border-0">
                     <div class="row mt-2 mb-3">
                         <div class="col border">
-                            <span>Pseudoknot Options</span>
-                            <div style="border: 1px solid black;">
+                            <span class="options-title">Pseudoknot Options</span>
+                            <hr>
+                            <div>
                                 <div>parser: "{{pseudoknot_options.parser}}"</div>
                                 <div>allow-ug: {{pseudoknot_options.allow_ug|default:"False"}}</div>
                                 <div>allow-skip-final-au: {{pseudoknot_options.allow_skip_final_au|default:"False"}}</div>
@@ -58,8 +59,9 @@
                             </div>
                         </div>
                         <div class="col border">
-                            <span>Hairpin Options</span>
-                            <div style="border: 1px solid black;">
+                            <span class="options-title">Hairpin Options</span>
+                            <hr>
+                            <div>
                                 <div>hairpin-grammar: "{{hairpin_options.hairpin_grammar|default:""}}"</div>
                                 <div>hairpin-allow-ug: {{hairpin_options.hairpin_allow_ug|default:"False"}}</div>
                                 <div>min-hairpin-size: {{hairpin_options.min_hairpin_size}}</div>
@@ -69,8 +71,9 @@
                             </div>
                         </div>
                         <div class="col border">
-                            <span>Energy Options</span>
-                            <div style="border: 1px solid black;">
+                            <span class="options-title">Energy Options</span>
+                            <hr>
+                            <div>
                                 <div>energy: "{{energy_options.energy}}"</div>
                             </div>
                         </div>
