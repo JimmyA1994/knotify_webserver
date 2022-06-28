@@ -144,3 +144,12 @@ def convert_svg_view(request):
     else:
         return HttpResponseBadRequest('Format is not supported. Please select one of the following formats: png, ps, pdf.')
     return HttpResponse(b64_binary)
+
+class InteractiveView(LoginRequiredMixin, View):
+    redirect_field_name = None
+
+    def get(self, request):
+        sequence = 'CGCGCGCUGUUUUUCUCGCUGACUUUCAGCGGGCGAAAAAAAUGUCAGCU'
+        result = '..............((((((((.[[)))))))).............]]..'
+        context = {'sequence': sequence, 'result': result}
+        return render(request, 'interactive.html', context)
