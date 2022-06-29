@@ -4,27 +4,41 @@
     <head>
         <meta charset="utf-8">
         <title>Interactive</title>
+        <link rel="shortcut icon" type="image/png" href="{% static 'images/ntua.svg' %}"/>
         <script src="https://unpkg.com/d3@3.5"></script>
         <script src="{% static 'js/fornac.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/fornac.css' %}">
         <link rel="stylesheet" href="{% static 'css/interactive.css' %}">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     </head>
     <body>
-        {% comment %} <div style="height:100%">
-            <div id='rna_ss' class="mb-2"></div>
-        </div>
-        <nav class="navbar fixed-bottom navbar-light bg-light">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="#">Fixed bottom</a>
-            </div>
-        </nav> {% endcomment %}
         <div class="main-body">
             <div id="rna_ss" class="mb-2"></div>
         </div>
         <div class="footer">
-            Here there are a lot of buttons!
+            <div class="form-check form-check-inline form-switch">
+                <input class="form-check-input" role="switch" type="checkbox" id="animateCheckbox" value="option1" checked>
+                <label class="form-check-label" for="animateCheckbox">Animate</label>
+            </div>
+            <div class="form-check form-check-inline form-switch">
+                <input class="form-check-input" role="switch" type="checkbox" id="numberingCheckbox" value="option2" checked>
+                <label class="form-check-label" for="numberingCheckbox">Display Numbering</label>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.container.centerView()">Center molecules</button>
+            <div class="btn-group dropup">
+                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    Color Scheme
+                </button>
+                <ul class="dropdown-menu">
+                    <li><h6 class="dropdown-header">Color scheme</h6></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" id="dropdown-item1" onclick="window.container.changeColorScheme('sequence'); selectDropdown(1);">Sequence</a></li>
+                    <li><a class="dropdown-item" id="dropdown-item2" onclick="window.container.changeColorScheme('structure'); selectDropdown(2);" style="background: #7A7978; color: #FFFFFF">Structure</a></li>
+                    <li><a class="dropdown-item" id="dropdown-item3" onclick="window.container.changeColorScheme('positions'); selectDropdown(3);">Positions</a></li>
+                </ul>
+            </div>
         </div>
         <script>
             function createContainer(width, height) {
@@ -39,15 +53,19 @@
                 container.addRNA(options.structure, options);
                 return container;
             }
+
             function init() {
                 window.container = createContainer(window.width, window.height);
                 setSize();
-                // window.container.centerView();
             }
 
             function setSize() {
-                // get size of main-body element
+                /** Replica of forna.setSize that resizes plot to main-body current size */
+
+                // Get size of main-body element
                 var mainBody = document.querySelector(".main-body");
+                // Divide by 4 to have plot occupy most space.
+                // The bigger the divisor the bigger the plot.
                 window.width = mainBody.offsetWidth/4;
                 window.height = mainBody.offsetHeight/4;
 
@@ -57,8 +75,6 @@
                 var options = window.container.options;
 
                 // set the viewBox
-                // var svg = document.querySelector("svg");
-                // svg.setAttribute('viewBox', "0 0 " + svgW + " " + svgH);
                 var svg = window.container.options.svg;
                 svg.attr('viewBox', "0 0 " + window.width + " " + window.height)
 
@@ -72,15 +88,59 @@
                 window.container.zoomer.x(xScale).y(yScale);
                 window.container.brusher.x(xScale).y(yScale);
 
-                //resize the background
+                // resize the background
                 svg.select('.background').attr('width', window.width).attr('height', window.height);
 
                 // center the view
                 window.container.centerView();
             }
 
+            function selectDropdown(item) {
+                /** enforces color scheme selected dropdown item style */
+
+                // unset all items
+                var item1 = document.getElementById("dropdown-item1");
+                item1.style.background = "#FFFFFF";
+                item1.style.color = "#000000";
+                var item2 = document.getElementById("dropdown-item2");
+                item2.style.background = "#FFFFFF";
+                item2.style.color = "#000000";
+                var item3 = document.getElementById("dropdown-item3");
+                item3.style.background = "#FFFFFF";
+                item3.style.color = "#000000";
+
+                // set selected item
+                var item = document.getElementById("dropdown-item"+item);
+                item.style.background = "#7A7978";
+                item.style.color = "#FFFFFF";
+            }
+
             window.onload = init;
             window.addEventListener('resize', setSize);
+
+            // register animation checkbox evenet listener
+            document.getElementById("animateCheckbox").checked = true;
+            var checkbox = document.querySelector("#animateCheckbox");
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    window['container'].startAnimation()
+                    console.log("Checkbox is checked..");
+                } else {
+                    window['container'].stopAnimation()
+                    console.log("Checkbox is not checked..");
+                }
+            });
+
+            // register numbering checkbox evenet listener
+            document.getElementById("numberingCheckbox").checked = true;
+            var numberingCheckbox = document.querySelector("#numberingCheckbox");
+            numberingCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    window['container'].displayNumbering(true);
+                } else {
+                    window['container'].displayNumbering(false);
+                }
+            });
         </script>
     </body>
 </html>
