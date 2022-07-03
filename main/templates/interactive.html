@@ -7,6 +7,7 @@
         <link rel="shortcut icon" type="image/png" href="{% static 'images/ntua.svg' %}"/>
         <script src="https://unpkg.com/d3@3.5"></script>
         <script src="{% static 'js/fornac.js' %}"></script>
+        <script src="{% static 'js/interactive.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/fornac.css' %}">
         <link rel="stylesheet" href="{% static 'css/interactive.css' %}">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -40,107 +41,5 @@
                 </ul>
             </div>
         </div>
-        <script>
-            function createContainer(width, height) {
-                var seq = 'AAAACCGGGCCUUUUACCCCAAAUUGGAA';
-                var str = '......(((..[[[[[.)))....]]]]]';
-                var container = new fornac.FornaContainer("#rna_ss",
-                {'animation': true, 'zoomable': true, 'initialSize':[width, height]});
-
-                 var options = {'structure': str,
-                    'sequence': seq
-                };
-                container.addRNA(options.structure, options);
-                return container;
-            }
-
-            function init() {
-                window.container = createContainer(window.width, window.height);
-                setSize();
-            }
-
-            function setSize() {
-                /** Replica of forna.setSize that resizes plot to main-body current size */
-
-                // Get size of main-body element
-                var mainBody = document.querySelector(".main-body");
-                // Divide by 4 to have plot occupy most space.
-                // The bigger the divisor the bigger the plot.
-                window.width = mainBody.offsetWidth/4;
-                window.height = mainBody.offsetHeight/4;
-
-                // save width and height
-                window.container.options.svgW = window.width;
-                window.container.options.svgH = window.height;
-                var options = window.container.options;
-
-                // set the viewBox
-                var svg = window.container.options.svg;
-                svg.attr('viewBox', "0 0 " + window.width + " " + window.height)
-
-                // Set the output range of the scales
-                var xScale = d3.scale.linear().domain([0, options.svgW]).range([0, options.svgW]);
-                xScale.range([0, window.width]).domain([0, window.width]);
-                var yScale = d3.scale.linear().domain([0, options.svgH]).range([0,  options.svgH]);
-                yScale.range([0, window.height]).domain([0, window.height]);
-
-                // re-attach the scales to the zoom behaviour
-                window.container.zoomer.x(xScale).y(yScale);
-                window.container.brusher.x(xScale).y(yScale);
-
-                // resize the background
-                svg.select('.background').attr('width', window.width).attr('height', window.height);
-
-                // center the view
-                window.container.centerView();
-            }
-
-            function selectDropdown(item) {
-                /** enforces color scheme selected dropdown item style */
-
-                // unset all items
-                var item1 = document.getElementById("dropdown-item1");
-                item1.style.background = "#FFFFFF";
-                item1.style.color = "#000000";
-                var item2 = document.getElementById("dropdown-item2");
-                item2.style.background = "#FFFFFF";
-                item2.style.color = "#000000";
-                var item3 = document.getElementById("dropdown-item3");
-                item3.style.background = "#FFFFFF";
-                item3.style.color = "#000000";
-
-                // set selected item
-                var item = document.getElementById("dropdown-item"+item);
-                item.style.background = "#7A7978";
-                item.style.color = "#FFFFFF";
-            }
-
-            window.onload = init;
-            window.addEventListener('resize', setSize);
-
-            // register animation checkbox evenet listener
-            document.getElementById("animateCheckbox").checked = true;
-            var checkbox = document.querySelector("#animateCheckbox");
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    window['container'].startAnimation()
-                    console.log("Checkbox is checked..");
-                } else {
-                    window['container'].stopAnimation()
-                    console.log("Checkbox is not checked..");
-                }
-            });
-
-            // register numbering checkbox evenet listener
-            document.getElementById("numberingCheckbox").checked = true;
-            var numberingCheckbox = document.querySelector("#numberingCheckbox");
-            numberingCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    window['container'].displayNumbering(true);
-                } else {
-                    window['container'].displayNumbering(false);
-                }
-            });
-        </script>
     </body>
 </html>
