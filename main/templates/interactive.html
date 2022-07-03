@@ -19,29 +19,60 @@
             <div id="rna_ss" class="mb-2"></div>
         </div>
         <div class="footer">
-            <div class="form-check form-check-inline form-switch">
-                <input class="form-check-input" role="switch" type="checkbox" id="animateCheckbox" value="option1" checked>
-                <label class="form-check-label" for="animateCheckbox">Animate</label>
-            </div>
-            <div class="form-check form-check-inline form-switch">
-                <input class="form-check-input" role="switch" type="checkbox" id="numberingCheckbox" value="option2" checked>
-                <label class="form-check-label" for="numberingCheckbox">Display Numbering</label>
-            </div>
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.container.centerView()">Center molecules</button>
             <div class="btn-group dropup">
                 <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    Color Scheme
+                    Presentation
                 </button>
                 <ul class="dropdown-menu">
-                    <li><h6 class="dropdown-header">Color scheme</h6></li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
+                    <li class="li-hr"><hr class="dropdown-divider"></li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="numberingCheckbox" checked>
+                            <label class="form-check-label" for="numberingCheckbox">Numbering</label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
+                            <label class="form-check-label" for="nodeLabelCheckbox">Node Label</label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="pseudoknotCheckbox" checked>
+                            <label class="form-check-label" for="pseudoknotCheckbox">Pseudoknot Links</label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="directionArrowsCheckbox" checked>
+                            <label class="form-check-label" for="directionArrowsCheckbox">Direction Arrows</label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="linksCheckbox" checked>
+                            <label class="form-check-label" for="linksCheckbox">Links</label>
+                        </div>
+                    </li>
+                    <li class="li-hr"><hr class="dropdown-divider"></li>
+                    <li class="li-dropdown-header"><h6 class="dropdown-header">Color Scheme</h6></li>
+                    <li class="li-hr"><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" id="dropdown-item1" onclick="window.container.changeColorScheme('sequence'); selectDropdown(1);">Sequence</a></li>
                     <li><a class="dropdown-item" id="dropdown-item2" onclick="window.container.changeColorScheme('structure'); selectDropdown(2);" style="background: #7A7978; color: #FFFFFF">Structure</a></li>
                     <li><a class="dropdown-item" id="dropdown-item3" onclick="window.container.changeColorScheme('positions'); selectDropdown(3);">Positions</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <div class="form-check form-check-inline form-switch">
+                            <input class="form-check-input" role="switch" type="checkbox" id="animateCheckbox" checked>
+                            <label class="form-check-label" for="animateCheckbox">Animate</label>
+                        </div>
+                    </li>
                 </ul>
             </div>
             <button type="button" class="btn btn-primary btn-sm" onclick="window.container.centerView()">Center molecules</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="reset()">Reset</button>
-        </div>
+         </div>
     </body>
 </html>
