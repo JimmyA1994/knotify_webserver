@@ -89,8 +89,6 @@ function reset() {
 }
 
 function init(){
-    // generate the container
-    init_container();
 
     // register plot sizing on every window resizing
     window.addEventListener('resize', setSize);
@@ -160,6 +158,18 @@ function init(){
             window.container.displayLinks(false);
         }
     });
+
+    // from download.js
+    register_download_events();
+
+    // load css text to window
+    window.css = document.getElementById("css_text").textContent;
+
+    // get svg from svg_ss element
+    window.plotType = 'interactive'
+
+    // generate the container
+    init_container();
 }
 
 //

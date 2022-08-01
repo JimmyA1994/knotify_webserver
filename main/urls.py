@@ -8,6 +8,6 @@ urlpatterns = [
     path('login/login/', process_login_view, name='process_login'),
     path('logout/', logout_view, name='logout'),
     path('results/', ResultsView.as_view(), name='results'),
-    path('results/convert_svg', convert_svg_view, name='convert_svg'),
+    path('convert_svg', convert_svg_view, name='convert_svg'),
     path('interactive/', InteractiveView.as_view(), name='interactive'),
 ]

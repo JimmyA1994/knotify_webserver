@@ -32,3 +32,11 @@ hr {
 li {
     padding: 5px;
 }
+
+.presentation-li:hover {
+    background-color: #e9ecef;
+}
+
+.presentation-option:hover{
+    cursor: pointer;
+}

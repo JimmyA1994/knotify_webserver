@@ -8,13 +8,16 @@
         <script src="https://unpkg.com/d3@3.5"></script>
         <script src="{% static 'js/fornac.js' %}"></script>
         <script src="{% static 'js/interactive.js' %}"></script>
+        <script src="{% static 'js/download.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/fornac.css' %}">
         <link rel="stylesheet" href="{% static 'css/interactive.css' %}">
+        <link rel="stylesheet" href="{% static 'css/download.css' %}">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     </head>
     <body>
+        <div style="display:none;" id="css_text">{{css}}</div>
         <div class="main-body">
             <div id="rna_ss" class="mb-2"></div>
         </div>
@@ -26,34 +29,34 @@
                 <ul class="dropdown-menu">
                     <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
                     <li class="li-hr"><hr class="dropdown-divider"></li>
-                    <li>
+                    <li class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="numberingCheckbox" checked>
-                            <label class="form-check-label" for="numberingCheckbox">Numbering</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="numberingCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="numberingCheckbox">Numbering</label>
                         </div>
                     </li>
-                    <li>
+                    <li class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
-                            <label class="form-check-label" for="nodeLabelCheckbox">Node Label</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="nodeLabelCheckbox">Node Label</label>
                         </div>
                     </li>
-                    <li>
+                    <li class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="pseudoknotCheckbox" checked>
-                            <label class="form-check-label" for="pseudoknotCheckbox">Pseudoknot Links</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="pseudoknotCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="pseudoknotCheckbox">Pseudoknot Links</label>
                         </div>
                     </li>
-                    <li>
+                    <li class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="directionArrowsCheckbox" checked>
-                            <label class="form-check-label" for="directionArrowsCheckbox">Direction Arrows</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="directionArrowsCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="directionArrowsCheckbox">Direction Arrows</label>
                         </div>
                     </li>
-                    <li>
+                    <li class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="linksCheckbox" checked>
-                            <label class="form-check-label" for="linksCheckbox">Links</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="linksCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="linksCheckbox">Links</label>
                         </div>
                     </li>
                     <li class="li-hr"><hr class="dropdown-divider"></li>
@@ -63,16 +66,110 @@
                     <li><a class="dropdown-item" id="dropdown-item2" onclick="window.container.changeColorScheme('structure'); selectDropdown(2);" style="background: #7A7978; color: #FFFFFF">Structure</a></li>
                     <li><a class="dropdown-item" id="dropdown-item3" onclick="window.container.changeColorScheme('positions'); selectDropdown(3);">Positions</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li>
+                    <li  class="presentation-li">
                         <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input" role="switch" type="checkbox" id="animateCheckbox" checked>
-                            <label class="form-check-label" for="animateCheckbox">Animate</label>
+                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="animateCheckbox" checked>
+                            <label class="form-check-label presentation-option" for="animateCheckbox">Animate</label>
                         </div>
                     </li>
                 </ul>
             </div>
             <button type="button" class="btn btn-primary btn-sm" onclick="window.container.centerView()">Center molecules</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="reset()">Reset</button>
-         </div>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
+        </div>
+
+        <!-- Download Modal -->
+        <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Download Menu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Adjust the options to your liking and press download
+                        <div class="row">
+                            <div class="col-3" style="border-right: 1px black solid">
+                                <div class="ms-1 mt-2">Format:</div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="svg" id="svg-radio" checked>
+                                    <label class="form-check-label" for="svg-radio">svg</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="png" id="img-radio1">
+                                    <label class="form-check-label" for="img-radio1">png</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="ps" id="img-radio2">
+                                    <label class="form-check-label" for="img-radio2">ps</label>
+                                </div>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="radio" name="pdf" id="img-radio3">
+                                    <label class="form-check-label" for="img-radio3">pdf</label>
+                                </div>
+                            </div>
+                            <div class="col-9">
+                                <div class="form-check ms-1 mt-2" style="display: block;" id="download-svg-options">
+                                    <input class="form-check-input" type="checkbox" id="background-check" name="background-check" checked>
+                                    <label class="form-check-label">Background</label>
+                                </div>
+                                <div style="display: none;" id="download-img-options">
+                                    <div class="ms-1 mt-2">Resolution:</div>
+                                    <div class="form-check ms-1">
+                                        <input class="form-check-input" type="radio" name="1280x720" id="size-radio1" checked>
+                                        <label class="form-check-label" for="size-radio1">720p</label>
+                                    </div>
+                                    <div class="form-check ms-1">
+                                        <input class="form-check-input" type="radio" name="1920x1080" id="size-radio2">
+                                        <label class="form-check-label" for="size-radio2">1080p</label>
+                                    </div>
+                                    <div class="form-check ms-1">
+                                        <input class="form-check-input" type="radio" name="2560x1440" id="size-radio3">
+                                        <label class="form-check-label" for="size-radio3">2k</label>
+                                    </div>
+                                    <div class="form-check ms-1">
+                                        <input class="form-check-input" type="radio" name="3840x2160" id="size-radio4">
+                                        <label class="form-check-label" for="size-radio4">4k</label>
+                                    </div>
+                                    <div class="form-check ms-1">
+                                        <input class="form-check-input d-inline-block" type="radio" name="custom" id="size-radio5">
+                                        <label class="form-check-label d-inline-block" for="size-radio5">Custom:</label>
+                                        <input type="text" id="size-width" style="width: 55px; height: 22px" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" disabled>
+                                        <span style="font-size: 12px">px</span>
+                                        <input type="text" id="size-height" style="width: 55px; height: 22px" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" disabled>
+                                        <span style="font-size: 12px">px</span>
+                                        <!-- <textarea class="d-inline-block" id="width-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
+                                        <!-- <textarea class="d-inline-block" id="height-text-area" name="w3review" rows="1" cols="4" maxlength="4" disabled></textarea> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="d-inline-block">
+                                Name:
+                                <!-- <input type="text" id="name-input" style="width: 260px; height: 22px" maxlength="32"> -->
+                                <input type="text" id="name-input" maxlength="32" oninput="this.value = this.value.replace(/[^a-zA-Z_0-9 ]/g, '')"">
+                                <button id="clear-name-button" onclick="clear_name()">&#10006;</button>
+                            </div>
+                            <!-- <div class="d-inline-block"> -->
+                                <!-- <textarea id="name-text-area" name="w3review" rows="1" cols="24" maxlength="24"></textarea> -->
+                            <!-- </div> -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <!-- <button type="button" class="btn btn-primary" onclick="download_svg()">Download</button> -->
+                            <button type="button" class="btn btn-primary" onclick="download_img()" id="modalDownloadButton">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                                </svg>
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

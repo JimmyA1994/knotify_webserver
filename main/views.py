@@ -151,5 +151,8 @@ class InteractiveView(LoginRequiredMixin, View):
     def get(self, request):
         sequence = 'CGCGCGCUGUUUUUCUCGCUGACUUUCAGCGGGCGAAAAAAAUGUCAGCU'
         result = '..............((((((((.[[)))))))).............]]..'
-        context = {'sequence': sequence, 'result': result}
+        with open('static/css/fornac_min.css') as f:
+            lines = f.readlines()
+        css = lines[0] # pass css to include in svg
+        context = {'sequence': sequence, 'result': result, 'css': css}
         return render(request, 'interactive.html', context)
