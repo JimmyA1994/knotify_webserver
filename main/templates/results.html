@@ -21,7 +21,7 @@
         </div>
         <div id="root" class="row">
             <div id="sequence" class="results invisible">{{ sequence }}</div>
-            <div id="structure" class="results invisible">{{ answer }}</div>
+            <div id="structure" class="results invisible">{{ structure }}</div>
         </div>
         <div class="row">
             <div class="d-flex flex-row-reverse">
@@ -122,6 +122,12 @@
                 </div>
             </div>
             <div class="col-6 text-end">
+                <form action="../interactive/" method="POST" style="display:inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="sequence" value="{{sequence}}">
+                    <input type="hidden" name="structure" value="{{structure}}">
+                    <button type="submit" class="btn btn-success">Interactive Mode</button>
+                </form>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
             </div>
         </div>

@@ -1,6 +1,6 @@
 function createContainer(width, height) {
-    var seq = 'AAAACCGGGCCUUUUACCCCAAAUUGGAA';
-    var str = '......(((..[[[[[.)))....]]]]]';
+    var seq = window.sequence;
+    var str = window.structure;
     var container = new fornac.FornaContainer("#rna_ss",
     {'animation': true, 'zoomable': true, 'initialSize':[width, height]});
 
@@ -162,8 +162,10 @@ function init(){
     // from download.js
     register_download_events();
 
-    // load css text to window
+    // receive django template context data and save it globally
     window.css = document.getElementById("css_text").textContent;
+    window.sequence = document.getElementById("sequence").textContent;
+    window.structure = document.getElementById("structure").textContent;
 
     // get svg from svg_ss element
     window.plotType = 'interactive'

@@ -101,11 +101,11 @@ class ResultsView(LoginRequiredMixin, View):
             return HttpResponseBadRequest('Prediction failed to run. Please try again.')
 
         submitted = timezone.now()
-        answer = client.predict()
+        structure = client.predict()
         completed = timezone.now()
         result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
                                        hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
-                                       result=answer)
+                                       result=structure)
 
         run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
         num_of_pseudoknots = result.result.count('[')
@@ -114,7 +114,7 @@ class ResultsView(LoginRequiredMixin, View):
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
         context = {
-            'sequence': sequence, 'answer': answer, 'num_of_pseudoknots': num_of_pseudoknots,
+            'sequence': sequence, 'structure': structure, 'num_of_pseudoknots': num_of_pseudoknots,
             'uuid': id, 'css': css, 'pseudoknot_options': client.validated_pseudoknot_options,
             'hairpin_options': client.validated_hairpin_options, 'energy_options': client.validated_energy_options
         }
@@ -148,11 +148,12 @@ def convert_svg_view(request):
 class InteractiveView(LoginRequiredMixin, View):
     redirect_field_name = None
 
-    def get(self, request):
-        sequence = 'CGCGCGCUGUUUUUCUCGCUGACUUUCAGCGGGCGAAAAAAAUGUCAGCU'
-        result = '..............((((((((.[[)))))))).............]]..'
+    def post(self, request):
+        data = request.POST
+        sequence = data.get('sequence')
+        structure = data.get('structure')
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
-        context = {'sequence': sequence, 'result': result, 'css': css}
+        context = {'sequence': sequence, 'structure': structure, 'css': css}
         return render(request, 'interactive.html', context)
