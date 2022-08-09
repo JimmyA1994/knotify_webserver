@@ -88,8 +88,12 @@ class ResultsView(LoginRequiredMixin, View):
             'max_hairpins_per_loop', 'max_hairpin_bulge'
         ]
         hairpin_options = {key:request.POST[key] for key in HAIRPIN_OPTIONS_FIELDS if key in request.POST}
-        if 'hairpin_grammar' in hairpin_options and not hairpin_options['hairpin_grammar']:
-            del hairpin_options['hairpin_grammar']
+        # traslate hairpin_grammar checkbox to the corresponding library
+        if 'hairpin_grammar' in hairpin_options:
+            if hairpin_options['hairpin_grammar']:
+                hairpin_options['hairpin_grammar'] = './libhairpin.so'
+            else:
+                del hairpin_options['hairpin_grammar']
 
         ENERGY_OPTIONS_FIELDS = ['energy']
         energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
