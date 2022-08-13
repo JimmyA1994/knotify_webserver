@@ -4,11 +4,11 @@ import uuid
 
 # Create your models here.
 class Result(Model):
-    sequence = CharField(max_length=256)
+    sequence = CharField(max_length=1024)
     pseudoknot_options = JSONField(null=True, blank=True, default=dict)
     hairpin_options = JSONField(null=True, blank=True, default=dict)
     energy_options = JSONField(null=True, blank=True, default=dict)
-    result = CharField(max_length=256)
+    structure = CharField(max_length=1024)
 
     def __str__(self):
         return self.sequence
@@ -16,7 +16,7 @@ class Result(Model):
 class Run(Model):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(User, null=False, on_delete=CASCADE)
-    result = ForeignKey(Result, null=False, on_delete=CASCADE)
+    result = ForeignKey(Result, null=True, on_delete=CASCADE)
     submitted = DateTimeField(null=True)
     completed = DateTimeField(null=True)
 

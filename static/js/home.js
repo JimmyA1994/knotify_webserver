@@ -25,6 +25,16 @@ function correctWindowSize(){
     if (minWindowSize.valueAsNumber > N) minWindowSize.value = N;
 }
 
+function previousRunsToggleEvent() {
+    var previous_runs_toggle = document.getElementById("previous-runs-button");
+    var text = previous_runs_toggle.innerText;
+    if (text == 'Show') {
+        previous_runs_toggle.innerText = 'Hide';
+    }
+    else {
+        previous_runs_toggle.innerText = 'Show';
+    }
+}
 
 window.addEventListener('load', function() {
     console.log('All assets are loaded')
@@ -35,4 +45,7 @@ window.addEventListener('load', function() {
 
     var sequence = document.getElementById("RNA-sequence");
     sequence.addEventListener("focusout", correctWindowSize);
+
+    var previous_runs_toggle = document.getElementById("previous-runs-button");
+    previous_runs_toggle.addEventListener("click", previousRunsToggleEvent);
 })

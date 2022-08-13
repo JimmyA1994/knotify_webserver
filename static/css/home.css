@@ -2,10 +2,28 @@
     background-color: #B3CEE5;
 } */
 
-.overview {
+/* .overview {
     height: 200px;;
-}
+} */
 
 .card-title {
     font-family: "Aldrich";
+}
+
+.previous-runs {
+    margin-bottom: 0.5em;
+}
+
+td {
+    word-wrap: break-word;
+    min-width: 160px;
+    max-width: 160px;
+}
+
+table {
+    background-color: #fff7ed;
+}
+
+td a svg {
+    margin-bottom: 4px;
 }

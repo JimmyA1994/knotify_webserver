@@ -9,13 +9,21 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from main.models import Result, Run
-from django.utils import timezone
+from django.utils import timezone, dateformat
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
     template_name = 'home.html'
+
+    def get(self, request):
+        user = request.user
+        runs_queryset = Run.objects.filter(user=user).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
+        date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
+        previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in runs_queryset]
+        context = { 'previous_runs': previous_runs}
+        return render(request, self.template_name, context)
 
 class ResultsView(LoginRequiredMixin, TemplateView):
     template_name = "results.html"
@@ -68,7 +76,28 @@ def logout_view(request):
 class ResultsView(LoginRequiredMixin, View):
     redirect_field_name = None
 
+    def get_context_data(self, run):
+        if not run:
+            return
+        with open('static/css/fornac_min.css') as f:
+            lines = f.readlines()
+        css = lines[0] # pass css to include in svg
+        context = {
+            'sequence': run.result.sequence, 'structure': run.result.structure, 'num_of_pseudoknots': run.result.structure.count('['),
+            'uuid': run.uuid, 'css': css, 'pseudoknot_options': run.result.pseudoknot_options,
+            'hairpin_options': run.result.hairpin_options, 'energy_options': run.result.energy_options
+        }
+        return context
+
+    def get(self, request):
+        """Return results page based on a previous run"""
+        uuid = request.GET.get('uuid')
+        run = Run.objects.get(uuid=uuid)
+        context = self.get_context_data(run)
+        return render(request, 'results.html', context)
+
     def post(self, request):
+        """Return results page for a newly requested sequence"""
         try:
             sequence = request.POST['sequence'].upper()
         except:
@@ -109,19 +138,10 @@ class ResultsView(LoginRequiredMixin, View):
         completed = timezone.now()
         result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
                                        hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
-                                       result=structure)
+                                       structure=structure)
 
         run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
-        num_of_pseudoknots = result.result.count('[')
-        id = run.uuid
-        with open('static/css/fornac_min.css') as f:
-            lines = f.readlines()
-        css = lines[0] # pass css to include in svg
-        context = {
-            'sequence': sequence, 'structure': structure, 'num_of_pseudoknots': num_of_pseudoknots,
-            'uuid': id, 'css': css, 'pseudoknot_options': client.validated_pseudoknot_options,
-            'hairpin_options': client.validated_hairpin_options, 'energy_options': client.validated_energy_options
-        }
+        context = self.get_context_data(run)
 
         return render(request, 'results.html', context)
 
