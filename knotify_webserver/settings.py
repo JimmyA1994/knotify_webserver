@@ -88,8 +88,8 @@ DATABASES = {
         'NAME': 'knotify_webserver_db',
         'USER': 'knotify_webserver_user',
         'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 

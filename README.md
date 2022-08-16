@@ -53,8 +53,11 @@ docker build --tag knotify_webserver .
 docker run --rm -i -p 8000:8000 -t knotify_webserver
 ```
 
-
-
+## Run knotify_webserver
+You need to run docker as root in order to start building the docker image and run the containerized application. So, on the main knotify_webserver directory, run the following command:
+```bash
+sudo docker compose up
+```
 ## To Do List
 
 ### HomePage

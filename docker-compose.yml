@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=knotify_webserver_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=knotify_webserver_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  web:
+    build: .
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
