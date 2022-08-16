@@ -4,10 +4,16 @@ function init(){
         trigger: 'focus'
       })
 
-    window['sequence'] = document.querySelector('#sequence').textContent;
-    window['dot-bracket'] = document.querySelector('#dot-bracket').textContent;
+    window.sequence = document.querySelector('#sequence').textContent;
+    window.structure = document.querySelector('#structure').textContent;
     window['input-size'] = window['sequence'].length
-    reportWindowSize()
+    window.displayNumbering = true;
+    window.showNucleotideLabels = true;
+    reportWindowSize();
+
+    registerPresentationButtons();
+
+    createChart();
 }
 
 
@@ -45,14 +51,14 @@ function reportWindowSize() {
         seq_div.appendChild(seq_content);
         root.appendChild(seq_div)
 
-        // create dot-bracket line and append it
+        // create structure line and append it
         var dot_count = document.createElement('div');
         dot_count.setAttribute("class", "counter results noselect")
         dot_count.innerHTML = count + "> ";
         var dot_content = document.createElement('div');
         dot_content.setAttribute("class", "results");
-        dot_content.setAttribute("id", "dot-bracket" + (count > 1 ? '-'+count : ''))
-        dot_content.innerHTML = window['dot-bracket'].slice(i, i+n);
+        dot_content.setAttribute("id", "structure" + (count > 1 ? '-'+count : ''))
+        dot_content.innerHTML = window['structure'].slice(i, i+n);
 
         dot_div = document.createElement('div');
         dot_div.setAttribute('class', 'responsive-line')
@@ -67,9 +73,79 @@ function reportWindowSize() {
     }
 }
 
+function registerPresentationButtons(){
+    // register numbering checkbox evenet listener
+    document.getElementById("numberingCheckbox").checked = true;
+    var numberingCheckbox = document.querySelector("#numberingCheckbox");
+    numberingCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            window.displayNumbering = true;
+        } else {
+            window.displayNumbering = false;
+        }
+        clearChart();
+        createChart();
+    });
+
+    // register node label checkbox evenet listener
+    document.getElementById("nodeLabelCheckbox").checked = true;
+    var nodeLabelCheckbox = document.querySelector("#nodeLabelCheckbox");
+    nodeLabelCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            window.showNucleotideLabels = true;
+        } else {
+            window.showNucleotideLabels = false;
+        }
+        clearChart();
+        createChart();
+    });
+}
+
 function copyOutput(){
-    console.log('Copied!');
-    navigator.clipboard.writeText(window['dot-bracket'])
+    console.log('Result copied!');
+    navigator.clipboard.writeText(window.structure)
+}
+
+function createChart(elementId='rna_ss') {
+    var rna1 = {'structure': window.structure,
+                'sequence': window.sequence,
+    };
+
+    // get presentation options
+    var labelInterval, showNucleotideLabels;
+    if(window.displayNumbering){
+        labelInterval = 10;
+    }
+    else {
+        labelInterval = false;
+    }
+    showNucleotideLabels = window.showNucleotideLabels;
+
+    var chart = fornac.rnaPlot()
+                .width(window.width)
+                .height(window.height)
+                .rnaLayout('simple')
+                .namePosition('0 0')
+                .labelInterval(labelInterval)
+                .showNucleotideLabels(showNucleotideLabels);
+    var svg = d3.select('#'+elementId)
+                .selectAll('svg')
+                .data([rna1])
+                .enter()
+                .append('div')
+                .classed('svg-container', true)
+                .append('svg')
+                .attr("preserveAspectRatio", "xMidYMid meet")
+                .attr('viewBox', "0 0 " + window.width + " " + window.height)
+                .call(chart);
+    return chart;
+}
+
+function clearChart(elementId='rna_ss') {
+    var rootElem = document.querySelector('#'+elementId);
+    while(rootElem.children.length > 0){
+        rootElem.children[0].remove();
+    }
 }
 
 window.onload = init;

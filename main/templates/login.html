@@ -1,0 +1,55 @@
+{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <title>Login</title>
+        <link rel="shortcut icon" type="image/png" href="{% static 'images/ntua.svg' %}"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Aldrich">
+        <script src="{% static 'js/login.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    </head>
+    <body>
+        <div class="container-fluid h-100">
+            <div class="row h-100 justify-content-center align-items-center login-background">
+                <div class="col-md-6 col-sm-8 col-11 login-card">
+                    <div class="row">
+                        <div class="col-4 login-card-banner">
+                            <div class="row">
+                                <img id="logo" src="{% static 'images/ntua.svg' %}" alt="NTUA logo" draggable="false" class="img-fluid rounded-circle">
+                            </div>
+                            <div class="row nav-row nav-title"><span class="text-center">KNOTIFY</span></div>
+                            <div class="row nav-row nav-subtitle mt-2"><span class="text-center">An RNA pseudoknot predition tool</span></div>
+                        </div>
+                        <div class="col-8">
+                            <div class="row"><span class="text-center title">Signup</span></div>
+                            <form method="post" onsubmit="return signup();">{% csrf_token %}
+                                <label>
+                                    <span class="login-form-label login-form-inline d-inline-block" for="UsernameInput">Email</span><input type="email" class="text-input login-form-inline" id="EmailInput" pattern='[\w\d_+.-]+@[\w]+[.][A-Za-z]+' required>
+                                </label>
+                                <label>
+                                    <span class="login-form-label login-form-inline d-inline-block" for="PasswordInput">Password</span><input type="password" class="text-input login-form-inline" id="PasswordInput" required>
+                                </label>
+                                <div class="row" style="margin-top: 30px;">
+                                    <div class="col-8"></div>
+                                    <div class="col-4">
+                                        <input type="submit" id="button" value='Sign up!'>
+                                </div>
+                            </div>
+                            </form>
+                            {% comment %} <div class="row" style="margin-top: 30px;">
+                                <div class="col-8"></div>
+                                <div class="col-4">
+                                    <button onclick="signup()">Sign up!</button>
+                                </div>
+                            </div> {% endcomment %}
+                            <div class="row">
+                                <span class="toggle-text text-center mt-5" id="toggle-login-span" style="display:visible">If you already have an account, <a onclick="toggleLogin()" class="toggle-link">login!</a></span>
+                                <span class="toggle-text text-center mt-5" id="toggle-signup-span" style="display:none">If you don't have an account, <a onclick="toggleSignup()" class="toggle-link">signup!</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+    </body>

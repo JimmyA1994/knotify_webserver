@@ -82,3 +82,35 @@
     background-color: #B3CEE5;
     border-bottom: 2px solid black;
 }
+
+.light-background {
+    background-color: #fff7ed;
+}
+
+hr {
+    margin-top: 0;
+}
+
+.options-title {
+    font-size: 18px;
+}
+
+li {
+    padding: 5px;
+}
+
+.dropdown-header {
+    font-size: 16px;
+}
+
+.dropdown-divider {
+    margin: 0 !important;
+}
+
+.presentation-li:hover {
+    background-color: #e9ecef;
+}
+
+.presentation-option:hover{
+    cursor: pointer;
+}

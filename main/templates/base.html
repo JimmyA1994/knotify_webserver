@@ -26,6 +26,7 @@
                     <!--<div class="row fs-2">ΕΘΝΙΚΟ ΜΕΤΣΟΒΙΟ ΠΟΛΥΤΕΧΝΕΙΟ</div>
                     <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
                     <div class="row">Εργαστήριο DSLab</div>-->
+                    <div class="row text-end"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
                 </div>
             </div>
 
@@ -37,5 +38,28 @@
         </div>
         <!-- </div> -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script type='text/javascript'>
+            function logout(){
+                base_url = window.location.protocol + '//' + window.location.host + '/'
+                var url = 'logout/';
+                var cookie = document.cookie;
+                var split = cookie.split("=");
+                var token = split[1];
+                fetch(base_url + 'logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': token,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if(data.hasOwnProperty('status') && data['status']=='good'){
+                        window.location.replace(base_url + 'login/');
+                    }
+                });
+            }
+        </script>
     </body>
 </html>
