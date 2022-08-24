@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from main.models import Result, Run
 from django.utils import timezone, dateformat
+from main.models import StatusChoices
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -19,7 +20,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
 
     def get(self, request):
         user = request.user
-        runs_queryset = Run.objects.filter(user=user).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
+        runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
         previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in runs_queryset]
         context = { 'previous_runs': previous_runs}

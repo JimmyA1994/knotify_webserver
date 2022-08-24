@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE
+from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE, TextChoices
 from django.contrib.auth.models import User
 import uuid
 
@@ -13,12 +13,22 @@ class Result(Model):
     def __str__(self):
         return self.sequence
 
+class StatusChoices(TextChoices):
+    ONGOING = 'ON', 'Ongoing'
+    FAILED = 'FA', 'Failed'
+    COMPLETED = 'CO', 'Completed'
 class Run(Model):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(User, null=False, on_delete=CASCADE)
     result = ForeignKey(Result, null=True, on_delete=CASCADE)
     submitted = DateTimeField(null=True)
     completed = DateTimeField(null=True)
+    status = CharField(max_length=2,
+                       choices=StatusChoices.choices,
+                       default=StatusChoices.ONGOING)
 
     def __str__(self):
         return str(self.uuid)
+
+    def is_it_completed(self):
+        return self.status == self.StatusChoices.COMPLETED
