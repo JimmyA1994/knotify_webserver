@@ -25,6 +25,7 @@ services:
   web:
     restart: always
     build: .
+    command: /home/knotify_webserver/docker-entrypoint.sh
     volumes:
       - .:/home/knotify_webserver
     ports:

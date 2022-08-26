@@ -8,9 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from main.models import Result, Run
+from main.models import Result, Run, StatusChoices
 from django.utils import timezone, dateformat
-from main.models import StatusChoices
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -20,10 +19,12 @@ class HomePageView(LoginRequiredMixin, TemplateView):
 
     def get(self, request):
         user = request.user
-        runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
+        current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted')
+        previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
-        previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in runs_queryset]
-        context = { 'previous_runs': previous_runs}
+        previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in previous_runs_queryset]
+        current_runs = [(str(run[0]), run[1], date_format(run[2])) for run in current_runs_queryset]
+        context = { 'current_runs': current_runs, 'previous_runs': previous_runs}
         return render(request, self.template_name, context)
 
 class ResultsView(LoginRequiredMixin, TemplateView):
@@ -128,23 +129,32 @@ class ResultsView(LoginRequiredMixin, View):
         ENERGY_OPTIONS_FIELDS = ['energy']
         energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
 
-        try:
-            client = KnotifyClient(pseudoknot_options, hairpin_options, energy_options, sequence)
-            user = request.user
-        except:
-            return HttpResponseBadRequest('Prediction failed to run. Please try again.')
+        # try:
+        #     client = KnotifyClient(pseudoknot_options, hairpin_options, energy_options, sequence)
+        #     user = request.user
+        # except:
+        #     return HttpResponseBadRequest('Prediction failed to run. Please try again.')
 
+        # submitted = timezone.now()
+        # structure = client.predict()
+        # completed = timezone.now()
+        # result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
+        #                                hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
+        #                                structure=structure)
+
+        # run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
+        # context = self.get_context_data(run)
+
+        initialized_result = Result.objects.create(sequence=sequence)
         submitted = timezone.now()
-        structure = client.predict()
-        completed = timezone.now()
-        result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
-                                       hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
-                                       structure=structure)
+        user = request.user
+        initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
+        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.uuid}
 
-        run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
-        context = self.get_context_data(run)
-
-        return render(request, 'results.html', context)
+        from main.tasks import predict_structure
+        predict_structure.apply_async((sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
+        return JsonResponse({'success': 'OK'})
+        # return render(request, 'results.html', context)
 
 
 @login_required(redirect_field_name=None)

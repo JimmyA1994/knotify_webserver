@@ -23,4 +23,3 @@ RUN pip install -r requirements.txt
 
 # Set up entrypoint script for data migration and running local server
 RUN chmod +x docker-entrypoint.sh
-ENTRYPOINT ["./docker-entrypoint.sh"]

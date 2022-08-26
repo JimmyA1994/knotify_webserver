@@ -10,7 +10,7 @@
     font-family: "Aldrich";
 }
 
-.previous-runs {
+.previous-runs, current_runs {
     margin-bottom: 0.5em;
 }
 

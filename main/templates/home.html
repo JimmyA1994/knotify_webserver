@@ -18,55 +18,73 @@
                 <p style="font-size: 14px; margin-left:1em;">This is my diploma thesis</p>
             </div>
         </div>
+        {% if current_runs or previous_runs %}
         <div>
             <div>
                 <u class="card-title">History</u>
             </div>
             <div>
-                {% if previous_runs %}
-                    <div class="previous-runs">
-                        <div class="d-flex justify-content-between">
-                            <div>Previous Runs</div>
-                            <a data-bs-toggle="collapse" href="#previous-runs" role="button" aria-expanded="true" aria-controls="previous-runs" id="previous-runs-button">Hide</a>
-                        </div>
-                        <!-- <div>Previous Runs</div>
-                        <div class="d-flex flex-row-reverse"><a data-bs-toggle="collapse" href="#previous-runs" role="button" aria-expanded="true" aria-controls="previous-runs">Toggle</a></div> -->
-                        <div class="table-responsive collapse show" id="previous-runs">
-                            <table class="table table-hover table-bordered table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Sequence</th>
-                                        <th>Submitted</th>
-                                        <th>Completed</th>
-                                        <!-- <th>Action</th> -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for uuid, sequence, submitted, completed in previous_runs %}
-                                        <tr>
-                                            <td><a href="results/?uuid={{uuid}}">{{uuid}}</a></td>
-                                            <!-- <td><a href="#" onclick="resultHistory('{{uuid}}'); return false;">{{uuid}}</a></td> -->
-                                            <td>{{sequence}}</td>
-                                            <td>{{submitted}}</td>
-                                            <td>{{completed}}</td>
-                                            <!-- <td>
-                                                <a href="#">Go to
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
-                                                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
-                                                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
-                                                    </svg>
-                                                </a>
-                                            </td> -->
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                {% if current_runs %}
+                <div class="current-runs">
+                    <div class="d-flex justify-content-between">
+                        <div>Current Runs</div>
+                        <a data-bs-toggle="collapse" href="#current-runs" role="button" aria-expanded="true" aria-controls="current-runs" id="current-runs-button">Hide</a>
                     </div>
+                    <div class="table-responsive collapse show" id="current-runs">
+                        <table class="table table-hover table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Sequence</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for uuid, sequence, submitted in current_runs %}
+                                <tr>
+                                    <td>{{uuid}}</td>
+                                    <td>{{sequence}}</td>
+                                    <td>{{submitted}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% if previous_runs %}
+                <div class="previous-runs">
+                    <div class="d-flex justify-content-between">
+                        <div>Previous Runs</div>
+                        <a data-bs-toggle="collapse" href="#previous-runs" role="button" aria-expanded="true" aria-controls="previous-runs" id="previous-runs-button">Hide</a>
+                    </div>
+                    <div class="table-responsive collapse show" id="previous-runs">
+                        <table class="table table-hover table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Sequence</th>
+                                    <th>Submitted</th>
+                                    <th>Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for uuid, sequence, submitted, completed in previous_runs %}
+                                <tr>
+                                    <td><a href="results/?uuid={{uuid}}">{{uuid}}</a></td>
+                                    <td>{{sequence}}</td>
+                                    <td>{{submitted}}</td>
+                                    <td>{{completed}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 
     <!-- <form class="p-2 mt-5 base-card" action="results/" method="POST">{% csrf_token %} -->
