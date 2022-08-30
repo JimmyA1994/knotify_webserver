@@ -23,3 +23,7 @@ RUN pip install -r requirements.txt
 
 # Set up entrypoint script for data migration and running local server
 RUN chmod +x docker-entrypoint.sh
+
+# run container as a non-root user
+RUN adduser --disabled-password --no-create-home nonroot
+USER nonroot
