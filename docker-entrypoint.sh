@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Wait for the db to apply migrations
-echo "Sleeping for 5 seconds..."
-sleep 5
+# Wait for db to finish initializing
+echo "Wait for db to initialize"
+python3 manage.py wait_for_db
 
 # Apply database migrations
 echo "Apply database migrations"

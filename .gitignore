@@ -3,4 +3,6 @@ wheel-requirements.txt
 lib*
 main/migrations
 main/__pycache__
+main/management/__pycache__
+main/management/commands/__pycache__
 knotify_webserver/__pycache__
