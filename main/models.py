@@ -18,6 +18,10 @@ class StatusChoices(TextChoices):
     FAILED = 'FA', 'Failed'
     COMPLETED = 'CO', 'Completed'
 class Run(Model):
+
+    class Meta:
+        ordering = ('completed',)
+
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(User, null=False, on_delete=CASCADE)
     result = ForeignKey(Result, null=True, on_delete=CASCADE)

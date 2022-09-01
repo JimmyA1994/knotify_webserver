@@ -1,13 +1,14 @@
 from django.urls import path
-from .views import HomePageView, LoginView, ResultsView, convert_svg_view, process_signup_view, process_login_view, logout_view, InteractiveView
+from main import views
 
 urlpatterns = [
-    path('', HomePageView.as_view(), name='home'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('login/signup/', process_signup_view, name='process_signup'),
-    path('login/login/', process_login_view, name='process_login'),
-    path('logout/', logout_view, name='logout'),
-    path('results/', ResultsView.as_view(), name='results'),
-    path('convert_svg', convert_svg_view, name='convert_svg'),
-    path('interactive/', InteractiveView.as_view(), name='interactive'),
+    path('', views.HomePageView.as_view(), name='home'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('login/signup/', views.process_signup_view, name='process_signup'),
+    path('login/login/', views.process_login_view, name='process_login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('results/', views.ResultsView.as_view(), name='results'),
+    path('convert_svg', views.convert_svg_view, name='convert_svg'),
+    path('interactive/', views.InteractiveView.as_view(), name='interactive'),
+    path('update_history/', views.update_history_view, name='update_history'),
 ]

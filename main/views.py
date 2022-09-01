@@ -23,8 +23,12 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
         previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in previous_runs_queryset]
+        try:
+            latest_history_uuid = str(previous_runs_queryset.last()[0])
+        except:
+            latest_history_uuid = ''
         current_runs = [(str(run[0]), run[1], date_format(run[2])) for run in current_runs_queryset]
-        context = { 'current_runs': current_runs, 'previous_runs': previous_runs}
+        context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
         return render(request, self.template_name, context)
 
 class ResultsView(LoginRequiredMixin, TemplateView):
@@ -192,3 +196,33 @@ class InteractiveView(LoginRequiredMixin, View):
         css = lines[0] # pass css to include in svg
         context = {'sequence': sequence, 'structure': structure, 'css': css}
         return render(request, 'interactive.html', context)
+
+
+@login_required(redirect_field_name=None)
+@require_http_methods(['POST'])
+def update_history_view(request):
+    '''
+        Return json with newest current and previous runs.
+        If latest_history_uuid is provided then all completed runs
+        after the specified will be returned, else return all previous runs
+    '''
+    user = request.user
+    data = request.POST
+    latest_history_uuid = data.get('latest_history_uuid')
+    current_runs_queryset = (Run.objects
+                                .filter(user=user, status=StatusChoices.ONGOING)
+                                .select_related('result__sequence')
+                                .values_list('uuid', 'result__sequence', 'submitted'))
+    previous_runs_queryset = (Run.objects
+                                 .filter(user=user, status=StatusChoices.COMPLETED))
+    if latest_history_uuid:
+        last_previous_entry = Run.objects.get(pk=latest_history_uuid)
+        completed = last_previous_entry.completed
+        previous_runs_queryset = previous_runs_queryset.filter(completed__gt=completed)
+    previous_runs_queryset = (previous_runs_queryset.select_related('result__sequence')
+                                                    .values_list('uuid', 'result__sequence', 'submitted', 'completed'))
+    date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
+    previous_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2]), 'completed':date_format(run[3])} for run in previous_runs_queryset]
+    current_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2])} for run in current_runs_queryset]
+    context = { 'current_runs': current_runs, 'previous_runs': previous_runs}
+    return JsonResponse(context)
