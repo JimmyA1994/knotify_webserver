@@ -27,3 +27,21 @@ table {
 td a svg {
     margin-bottom: 4px;
 }
+
+mark {
+    background: #FF6978;
+    color: #ffffff;
+}
+
+.page-link{
+    color: #3C6E71;
+}
+
+.page-item.active > a{
+    background-color: #3C6E71 !important;
+    border-color: #3C6E71 !important;
+}
+
+.detail-view {
+    background-color: #fffaf4;
+}

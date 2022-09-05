@@ -36,6 +36,18 @@ function previousRunsToggleEvent() {
     }
 }
 
+function currentRunsToggleEvent() {
+    var current_runs_toggle = document.getElementById("current-runs-button");
+    var text = current_runs_toggle.innerText;
+    if (text == 'Show') {
+        current_runs_toggle.innerText = 'Hide';
+    }
+    else {
+        current_runs_toggle.innerText = 'Show';
+    }
+}
+
+
 window.addEventListener('load', function() {
     console.log('All assets are loaded')
     var maxWindowSize = document.getElementById("max-window-size");
@@ -46,6 +58,22 @@ window.addEventListener('load', function() {
     var sequence = document.getElementById("RNA-sequence");
     sequence.addEventListener("focusout", correctWindowSize);
 
-    var previous_runs_toggle = document.getElementById("previous-runs-button");
-    previous_runs_toggle.addEventListener("click", previousRunsToggleEvent);
+    if (window.hasOwnProperty('previous_runs')) {
+        // register show/hide button
+        var previous_runs_toggle = document.getElementById("previous-runs-button");
+        previous_runs_toggle.addEventListener("click", previousRunsToggleEvent);
+
+        // initialize table
+        var $table = $('#previous_runs_table');
+        $table.bootstrapTable({data: window.previous_runs})
+    }
+    if (window.hasOwnProperty('current_runs')) {
+        // register show/hide button
+        var current_runs_toggle = document.getElementById("current-runs-button");
+        current_runs_toggle.addEventListener("click", currentRunsToggleEvent);
+
+        // initialize table
+        var $table = $('#current_runs_table');
+        $table.bootstrapTable({data: window.current_runs})
+    }
 })

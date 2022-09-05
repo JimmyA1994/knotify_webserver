@@ -20,14 +20,15 @@ class HomePageView(LoginRequiredMixin, TemplateView):
     def get(self, request):
         user = request.user
         current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted')
-        previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted', 'completed')
+        previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'result__structure', 'submitted', 'completed')
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
-        previous_runs = [(str(run[0]), run[1], date_format(run[2]), date_format(run[3])) for run in previous_runs_queryset]
+        previous_runs = [{'id':str(uuid), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
+                         for uuid, sequence, structure, submitted, completed in previous_runs_queryset]
         try:
             latest_history_uuid = str(previous_runs_queryset.last()[0])
         except:
             latest_history_uuid = ''
-        current_runs = [(str(run[0]), run[1], date_format(run[2])) for run in current_runs_queryset]
+        current_runs = [{'id': str(uuid), 'sequence': sequence, 'submitted': date_format(submitted)} for uuid, sequence, submitted in current_runs_queryset]
         context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
         return render(request, self.template_name, context)
 
@@ -226,3 +227,18 @@ def update_history_view(request):
     current_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2])} for run in current_runs_queryset]
     context = { 'current_runs': current_runs, 'previous_runs': previous_runs}
     return JsonResponse(context)
+
+
+@login_required(redirect_field_name=None)
+@require_http_methods(['POST'])
+def delete_run_view(request):
+    body = json.loads(request.body.decode('UTF-8'))
+    run_uuid = body.get('run_uuid', '')
+    success = True
+    try:
+        run = Run.objects.get(pk=run_uuid)
+        result = run.result
+        result.delete() # cascade on delete removes run also
+    except:
+        success = False
+    return JsonResponse({'success': success})

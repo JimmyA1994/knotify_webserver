@@ -11,4 +11,5 @@ urlpatterns = [
     path('convert_svg', views.convert_svg_view, name='convert_svg'),
     path('interactive/', views.InteractiveView.as_view(), name='interactive'),
     path('update_history/', views.update_history_view, name='update_history'),
+    path('delete_run/', views.delete_run_view, name='delete_run'),
 ]
