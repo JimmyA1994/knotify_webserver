@@ -17,7 +17,7 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A knotify_webserver worker -l INFO
+    command: celery -A knotify_webserver worker -l INFO --max-tasks-per-child=1
     depends_on:
       - db
       - redis
