@@ -22,20 +22,21 @@
                 <p style="font-size: 14px; margin-left:1em;">This is my diploma thesis</p>
             </div>
         </div>
-        {% if current_runs or previous_runs %}
         <div id='history-container'>
-            <div>
+            {% if current_runs or previous_runs %}
+            <div id="history-title">
                 <u class="card-title">History</u>
             </div>
+            {% endif %}
             <div>
-                {% if current_runs %}
                 <div class="current-runs" id="current-runs-container">
+                    {% if current_runs %}
                     <div class="d-flex justify-content-between">
                         <div>Current Runs</div>
                         <a data-bs-toggle="collapse" href="#current-runs" role="button" aria-expanded="true" aria-controls="current-runs" id="current-runs-button">Hide</a>
                     </div>
                     <div class="table-responsive collapse show" id="current-runs">
-                        <table class="table table-hover table-bordered table-sm" id="current_runs_table">
+                        <table class="table table-hover table-bordered table-sm" id="current-runs-table" data-height="240">
                             <thead>
                                 <tr>
                                     <th data-field="id">ID</th>
@@ -45,20 +46,21 @@
                             </thead>
                         </table>
                     </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if previous_runs %}
                 <div class="previous-runs" id="previous-runs-container">
+                    {% if previous_runs %}
                     <div class="d-flex justify-content-between">
                         <div>Previous Runs</div>
                         <a data-bs-toggle="collapse" href="#previous-runs" role="button" aria-expanded="true" aria-controls="previous-runs" id="previous-runs-button">Hide</a>
                     </div>
                     <div class="table-responsive collapse show" id="previous-runs">
                         <div id="toolbar"></div>
-                        <table class="table table-hover table-bordered table-sm" id="previous_runs_table" data-toggle="previous_runs_table"
+                        <table class="table table-hover table-bordered table-sm" id="previous-runs-table" data-toggle="previous-runs-table"
                                data-pagination="true" data-page-list="[10, 25, 50, 100, 200, All]"
                                data-detail-view="true" data-detail-view-icon="false" data-detail-formatter="detailFormatter"
-                               data-buttons-prefix="btn-sm btn" data-show-columns="true" data-buttons-class="danger"
+                               data-buttons-prefix="btn-sm btn" data-show-columns="true"
+                               data-buttons-class="danger"
                                data-icon-size="sm" data-height="460" data-toolbar="#toolbar"
                                data-search="true" data-search-highlight="true" data-search-align="left"
                                data-sort-name="completed" data-sort-order="desc"
@@ -76,14 +78,13 @@
                             </thead>
                         </table>
                     </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
-        {% endif %}
     </div>
 
-    <form class="p-2 mt-5 card-decor" action="results/" method="POST">{% csrf_token %}
+    <form class="p-2 mt-5 card-decor" onsubmit="submitFunction(); return false;">{% csrf_token %}
         <div class="form-group">
             <div>Enter your RNA sequence here.</div>
             <input type="text" class="form-control my-2" id="RNA-sequence" name="sequence" placeholder="" oninput="this.value = this.value.replace(/[^aAuUgGcC]/g, '');" required>
@@ -179,15 +180,43 @@
 
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" id="form-submit-btn">Submit</button>
     </form>
 
+        <!-- Submit/Inform Modal -->
+        <div class="modal fade" id="submitModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="submitModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" id="modal-options">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="text-center" id="submit-modal-text">
+                            <!-- Here we insert modal's content programmatically -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetInformCompleted();">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <script>
+        // Note: previous_runs and current_runs are used only for table initialization
         {% if previous_runs %}
-        window.previous_runs = {{ previous_runs | safe }}
+        window.previous_runs = {{ previous_runs | safe }}; // used only to initialize previous runs table
+        window.previous_runs_ids = new Set({{ previous_runs_ids | safe }});
+        {% else %}
+        window.previous_runs = []; // used only to initialize previous runs table
+        window.previous_runs_ids = new Set();
         {% endif %}
         {% if current_runs %}
-        window.current_runs = {{ current_runs | safe }}
+        window.current_runs = {{ current_runs | safe }};
+        {% else %}
+        window.current_runs = [];
+        {% endif %}
+        {% if latest_history_uuid %}
+        window.latest_history_uuid = '{{ latest_history_uuid | safe }}';
+        {% else %}
+        window.latest_history_uuid = "";
         {% endif %}
 
         /** format previous runs table detail view */
@@ -195,7 +224,7 @@
             var html = []
             $.each(row, function (key, value) {
                 if(key == 'sequence' || key == 'structure'){
-                    html.push('<p><b>' + key + ':</b> ' + '<span class="user-select-all">' + value + '</span>' + '</p>');
+                    html.push('<p><b class="user-select-none me-1">' + key + ':</b>' + '<span class="user-select-all">' + value + '</span>' + '</p>');
                 }
             })
             return html.join('')
@@ -210,7 +239,6 @@
             }[column.field]
           }
 
-        var $table = $('#previous_runs_table');
         /** define actions column presentation */
         function operateFormatter(value, row, index) {
             return [
@@ -230,11 +258,13 @@
         // define actions column functionality
         window.operateEvents = {
             'click .expand': function (e, value, row, index) {
+                var $table = $('#previous-runs-table');
                 $table.bootstrapTable('toggleDetailView', index)
             },
             'click .result': function (e, value, row, index) {
             },
             'click .remove': function (e, value, row, index) {
+                var $table = $('#previous-runs-table');
                 $table.bootstrapTable('showLoading');
                 // delete entry on server
                 var cookie = document.cookie;
@@ -253,22 +283,46 @@
                 .then(data => {
                     if(!data['success']){
                         // error handling
+                        triggerPopUp('Run could not be deleted. <i class="bi bi-emoji-frown text-danger"></i>');
+                        $table.bootstrapTable('hideLoading');
                         return;
                     }
                     $table.bootstrapTable('remove', {
                         field: 'id',
                         values: [row.id]
                     });
-                    $table.bootstrapTable('hideLoading');
-                    if($table.bootstrapTable('getData').length == 0){ // no more previous runs left on the table
-                        var current_runs_container = document.querySelector('#current-runs-container');
-                        if(current_runs_container == null){ // no current nor previous runs left to display. Remove history section
-                            var history_container = document.querySelector('#history-container');
-                            history_container.remove();
+                    // remove element from window.previous_runs_ids and update window.latest_history_uuid
+                    window.previous_runs_ids.delete(row.id);
+                    var previous_runs = $table.bootstrapTable('getData');
+                    if(previous_runs.length == 0){ // no more previous runs left on the table
+                        window.latest_history_uuid = "";
+
+                        var current_runs_table = document.querySelector('#current-runs-table');
+                        if(!current_runs_table){ // no current nor previous runs left to display. Remove history section
+                            var historyTitle = document.querySelector("#history-title");
+                            historyTitle.remove();
+                            var previous_runs_container = document.querySelector('#previous-runs-container');
+                            removeAllChildNodes(previous_runs_container);
+                            var current_runs_container = document.querySelector('#current-runs-container');
+                            removeAllChildNodes(current_runs_container);
                         } else{ // remove just the previous runs section
                             var previous_runs_container = document.querySelector('#previous-runs-container');
-                            previous_runs_container.remove();
+                            removeAllChildNodes(previous_runs_container);
                         }
+                    }else {
+                        if(window.latest_history_uuid == row.id){ // latest_history_uuid needs updating
+                            // find latest completed
+                            var latest_id = previous_runs.at(0)["id"];
+                            var latest_completed = previous_runs.at(0)["completed"];
+                            previous_runs.forEach(obj => {
+                                if(obj.completed > latest_completed){
+                                    latest_completed = obj.completed;
+                                    latest_id = obj.id;
+                                }
+                            });
+                            window.latest_history_uuid = latest_id;
+                        }
+                        $table.bootstrapTable('hideLoading');
                     }
                 });
             }
