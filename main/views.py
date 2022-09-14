@@ -24,12 +24,13 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
         previous_runs = [{'id':str(uuid), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
                          for uuid, sequence, structure, submitted, completed in previous_runs_queryset]
+        previous_runs_ids = [str(run[0]) for run in previous_runs_queryset]
         try:
             latest_history_uuid = str(previous_runs_queryset.last()[0])
         except:
             latest_history_uuid = ''
         current_runs = [{'id': str(uuid), 'sequence': sequence, 'submitted': date_format(submitted)} for uuid, sequence, submitted in current_runs_queryset]
-        context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
+        context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid, 'previous_runs_ids': previous_runs_ids}
         return render(request, self.template_name, context)
 
 class ResultsView(LoginRequiredMixin, TemplateView):
@@ -134,22 +135,6 @@ class ResultsView(LoginRequiredMixin, View):
         ENERGY_OPTIONS_FIELDS = ['energy']
         energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
 
-        # try:
-        #     client = KnotifyClient(pseudoknot_options, hairpin_options, energy_options, sequence)
-        #     user = request.user
-        # except:
-        #     return HttpResponseBadRequest('Prediction failed to run. Please try again.')
-
-        # submitted = timezone.now()
-        # structure = client.predict()
-        # completed = timezone.now()
-        # result = Result.objects.create(sequence=sequence, pseudoknot_options=client.validated_pseudoknot_options,
-        #                                hairpin_options=client.validated_hairpin_options, energy_options=client.validated_energy_options,
-        #                                structure=structure)
-
-        # run = Run.objects.create(user=user, result=result, submitted=submitted, completed=completed)
-        # context = self.get_context_data(run)
-
         initialized_result = Result.objects.create(sequence=sequence)
         submitted = timezone.now()
         user = request.user
@@ -208,7 +193,7 @@ def update_history_view(request):
         after the specified will be returned, else return all previous runs
     '''
     user = request.user
-    data = request.POST
+    data = json.loads(request.body.decode("utf-8"))
     latest_history_uuid = data.get('latest_history_uuid')
     current_runs_queryset = (Run.objects
                                 .filter(user=user, status=StatusChoices.ONGOING)
@@ -221,11 +206,16 @@ def update_history_view(request):
         completed = last_previous_entry.completed
         previous_runs_queryset = previous_runs_queryset.filter(completed__gt=completed)
     previous_runs_queryset = (previous_runs_queryset.select_related('result__sequence')
-                                                    .values_list('uuid', 'result__sequence', 'submitted', 'completed'))
+                                                    .values_list('uuid', 'result__sequence', 'result__structure', 'submitted', 'completed'))
     date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
-    previous_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2]), 'completed':date_format(run[3])} for run in previous_runs_queryset]
+    previous_runs = [{'id':str(uuid), 'sequence':sequence, 'structure': structure,'submitted':date_format(submitted), 'completed':date_format(completed)}
+                     for uuid, sequence, structure, submitted, completed in previous_runs_queryset]
     current_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2])} for run in current_runs_queryset]
-    context = { 'current_runs': current_runs, 'previous_runs': previous_runs}
+    try:
+        latest_history_uuid = previous_runs[-1]['id']
+    except:
+        latest_history_uuid = ''
+    context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
     return JsonResponse(context)
 
 
