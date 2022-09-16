@@ -56,3 +56,23 @@ body {
 #logout-anchor:hover{
     color: #B3CEE5;
 }
+
+/* chrome-edge width */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* chrome-edge track */
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* chrome-edge handle */
+::-webkit-scrollbar-thumb {
+    background: #BEBEBE;
+    border-radius: 10em;
+}
+/* chrome-edge handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #707070;
+}
