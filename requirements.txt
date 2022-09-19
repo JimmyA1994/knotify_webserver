@@ -4,5 +4,6 @@ CairoSVG==2.5.2
 celery==5.2.3
 psycopg2==2.9.3
 redis==4.3.4
+django-redis==5.2.0
 wheels/knotify-0.0.1.dev71-py3-none-any.whl
 wheels/vienna_rna_wheel-2.4.17+ubuntu2004.dslab0-cp38-cp38-linux_x86_64.whl
