@@ -45,3 +45,7 @@ mark {
 .detail-view {
     background-color: #fffaf4;
 }
+
+.fixed-table-body {
+    background-color: #fdfaf6;
+}
