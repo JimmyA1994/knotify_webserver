@@ -13,15 +13,15 @@ services:
       - POSTGRES_DB=knotify_webserver_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-  celery:
-    restart: always
-    build:
-      context: .
-    command: celery -A knotify_webserver worker -l INFO --max-tasks-per-child=1
-    depends_on:
-      - db
-      - redis
-      - web
+  # celery:
+  #   restart: always
+  #   build:
+  #     context: .
+  #   command: celery -A knotify_webserver worker -l INFO --max-tasks-per-child=1
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - web
   web:
     restart: always
     build: .
@@ -32,6 +32,22 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - redis
+      - knotify-worker
+  knotify-consumer:
+    restart: always
+    build:
+      context: ./knotify-docker/
+    command: /knotify/bin/python consumer.py
+    depends_on:
+      - redis
+      - knotify-worker
+  knotify-worker:
+    restart: always
+    build:
+      context: ./knotify-docker/
+    command: celery -A tasks worker -l INFO --max-tasks-per-child=1
+    depends_on:
       - redis
 
 volumes:

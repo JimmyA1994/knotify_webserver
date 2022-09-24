@@ -1,15 +1,17 @@
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views import View
-from .utils import KnotifyClient
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from main.models import Result, Run, StatusChoices
 from django.utils import timezone, dateformat
+from django.conf import settings
+from redis import Redis
 import json
 
 class HomePageView(LoginRequiredMixin, TemplateView):
@@ -139,12 +141,14 @@ class ResultsView(LoginRequiredMixin, View):
         submitted = timezone.now()
         user = request.user
         initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
-        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.uuid}
+        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.uuid.hex}
 
-        from main.tasks import predict_structure
-        predict_structure.apply_async((sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
+        redis_connection = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+        msg = json.dumps({'sequence': sequence, 'pseudoknot_options': pseudoknot_options,
+                          'hairpin_options': hairpin_options, 'energy_options': energy_options, 'model_ids': model_ids})
+        redis_connection.publish(channel='Django2Celery', message=msg)
+
         return JsonResponse({'success': 'OK'})
-        # return render(request, 'results.html', context)
 
 
 @login_required(redirect_field_name=None)
@@ -232,3 +236,43 @@ def delete_run_view(request):
     except:
         success = False
     return JsonResponse({'success': success})
+
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def handle_task_completion(request):
+    try:
+        data = json.loads(request.body.decode())
+    except Exception as e:
+        # future mail here
+        raise Exception(f'handle task completion failed retrieving json send by celery worker.')
+    if not data.get('model_ids'):
+        raise Exception(f'Task returned success=False')
+
+    # retrieve unserializable objects
+    model_ids = data.get('model_ids', {})
+    run_id = model_ids.get('run_id', '')
+    run = Run.objects.get(pk=run_id)
+    result_id = model_ids.get('result_id', '')
+    result = Result.objects.get(pk=result_id)
+
+    if not data.get('success'):
+        run.status = StatusChoices.FAILED
+        run.save(update_fields=('status'))
+        result.delete()
+        raise Exception(f'Task returned success=False')
+
+    # update result
+    result.pseudoknot_options = data.get('validated_pseudoknot_options', {})
+    result.hairpin_options = data.get('validated_hairpin_options', {})
+    result.energy_options = data.get('validated_energy_options', {})
+    result.structure = data.get('structure', '')
+    result.save(update_fields=('pseudoknot_options', 'hairpin_options', 'energy_options', 'structure'))
+
+    # update run
+    completed = timezone.now()
+    run.status = StatusChoices.COMPLETED
+    run.completed = completed
+    run.save(update_fields=('status', 'completed'))
+
+    return HttpResponse()
