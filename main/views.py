@@ -14,6 +14,10 @@ from django.conf import settings
 from redis import Redis
 import json
 
+from celery import Celery
+app = Celery("knotify", backend='redis://redis:6379',
+                            broker='redis://redis:6379')
+
 class HomePageView(LoginRequiredMixin, TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
@@ -137,16 +141,15 @@ class ResultsView(LoginRequiredMixin, View):
         ENERGY_OPTIONS_FIELDS = ['energy']
         energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
 
+        # initialize result and run on db, so that polling can check for process status
         initialized_result = Result.objects.create(sequence=sequence)
         submitted = timezone.now()
         user = request.user
         initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
         model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.uuid.hex}
 
-        redis_connection = Redis.from_url(settings.REDIS_URL, decode_responses=True)
-        msg = json.dumps({'sequence': sequence, 'pseudoknot_options': pseudoknot_options,
-                          'hairpin_options': hairpin_options, 'energy_options': energy_options, 'model_ids': model_ids})
-        redis_connection.publish(channel='Django2Celery', message=msg)
+        # send task to knotify service for processing
+        app.send_task('predict', (sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
 
         return JsonResponse({'success': 'OK'})
 

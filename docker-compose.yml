@@ -33,19 +33,11 @@ services:
     depends_on:
       - db
       - redis
-      - knotify-worker
-  knotify-consumer:
+      - knotify
+  knotify:
     restart: always
     build:
-      context: ./knotify-docker/
-    command: /knotify/bin/python consumer.py
-    depends_on:
-      - redis
-      - knotify-worker
-  knotify-worker:
-    restart: always
-    build:
-      context: ./knotify-docker/
+      context: ./knotify/
     command: celery -A tasks worker -l INFO --max-tasks-per-child=1
     depends_on:
       - redis

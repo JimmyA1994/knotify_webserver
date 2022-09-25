@@ -2,17 +2,11 @@ from celery import Celery
 import requests
 from knotify_client import KnotifyClient
 
-app = Celery("knotify_webserver", backend='redis://redis:6379',
+app = Celery("knotify", backend='redis://redis:6379',
                                   broker='redis://redis:6379')
 
 @app.task(name='predict')
-def predict(data):
-    sequence = data.get('sequence', '')
-    pseudoknot_options = data.get('pseudoknot_options', {})
-    hairpin_options = data.get('hairpin_options', {})
-    energy_options= data.get('energy_options', {})
-    model_ids = data.get('model_ids', {})
-
+def predict(sequence, pseudoknot_options, hairpin_options, energy_options, model_ids):
     # run the prediction
     try:
         client = KnotifyClient(pseudoknot_options, hairpin_options, energy_options, sequence)
