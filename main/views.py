@@ -10,15 +10,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from main.models import Result, Run, StatusChoices
 from django.utils import timezone, dateformat
-from django.conf import settings
-from redis import Redis
+from guest_user.mixins import AllowGuestUserMixin
 import json
 
 from celery import Celery
 app = Celery("knotify", backend='redis://redis:6379',
                             broker='redis://redis:6379')
-
-class HomePageView(LoginRequiredMixin, TemplateView):
+class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
     template_name = 'home.html'

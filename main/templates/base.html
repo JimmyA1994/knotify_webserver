@@ -1,4 +1,5 @@
 {% load static %}
+{% load guest_user %}
 <!doctype html>
 <html>
     <head>
@@ -26,7 +27,11 @@
                     <!--<div class="row fs-2">ΕΘΝΙΚΟ ΜΕΤΣΟΒΙΟ ΠΟΛΥΤΕΧΝΕΙΟ</div>
                     <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
                     <div class="row">Εργαστήριο DSLab</div>-->
+                    {% if user|is_guest_user %}
+                    <div class="row text-end"><a id="logout-anchor" href="login/">Convert</a></div>
+                    {% else %}
                     <div class="row text-end"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
+                    {% endif %}
                 </div>
             </div>
 
