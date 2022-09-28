@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from main.models import Result, Run, StatusChoices
 from django.utils import timezone, dateformat
 from guest_user.mixins import AllowGuestUserMixin
+from guest_user.models import is_guest_user
 import json
 
 from celery import Celery
@@ -53,6 +54,12 @@ def process_signup_view(request):
     password = body.get('password', '')
     user = User.objects.create_user(username=username, email=email, password=password)
     if user:
+        if is_guest_user(request.user):
+            # migrate Runs to new user
+            Run.objects.filter(user=request.user).update(user=user)
+            User.objects.get(pk=request.user.id).delete()
+            logout(request)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
     else:
         return JsonResponse({'status':'bad'})
@@ -68,7 +75,7 @@ def process_login_view(request):
     print(f'{password = }')
     user = authenticate(username=username, password=password)
     if user:
-        login(request, user)
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
     else:
         return JsonResponse({'status':'bad'})
