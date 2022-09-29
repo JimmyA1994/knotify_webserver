@@ -390,7 +390,17 @@ function polling(){
                 window.current_runs = [];
             }
         }
+
+        // 6. trigger guest history alert
+        if(window.is_guest_user && data.hasOwnProperty('notify_guest_user') && data['notify_guest_user']){
+            triggerGuestHistoryAlert();
+        }
     });
+}
+
+function triggerGuestHistoryAlert() {
+    var alert = document.querySelector('#guest-history-alert');
+    alert.classList.replace('collapse', 'show');
 }
 
 function submitFunction() {

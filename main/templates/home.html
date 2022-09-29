@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load guest_user %}
 {% block head %}
     <title>Knotify</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
@@ -11,7 +12,11 @@
 {% endblock %}
 
 {% block body %}
-
+    <div class="alert alert-bg-color alert-dismissible fade collapse" role="alert" id="guest-history-alert">
+        <i class="bi bi-info-circle"></i>
+        You can keep your history by creating an account. No personal info is needed, just a simple username and password combination! To sign up, click <a href="login/" class="alert-link">here</a> or click on convert link on the navbar at any time.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <!-- <div class="base-card overview"> -->
     <div class="card-decor overview">
         <div>
@@ -217,6 +222,11 @@
         window.latest_history_uuid = '{{ latest_history_uuid | safe }}';
         {% else %}
         window.latest_history_uuid = "";
+        {% endif %}
+        {% if user|is_guest_user %}
+        window.is_guest_user = true;
+        {% else %}
+        window.is_guest_user = false;
         {% endif %}
 
         /** format previous runs table detail view */

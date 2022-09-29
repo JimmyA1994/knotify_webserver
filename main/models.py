@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE, TextChoices, BooleanField
+from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, OneToOneField, JSONField, CASCADE, TextChoices, BooleanField
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 import uuid
@@ -41,7 +41,7 @@ class Run(Model):
 
 
 class UserProfile(Model):
-    user = ForeignKey(User, null=False, on_delete=CASCADE)
+    user = OneToOneField(User, null=True, on_delete=CASCADE)
     guest_notified_for_conversion = BooleanField(default=False)
 
 

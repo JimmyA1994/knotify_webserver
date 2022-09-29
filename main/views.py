@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from main.models import Result, Run, StatusChoices
+from main.models import Result, Run, StatusChoices, UserProfile
 from django.utils import timezone, dateformat
 from guest_user.mixins import AllowGuestUserMixin
 from guest_user.models import is_guest_user
@@ -57,7 +57,14 @@ def process_signup_view(request):
         if is_guest_user(request.user):
             # migrate Runs to new user
             Run.objects.filter(user=request.user).update(user=user)
-            User.objects.get(pk=request.user.id).delete()
+
+            # migrate UserProfile to new user
+            guest_user__user_profile_values = UserProfile.objects.filter(user=request.user).values().first()
+            del guest_user__user_profile_values['id']
+            del guest_user__user_profile_values['user_id']
+            UserProfile.objects.filter(user=user).update(**guest_user__user_profile_values)
+            User.objects.get(pk=request.user.id).delete() # delete guest user
+
             logout(request)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
@@ -227,7 +234,17 @@ def update_history_view(request):
         latest_history_uuid = previous_runs[-1]['id']
     except:
         latest_history_uuid = ''
+
     context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
+
+    if is_guest_user(user):
+        # add flag to trigger notification
+        user = User.objects.select_related('userprofile').get(pk=user.id)
+        if not user.userprofile.guest_notified_for_conversion and len(previous_runs) > 0:
+            context['notify_guest_user'] = True
+            user.userprofile.guest_notified_for_conversion = True
+            user.userprofile.save()
+
     return JsonResponse(context)
 
 

@@ -49,3 +49,15 @@ mark {
 .fixed-table-body {
     background-color: #fdfaf6;
 }
+
+.alert-bg-color {
+    background-color: #d9e6f2;
+}
+
+.alert-link {
+    color: #4182be;
+}
+
+.alert-link:hover {
+    color: #346898;
+}
