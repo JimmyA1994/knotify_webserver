@@ -1,5 +1,6 @@
-from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE, TextChoices
+from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, JSONField, CASCADE, TextChoices, BooleanField
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 import uuid
 
 # Create your models here.
@@ -13,12 +14,13 @@ class Result(Model):
     def __str__(self):
         return self.sequence
 
+
 class StatusChoices(TextChoices):
     ONGOING = 'ON', 'Ongoing'
     FAILED = 'FA', 'Failed'
     COMPLETED = 'CO', 'Completed'
-class Run(Model):
 
+class Run(Model):
     class Meta:
         ordering = ('completed',)
 
@@ -36,3 +38,16 @@ class Run(Model):
 
     def is_it_completed(self):
         return self.status == self.StatusChoices.COMPLETED
+
+
+class UserProfile(Model):
+    user = ForeignKey(User, null=False, on_delete=CASCADE)
+    guest_notified_for_conversion = BooleanField(default=False)
+
+
+# define post_save signal of user to automatically create coressponding profile
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
