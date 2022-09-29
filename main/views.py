@@ -59,7 +59,7 @@ def process_signup_view(request):
             Run.objects.filter(user=request.user).update(user=user)
             User.objects.get(pk=request.user.id).delete()
             logout(request)
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
     else:
         return JsonResponse({'status':'bad'})
