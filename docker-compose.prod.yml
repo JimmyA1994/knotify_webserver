@@ -1,0 +1,37 @@
+services:
+  redis:
+    restart: always
+    image: redis:latest
+  db:
+    restart: always
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    env_file:
+      .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  web:
+    restart: always
+    build: .
+    command: /home/knotify_webserver/docker-entrypoint.sh
+    volumes:
+      - .:/home/knotify_webserver
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+      - knotify
+    env_file:
+      .prod_env
+  knotify:
+    restart: always
+    build:
+      context: ./knotify/
+    command: celery -A tasks worker -l INFO --max-tasks-per-child=1
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:

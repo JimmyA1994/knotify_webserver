@@ -1,5 +1,5 @@
-DJANGO_SETTINGS_MODULE="knotify_webserver.settings"
-DEBUG=1
+DJANGO_SETTINGS_MODULE="knotify_webserver.production_settings"
+DEBUG=0
 
 # DB settings
 POSTGRES_DB = 'knotify_webserver_db'
