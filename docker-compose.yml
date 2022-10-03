@@ -7,21 +7,10 @@ services:
     image: postgres:latest
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_USER=knotify_webserver_user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=knotify_webserver_db
+    env_file:
+      .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-  # celery:
-  #   restart: always
-  #   build:
-  #     context: .
-  #   command: celery -A knotify_webserver worker -l INFO --max-tasks-per-child=1
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - web
   web:
     restart: always
     build: .
@@ -34,6 +23,8 @@ services:
       - db
       - redis
       - knotify
+    env_file:
+      .env
   knotify:
     restart: always
     build:
