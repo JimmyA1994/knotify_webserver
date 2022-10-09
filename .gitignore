@@ -1,7 +1,7 @@
 wheels/*
 wheel-requirements.txt
 lib*
-main/__pycache__
-main/management/__pycache__
-main/management/commands/__pycache__
-knotify_webserver/__pycache__
+venv
+.venv
+**/__pycache__
+local_settings.py
