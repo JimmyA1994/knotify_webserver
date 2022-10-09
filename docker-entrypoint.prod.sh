@@ -9,5 +9,5 @@ echo "Apply database migrations"
 python3 manage.py migrate
 
 # Start server
-echo "Starting dev server"
-python3 manage.py runserver 0.0.0.0:8000
+echo "Starting uwsgi server"
+uwsgi --ini knotify_webserver/uwsgi.ini
