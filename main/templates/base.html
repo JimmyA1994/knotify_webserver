@@ -28,7 +28,7 @@
                     <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
                     <div class="row">Εργαστήριο DSLab</div>-->
                     {% if user|is_guest_user %}
-                    <div class="row text-end"><a id="logout-anchor" href="login/">Convert</a></div>
+                    <div class="row text-end"><a id="logout-anchor" onclick="convert()" href="#">Convert</a></div>
                     {% else %}
                     <div class="row text-end"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
                     {% endif %}
@@ -45,7 +45,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
         <script type='text/javascript'>
             function logout(){
-                base_url = window.location.protocol + '//' + window.location.host + '/'
+                base_url = window.location.protocol + '//' + window.location.host + '/';
                 var url = 'logout/';
                 var cookie = document.cookie;
                 var split = cookie.split("=");
@@ -64,6 +64,10 @@
                         window.location.replace(base_url + 'login/');
                     }
                 });
+            }
+            function convert(){
+                base_url = window.location.protocol + '//' + window.location.host + '/';
+                window.location.replace(base_url + 'login/');
             }
         </script>
     </body>
