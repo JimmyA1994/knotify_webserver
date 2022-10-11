@@ -11,7 +11,7 @@ services:
       .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-  web:
+  django:
     restart: always
     build: .
     command: /home/knotify_webserver/docker-entrypoint.prod.sh
@@ -27,12 +27,14 @@ services:
       .prod_env
     labels:
       - traefik.enable=true
-      - traefik.http.routers.whoami.entrypoints=web
+      - traefik.http.routers.drouter.entrypoints=web
+      - traefik.http.routers.drouter.rule=Host(`localhost`)
   knotify:
     restart: always
     build:
       context: ./knotify/
     command: celery -A tasks worker -l INFO --max-tasks-per-child=1
+    mem_limit: 512m
     depends_on:
       - redis
   reverse-proxy:
