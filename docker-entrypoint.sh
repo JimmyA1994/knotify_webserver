@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit if any command fails
+set -e
+
 # Wait for db to finish initializing
 echo "Wait for db to initialize"
 python3 manage.py wait_for_db
