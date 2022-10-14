@@ -175,3 +175,9 @@ CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+
+# Load local_settings.py for environment-specific configuration
+try:
+    from local_settings import *
+except ImportError:
+    pass
