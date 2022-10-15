@@ -16,7 +16,7 @@ function correctWindowSize(){
     // Enforce this on window-size change.
     console.log('correcting..');
     var sequence = document.getElementById("RNA-sequence");
-    if (!sequence) return;
+    if (!sequence || sequence.value.length == 0) return;
 
     var N = sequence.value.length;
     var maxWindowSize = document.getElementById("max-window-size");

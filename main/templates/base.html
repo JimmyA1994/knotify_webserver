@@ -28,9 +28,9 @@
                     <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
                     <div class="row">Εργαστήριο DSLab</div>-->
                     {% if user|is_guest_user %}
-                    <div class="row text-end"><a id="logout-anchor" onclick="convert()" href="#">Convert</a></div>
+                    <div class="d-flex flex-row-reverse"><a id="logout-anchor" href="login/">Convert</a></div>
                     {% else %}
-                    <div class="row text-end"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
+                    <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
                     {% endif %}
                 </div>
             </div>
