@@ -25,10 +25,6 @@ services:
       - knotify
     env_file:
       .prod_env
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.drouter.entrypoints=web
-      - traefik.http.routers.drouter.rule=Host(`localhost`)
   knotify:
     restart: always
     build:
@@ -37,14 +33,13 @@ services:
     mem_limit: 512m
     depends_on:
       - redis
-  reverse-proxy:
-    image: traefik
+  nginx:
+    build: ./nginx
     ports:
       - 80:80
-      - 8080:8080
-    command: --providers.docker --providers.docker.exposedbydefault=false --entrypoints.web.address=:80
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
+      - .:/home/knotify_webserver
+    depends_on:
+      - django
 volumes:
   postgres_data:
