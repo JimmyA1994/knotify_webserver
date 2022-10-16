@@ -7,4 +7,3 @@ redis==4.3.4
 django-redis==5.2.0
 django-guest-user==0.5.2
 uwsgi==2.0.20
-whitenoise==6.2.0

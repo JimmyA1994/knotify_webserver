@@ -1,0 +1,1 @@
+This is a secret file, so that git can track uwsgi_socket directory. The uwsgi_socket directory hosts the unix socket that uwsgi uses to receive requests. Docker file permissions can be finicky, so a simple way that allows uwsgi to create nginx_uwsgi.sock is to create the parent folder (uwsgi_socket) beforehand.

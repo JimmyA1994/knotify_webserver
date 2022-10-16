@@ -1,8 +1,12 @@
 services:
   redis:
+    container_name: redis
     restart: always
     image: redis:latest
+    networks:
+      - backend
   db:
+    container_name: db
     restart: always
     image: postgres:latest
     ports:
@@ -11,7 +15,10 @@ services:
       .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-  web:
+    networks:
+      - backend
+  django:
+    container_name: django
     restart: always
     build: .
     command: /home/knotify_webserver/docker-entrypoint.sh
@@ -25,13 +32,35 @@ services:
       - knotify
     env_file:
       .env
+    networks:
+      - frontend
+      - backend
   knotify:
+    container_name: knotify
     restart: always
     build:
       context: ./knotify/
     command: celery -A tasks worker -l INFO --max-tasks-per-child=1
     depends_on:
       - redis
-
+    networks:
+      - frontend
+      - backend
+  nginx:
+    container_name: nginx
+    restart: always
+    build: ./nginx/
+    ports:
+      - 80:80
+    volumes:
+      - ./static:/home/static
+      - ./uwsgi_socket/:/home/uwsgi_socket/
+    depends_on:
+      - django
+    networks:
+      - frontend
 volumes:
   postgres_data:
+networks:
+  frontend:
+  backend:

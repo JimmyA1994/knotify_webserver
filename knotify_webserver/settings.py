@@ -32,7 +32,7 @@ PRODUCTION = False
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', 0)))
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django', 'nginx']
 
 
 # Application definition
@@ -55,7 +55,6 @@ AUTHENTICATION_BACKENDS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

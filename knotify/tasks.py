@@ -19,4 +19,4 @@ def predict(sequence, pseudoknot_options, hairpin_options, energy_options, model
                 'model_ids': model_ids}
     finally:
         # return result back to django to save it to db and update frontend
-        requests.post('http://django:8000/handle_task_completion/', json=data)
+        requests.post('http://nginx/handle_task_completion/', json=data)
