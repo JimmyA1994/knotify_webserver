@@ -32,7 +32,7 @@ PRODUCTION = False
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', 0)))
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django']
+ALLOWED_HOSTS = ['knotify.dslab.ece.ntua.gr',]
 
 
 # Application definition
