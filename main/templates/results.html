@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/results.css' %}">
     <link rel="stylesheet" href="{% static 'css/fornac.css' %}">
     <script src="https://unpkg.com/d3@3.5"></script>
+    <script src="https://d3js.org/d3.v6.js"></script>
     <script src="{% static 'js/download.js' %}"></script>
     <script src="{% static 'js/results.js' %}"></script>
     <script src="{% static 'js/fornac.js' %}"></script>
@@ -22,6 +23,7 @@
         <div id="root" class="row">
             <div id="sequence" class="results invisible">{{ sequence }}</div>
             <div id="structure" class="results invisible">{{ structure }}</div>
+            <div id="uuid" class="results invisible">{{ uuid }}</div>
         </div>
         <div class="row">
             <div class="d-flex flex-row-reverse">
@@ -90,78 +92,57 @@
             <u class="card-title col-2 text-center">Graphics</u>
         </div>
         <p>Below is a 2D representation of the predicted rna secondary structure:</p>
-        <div id='rna_ss' class="mb-2"> </div>
-        <!-- also include hidden svg container for different size containers -->
-        <!-- <div class="row">
-            <div id="interactive_options_title" class="col-6" style="visibility: hidden;">Customize the plot</div>
-            <div class="col-6 text-end"></div>
-            <div class="col-6 text-end"><a id="togglePlotButton" href="#" onclick="togglePlot()">Try interactive!</a></div>
-        </div> -->
-        <div class="row my-2">
-            <div class="col-6 text-start p-0">
-                <div class="btn-group dropup">
-                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                        Presentation
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
-                        <li class="li-hr"><hr class="dropdown-divider"></li>
-                        <li class="presentation-li">
-                            <div class="form-check form-check-inline form-switch">
-                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="numberingCheckbox" checked>
-                                <label class="form-check-label presentation-option" for="numberingCheckbox">Numbering</label>
-                            </div>
-                        </li>
-                        <li class="presentation-li">
-                            <div class="form-check form-check-inline form-switch">
-                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
-                                <label class="form-check-label presentation-option" for="nodeLabelCheckbox">Node Label</label>
-                            </div>
-                        </li>
-                    </ul>
+        <ul class="nav nav-tabs" id="graphicsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="naview-tab" data-bs-toggle="tab" data-bs-target="#naview-tab-panel" type="button" role="tab" aria-controls="naview-tab-panel" aria-selected="true">NAView</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="arc-tab" data-bs-toggle="tab" data-bs-target="#arc-tab-panel" type="button" role="tab" aria-controls="arc-tab-panel" aria-selected="false">Arc</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="graphicsTabContent">
+            <div class="tab-pane fade show active" id="naview-tab-panel" role="tabpanel" aria-labelledby="naview-tab" tabindex="0">
+                <div id='rna_ss' class="mb-2"> </div>
+
+                <div class="row my-2">
+                    <div class="col-6 text-start p-0">
+                        <div class="btn-group dropup">
+                            <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                Presentation
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
+                                <li class="li-hr"><hr class="dropdown-divider"></li>
+                                <li class="presentation-li">
+                                    <div class="form-check form-check-inline form-switch">
+                                        <input class="form-check-input presentation-option" role="switch" type="checkbox" id="numberingCheckbox" checked>
+                                        <label class="form-check-label presentation-option" for="numberingCheckbox">Numbering</label>
+                                    </div>
+                                </li>
+                                <li class="presentation-li">
+                                    <div class="form-check form-check-inline form-switch">
+                                        <input class="form-check-input presentation-option" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
+                                        <label class="form-check-label presentation-option" for="nodeLabelCheckbox">Node Label</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-6 text-end">
+                        <form action="../interactive/" method="POST" style="display:inline-block;">
+                            {% csrf_token %}
+                            <input type="hidden" name="sequence" value="{{sequence}}">
+                            <input type="hidden" name="structure" value="{{structure}}">
+                            <button type="submit" class="btn btn-success">Interactive Mode</button>
+                        </form>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
+                    </div>
                 </div>
             </div>
-            <div class="col-6 text-end">
-                <form action="../interactive/" method="POST" style="display:inline-block;">
-                    {% csrf_token %}
-                    <input type="hidden" name="sequence" value="{{sequence}}">
-                    <input type="hidden" name="structure" value="{{structure}}">
-                    <button type="submit" class="btn btn-success">Interactive Mode</button>
-                </form>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
+            <div class="tab-pane fade" id="arc-tab-panel" role="tabpanel" aria-labelledby="arc-tab" tabindex="0">
+                <div id="arc-container" style="background: #fff7ed;"></div>
             </div>
         </div>
-        <!-- <div id="interactive_options" class="mb-3" style="visibility: hidden;">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                <label class="form-check-label" for="inlineCheckbox1">Animate</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                <label class="form-check-label" for="inlineCheckbox2">Display Numbering</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-                <label class="form-check-label" for="inlineCheckbox3">Node outline</label>
-            </div>
-            <a href="#" onclick="centerMolecules()">Center molecules</a>
-            <div class="dropup d-inline">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                  Color Scheme
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#" id="dropdown-item1" onclick="window.container.changeColorScheme('sequence'); selectDropdown(1);" style="background: #7A7978; color: #FFFFFF">Sequence</a></li>
-                    <li><a class="dropdown-item" href="#" id="dropdown-item2" onclick="window.container.changeColorScheme('positions'); selectDropdown(2);">Positions</a></li>
-                    <li><a class="dropdown-item" href="#" id="dropdown-item3" onclick="window.container.changeColorScheme('structure'); selectDropdown(3);">Structure</a></li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">
-                Download
-            </button>
-
-        </div> -->
-    </div>
-
 
     <!-- Download Modal -->
     <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

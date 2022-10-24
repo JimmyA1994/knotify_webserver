@@ -6,6 +6,7 @@ function init(){
 
     window.sequence = document.querySelector('#sequence').textContent;
     window.structure = document.querySelector('#structure').textContent;
+    window.uuid = document.querySelector('#uuid').textContent;
     window['input-size'] = window['sequence'].length
     window.displayNumbering = true;
     window.showNucleotideLabels = true;
@@ -14,6 +15,8 @@ function init(){
     registerPresentationButtons();
 
     createChart();
+
+    createArcDiagram();
 }
 
 
@@ -138,6 +141,12 @@ function createChart(elementId='rna_ss') {
                 .attr("preserveAspectRatio", "xMidYMid meet")
                 .attr('viewBox', "0 0 " + window.width + " " + window.height)
                 .call(chart);
+
+    // remember the size generated
+    const node = d3.select('#'+elementId).node()
+    window.naview_height = node.offsetHeight;
+    window.naview_width = node.offsetWidth;
+
     return chart;
 }
 
@@ -146,6 +155,57 @@ function clearChart(elementId='rna_ss') {
     while(rootElem.children.length > 0){
         rootElem.children[0].remove();
     }
+}
+
+async function getArcDiagram(){
+    var cookie = document.cookie;
+    var split = cookie.split("=");
+    var token = split[1];
+    var url = window.location.protocol + "//" + window.location.host + '/get_varna_arc_diagram/';
+    var body = {
+        'uuid': window.uuid,
+        'sequence': window.sequence,
+        'structure': window.structure,
+    }
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token,
+        },
+        body: JSON.stringify(body)
+    });
+    return response.text();
+}
+
+function createArcDiagram(){
+    getArcDiagram().then(text => {
+        const doc = (new DOMParser).parseFromString(text, "image/svg+xml");
+        const svg_element = d3.select(doc.documentElement).remove();
+        const svg_node = svg_element.node();
+        const inner_g_element = svg_node.children[0]
+        const svg = d3
+            .create("svg")
+            .attr("viewBox", "0 0 " + window.naview_width.toString() + " " + window.naview_height.toString());
+            // .attr("width", svg_node.getAttribute("width"))
+            // .attr("preserveAspectRatio", "xMidYMid meet")
+            // .attr("height", svg_node.getAttribute("height"))
+        const x = d3.scaleLinear([0, 1], [0, 100]);
+        const y = d3.scaleLinear([0, 1], [0, 100]);
+        svg.node().appendChild(inner_g_element);
+        const g = svg.select('g');
+        var g_node = g.node();
+        var initial_width = Number(g_node.children[g_node.childElementCount-1].getAttribute('x'));
+        var scale = (window.naview_width/(1.05*initial_width)).toString();
+
+        var transform;
+        const zoom = d3.zoom().on("zoom", e => {
+            g.attr("transform", (transform = e.transform));
+        });
+
+        final_node = svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(0, window.naview_height/4).scale(scale)).node();
+        document.querySelector('#arc-container').appendChild(final_node);
+    });
 }
 
 window.onload = init;

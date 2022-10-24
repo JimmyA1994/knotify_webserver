@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -301,3 +301,64 @@ def handle_task_completion(request):
     run.save(update_fields=('status', 'completed'))
 
     return HttpResponse()
+
+# @require_http_methods(['GET'])
+@login_required(redirect_field_name=None)
+@require_http_methods(['POST'])
+def get_varna_arc_diagram(request):
+    # parse input
+    body = json.loads(request.body.decode('UTF-8'))
+    sequence = body.get('sequence', '')
+    sequence = sequence.upper()
+    structure = body.get('structure', '')
+    uuid = body.get('uuid', 'filename')
+    filename = uuid + '.svg'
+    empty = not (sequence or structure)
+    contain_unknown_characters = not (set(sequence).issubset({'A','C', 'G', 'U'})
+                                      or set(structure).issubset({'(', ')', '[', ']', '.'}))
+    if empty or contain_unknown_characters:
+        return HttpResponseBadRequest('Parameters were not recognised.')
+
+    outline_color = '#ADABA9'
+
+    A_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'A'])
+    A_color_args = f'-basesStyle1 fill=#DBDB8D,outline={outline_color} -applyBasesStyle1on {A_indexes} ' if A_indexes else ''
+
+    C_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'C'])
+    C_color_args = f'-basesStyle2 fill=#98DF8A,outline={outline_color}  -applyBasesStyle2on {C_indexes} ' if C_indexes else ''
+
+    G_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'G'])
+    G_color_args = f'-basesStyle3 fill=#E19896,outline={outline_color}  -applyBasesStyle3on {G_indexes} ' if G_indexes else ''
+
+    U_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'U'])
+    U_color_args = f'-basesStyle4 fill=#AEC7E8,outline={outline_color}  -applyBasesStyle4on {U_indexes}'  if U_indexes else ''
+
+    # run varna
+    cmd = (f'java -cp /usr/share/java/varna.jar fr.orsay.lri.varna.applications.VARNAcmd \
+                  -sequenceDBN {sequence} -structureDBN {structure} \
+                  -o {filename} -algorithm line -bpStyle none -bp #ff312f '
+                 + A_color_args + C_color_args + G_color_args + U_color_args)
+    print(cmd)
+    import subprocess
+    run = subprocess.run(cmd.split())
+    if run.returncode != 0:
+        return HttpResponseServerError('Varna arc diagram could not be generated.')
+
+    # read svg
+    with open(filename) as file:
+        svg_data = file.read()
+
+    # delete file
+    delete_cmd = f'rm {filename}'
+    subprocess.run(delete_cmd.split())
+
+    # Wrap svg elements around a <g> element, so that d3.js can select it.
+    svg_data = svg_data.replace('svg">', 'svg">\n<g>')
+    svg_data = svg_data.replace('</svg>', '</g>\n</svg>')
+
+    # match style to that of naview (fornac)
+    svg_data = svg_data.replace('font-family="Verdana"', 'font-family="Tahoma, Geneva, sans-serif" font-weight="bold"')
+    svg_data = svg_data.replace('stroke-width="1.0"', 'stroke-width="0.8"')
+
+    # return svg
+    return HttpResponse(svg_data, content_type="image/svg+xml")

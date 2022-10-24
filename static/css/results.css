@@ -114,3 +114,19 @@ li {
 .presentation-option:hover{
     cursor: pointer;
 }
+
+#graphicsTab{
+    margin-left: 6px;
+    border: 0;
+}
+
+.nav-item {
+    padding-bottom: 0;
+}
+
+.nav-tabs{
+    border-width: 0;
+}
+.nav-tabs .nav-item .nav-link.active {
+    background-color: #fff7ed;
+}
