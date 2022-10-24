@@ -13,7 +13,7 @@ ENV TZ=Europe/Athens
 ENV LANG=en_US.UTF-8
 ENV SHELL=/usr/bin/bash
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y python3 python3-pip pipenv tzdata libcairo2 libpq-dev
+RUN apt-get update && apt-get install -y python3 python3-pip pipenv tzdata libcairo2 libpq-dev varna
 
 # Copy files into container and install app dependanies
 RUN mkdir /home/knotify_webserver
