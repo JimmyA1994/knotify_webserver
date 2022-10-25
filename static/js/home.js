@@ -253,7 +253,7 @@ function triggerPopUp(message, completed_runs=[]){
         completed_runs.forEach(obj => {
             tds += '<tr><td>'+obj.id+'</td><td>'+obj.sequence+'</td><td><a href="results/?uuid='+obj.id+'"<i class="bi bi-box-arrow-in-up-right"></i></td></tr>';
         });
-        var html =  '<span>The following runs has been completed:</span>' +
+        var html =  '<span>The following runs have been completed:</span>' +
                     '<table class="table table-sm">' +
                         '<thead>' +
                             '<tr>' +
