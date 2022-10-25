@@ -139,8 +139,15 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="arc-tab-panel" role="tabpanel" aria-labelledby="arc-tab" tabindex="0">
-                <div id="arc-container" style="background: #fff7ed;"></div>
+            <div class="tab-pane fade pb-2" id="arc-tab-panel" role="tabpanel" aria-labelledby="arc-tab" tabindex="0">
+                <div id="arc-container" style="background: #fff7ed;">
+                    <!-- Initially a spinner, replace it with arc diagram programmatically -->
+                    <div class="d-flex justify-content-center py-3" id="spinner-container">
+                        <div class="spinner-border">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

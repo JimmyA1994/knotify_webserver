@@ -183,27 +183,41 @@ function createArcDiagram(){
         const doc = (new DOMParser).parseFromString(text, "image/svg+xml");
         const svg_element = d3.select(doc.documentElement).remove();
         const svg_node = svg_element.node();
-        const inner_g_element = svg_node.children[0]
+        const inner_g_element = svg_node.children[0];
+        const viewBox = "0 0 " + window.naview_width.toString() + " " + window.naview_height.toString();
         const svg = d3
             .create("svg")
-            .attr("viewBox", "0 0 " + window.naview_width.toString() + " " + window.naview_height.toString());
-            // .attr("width", svg_node.getAttribute("width"))
-            // .attr("preserveAspectRatio", "xMidYMid meet")
-            // .attr("height", svg_node.getAttribute("height"))
+            .attr("viewBox", viewBox);
         const x = d3.scaleLinear([0, 1], [0, 100]);
         const y = d3.scaleLinear([0, 1], [0, 100]);
         svg.node().appendChild(inner_g_element);
         const g = svg.select('g');
         var g_node = g.node();
-        var initial_width = Number(g_node.children[g_node.childElementCount-1].getAttribute('x'));
-        var scale = (window.naview_width/(1.05*initial_width)).toString();
 
+        // get an estimation of initial svg size:
+        // let the last element's position equal roughly to the size of the svg.
+        const last_svg_element = g_node.children[g_node.childElementCount-1];
+        const initial_width = Number(last_svg_element.getAttribute('x'));
+        const initial_height = Number(last_svg_element.getAttribute('y'));
+        // calculate the how much we should scale:
+        // intentionally let a 5% smaller scalling to compensate for estimation errors.
+        const scale = window.naview_width/(1.05*initial_width);
+        // calculate how much the svg should move to provide a centered view.
+        const scaled_width = scale*initial_width;
+        const scaled_height = scale*initial_height;
+        const transformed_x = Math.abs(window.naview_width - scaled_width)/4; // a shorter start is required here
+        const transformed_y = Math.abs(window.naview_height - scaled_height)/2;
+
+        // zoom+pan event handler
         var transform;
         const zoom = d3.zoom().on("zoom", e => {
             g.attr("transform", (transform = e.transform));
         });
 
-        final_node = svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(0, window.naview_height/4).scale(scale)).node();
+        // apply transformation and zoom event handler
+        final_node = svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(transformed_x, transformed_y).scale(scale)).node();
+        // replace spinner with arc diagram
+        document.querySelector("#spinner-container").remove();
         document.querySelector('#arc-container').appendChild(final_node);
     });
 }
