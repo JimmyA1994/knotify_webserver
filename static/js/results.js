@@ -204,6 +204,8 @@ function createArcDiagram(){
         });
 
         final_node = svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(0, window.naview_height/4).scale(scale)).node();
+        // remove spinner and add arc diagram
+        document.querySelector("#spinner-container").remove();
         document.querySelector('#arc-container').appendChild(final_node);
     });
 }
