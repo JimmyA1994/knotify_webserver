@@ -251,7 +251,7 @@ function triggerPopUp(message, completed_runs=[]){
 
         var tds = ""
         completed_runs.forEach(obj => {
-            tds += '<tr><td>'+obj.id+'</td><td>'+obj.sequence+'</td><td><a href="results/?uuid='+obj.id+'"<i class="bi bi-box-arrow-in-up-right"></i></td></tr>';
+            tds += '<tr><td>'+obj.id+'</td><td>'+obj.sequence+'</td><td><a href="results/?id='+obj.id+'"<i class="bi bi-box-arrow-in-up-right"></i></td></tr>';
         });
         var html =  '<span>The following runs have been completed:</span>' +
                     '<table class="table table-sm" style="border: 1px solid #ffd199;">' +
@@ -323,7 +323,7 @@ function polling(){
             'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
             'X-CSRFToken': token,
         },
-        body: JSON.stringify({'latest_history_uuid': window.latest_history_uuid})
+        body: JSON.stringify({'latest_history_id': window.latest_history_id})
     })
     .then((response) => response.json())
     .then((data) => {
@@ -338,8 +338,8 @@ function polling(){
         var update_previous_runs_table = []
         previous_runs.forEach(run =>{
             // check in previous table if run already exists
-            uuid = run['id'];
-            if(!window.previous_runs_ids.has(uuid)){
+            id = run['id'];
+            if(!window.previous_runs_ids.has(id)){
                 update_previous_runs_table.push(run);
             }
         });
@@ -376,8 +376,8 @@ function polling(){
             }
             // add new previous entries ids to window.previous_runs_ids set
             extract_ids(update_previous_runs_table).forEach(item => window.previous_runs_ids.add(item));
-            if(data['latest_history_uuid'] && data['latest_history_uuid'] != window.latest_history_uuid){
-                window.latest_history_uuid = data['latest_history_uuid'];
+            if(data['latest_history_id'] && data['latest_history_id'] != window.latest_history_id){
+                window.latest_history_id = data['latest_history_id'];
             }
         }
 

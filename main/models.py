@@ -1,7 +1,7 @@
-from django.db.models import Model, CharField, UUIDField, DateTimeField, ForeignKey, OneToOneField, JSONField, CASCADE, TextChoices, BooleanField
+from django.db.models import Model, CharField, DateTimeField, ForeignKey, OneToOneField, JSONField, CASCADE, TextChoices, BooleanField
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-import uuid
+from main.utils import custom_id
 
 # Create your models here.
 class Result(Model):
@@ -24,7 +24,7 @@ class Run(Model):
     class Meta:
         ordering = ('completed',)
 
-    uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = CharField(primary_key=True, max_length=8, unique=True, default=custom_id)
     user = ForeignKey(User, null=False, on_delete=CASCADE)
     result = ForeignKey(Result, null=True, on_delete=CASCADE)
     submitted = DateTimeField(null=True)
@@ -34,7 +34,7 @@ class Run(Model):
                        default=StatusChoices.ONGOING)
 
     def __str__(self):
-        return str(self.uuid)
+        return str(self.id)
 
     def is_it_completed(self):
         return self.status == self.StatusChoices.COMPLETED
