@@ -193,7 +193,7 @@
             <div class="modal-dialog modal-lg modal-dialog-centered" id="modal-options">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <div class="text-center" id="submit-modal-text">
+                        <div class="text-center overflow-auto" id="submit-modal-text">
                             <!-- Here we insert modal's content programmatically -->
                         </div>
                     </div>
@@ -218,10 +218,10 @@
         {% else %}
         window.current_runs = [];
         {% endif %}
-        {% if latest_history_uuid %}
-        window.latest_history_uuid = '{{ latest_history_uuid | safe }}';
+        {% if latest_history_id %}
+        window.latest_history_id = '{{ latest_history_id | safe }}';
         {% else %}
-        window.latest_history_uuid = "";
+        window.latest_history_id = "";
         {% endif %}
         {% if user|is_guest_user %}
         window.is_guest_user = true;
@@ -256,7 +256,7 @@
                     '<a class="expand" href="javascript:void(0)" title="Expand Entry">',
                         '<i class="bi bi-arrow-down-left-square"></i>',
                     '</a>  ',
-                    '<a class="result" href="results/?uuid='+row.id+'" title="Go to">',
+                    '<a class="result" href="results/?id='+row.id+'" title="Go to">',
                         '<i class="bi bi-box-arrow-in-up-right"></i>',
                     '</a>  ',
                     '<a class="remove" href="javascript:void(0)" title="Remove">',
@@ -287,7 +287,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': token,
                     },
-                    body: JSON.stringify({'run_uuid':row.id})
+                    body: JSON.stringify({'run_id':row.id})
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -301,11 +301,11 @@
                         field: 'id',
                         values: [row.id]
                     });
-                    // remove element from window.previous_runs_ids and update window.latest_history_uuid
+                    // remove element from window.previous_runs_ids and update window.latest_history_id
                     window.previous_runs_ids.delete(row.id);
                     var previous_runs = $table.bootstrapTable('getData');
                     if(previous_runs.length == 0){ // no more previous runs left on the table
-                        window.latest_history_uuid = "";
+                        window.latest_history_id = "";
 
                         var current_runs_table = document.querySelector('#current-runs-table');
                         if(!current_runs_table){ // no current nor previous runs left to display. Remove history section
@@ -320,7 +320,7 @@
                             removeAllChildNodes(previous_runs_container);
                         }
                     }else {
-                        if(window.latest_history_uuid == row.id){ // latest_history_uuid needs updating
+                        if(window.latest_history_id == row.id){ // latest_history_id needs updating
                             // find latest completed
                             var latest_id = previous_runs.at(0)["id"];
                             var latest_completed = previous_runs.at(0)["completed"];
@@ -330,7 +330,7 @@
                                     latest_id = obj.id;
                                 }
                             });
-                            window.latest_history_uuid = latest_id;
+                            window.latest_history_id = latest_id;
                         }
                         $table.bootstrapTable('hideLoading');
                     }

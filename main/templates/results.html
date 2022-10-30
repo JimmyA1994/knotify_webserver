@@ -23,7 +23,7 @@
         <div id="root" class="row">
             <div id="sequence" class="results invisible">{{ sequence }}</div>
             <div id="structure" class="results invisible">{{ structure }}</div>
-            <div id="uuid" class="results invisible">{{ uuid }}</div>
+            <div id="run_id" class="results invisible">{{ id }}</div>
         </div>
         <div class="row">
             <div class="d-flex flex-row-reverse">
@@ -36,7 +36,7 @@
         <div class="row">
             <div>More information about the prediction:</div>
             <ul class="ps-5">
-                <li id="request_id">Request id: {{ uuid }}</li>
+                <li id="request_id">Request id: {{ id }}</li>
                 <li>Sequence length: {{ sequence | length }}</li>
                 <li>Number of pseudoknots: {{ num_of_pseudoknots }}</li>
             </ul>

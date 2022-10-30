@@ -6,7 +6,7 @@ function init(){
 
     window.sequence = document.querySelector('#sequence').textContent;
     window.structure = document.querySelector('#structure').textContent;
-    window.uuid = document.querySelector('#uuid').textContent;
+    window.id = document.querySelector('#run_id').textContent;
     window['input-size'] = window['sequence'].length
     window.displayNumbering = true;
     window.showNucleotideLabels = true;
@@ -163,7 +163,7 @@ async function getArcDiagram(){
     var token = split[1];
     var url = window.location.protocol + "//" + window.location.host + '/get_varna_arc_diagram/';
     var body = {
-        'uuid': window.uuid,
+        'id': window.id,
         'sequence': window.sequence,
         'structure': window.structure,
     }

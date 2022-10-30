@@ -116,17 +116,29 @@ li {
 }
 
 #graphicsTab{
-    margin-left: 6px;
+    margin-left: 7px;
     border: 0;
 }
 
 .nav-item {
     padding-bottom: 0;
+    font-family: "Aldrich";
 }
 
 .nav-tabs{
     border-width: 0;
 }
+
+li .nav-link{
+    color: #fff7ed;
+}
+
+li .nav-link:hover{
+    color: #495057;
+}
+
 .nav-tabs .nav-item .nav-link.active {
     background-color: #fff7ed;
+    border-width: 0;
+    border-bottom: 1px solid #fff7ed;
 }

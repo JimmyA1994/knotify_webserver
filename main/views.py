@@ -16,7 +16,7 @@ import json
 
 from celery import Celery
 app = Celery("knotify", backend='redis://redis:6379',
-                            broker='redis://redis:6379')
+                        broker='redis://redis:6379')
 class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
@@ -24,25 +24,24 @@ class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
 
     def get(self, request):
         user = request.user
-        current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('uuid', 'result__sequence', 'submitted')
-        previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('uuid', 'result__sequence', 'result__structure', 'submitted', 'completed')
+        current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('id', 'result__sequence', 'submitted')
+        previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('id', 'result__sequence', 'result__structure', 'submitted', 'completed')
         date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
-        previous_runs = [{'id':str(uuid), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
-                         for uuid, sequence, structure, submitted, completed in previous_runs_queryset]
+        previous_runs = [{'id':str(id), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
+                         for id, sequence, structure, submitted, completed in previous_runs_queryset]
         previous_runs_ids = [str(run[0]) for run in previous_runs_queryset]
         try:
-            latest_history_uuid = str(previous_runs_queryset.last()[0])
+            latest_history_id = str(previous_runs_queryset.last()[0])
         except:
-            latest_history_uuid = ''
-        current_runs = [{'id': str(uuid), 'sequence': sequence, 'submitted': date_format(submitted)} for uuid, sequence, submitted in current_runs_queryset]
-        context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid, 'previous_runs_ids': previous_runs_ids}
+            latest_history_id = ''
+        current_runs = [{'id': str(id), 'sequence': sequence, 'submitted': date_format(submitted)} for id, sequence, submitted in current_runs_queryset]
+        context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_id': latest_history_id, 'previous_runs_ids': previous_runs_ids}
         return render(request, self.template_name, context)
 
-class ResultsView(LoginRequiredMixin, TemplateView):
-    template_name = "results.html"
 
 class LoginView(TemplateView):
     template_name = 'login.html'
+
 
 @require_http_methods(['POST'])
 def process_signup_view(request):
@@ -110,15 +109,15 @@ class ResultsView(LoginRequiredMixin, View):
         css = lines[0] # pass css to include in svg
         context = {
             'sequence': run.result.sequence, 'structure': run.result.structure, 'num_of_pseudoknots': run.result.structure.count('['),
-            'uuid': run.uuid, 'css': css, 'pseudoknot_options': run.result.pseudoknot_options,
+            'id': run.id, 'css': css, 'pseudoknot_options': run.result.pseudoknot_options,
             'hairpin_options': run.result.hairpin_options, 'energy_options': run.result.energy_options
         }
         return context
 
     def get(self, request):
         """Return results page based on a previous run"""
-        uuid = request.GET.get('uuid')
-        run = Run.objects.get(uuid=uuid)
+        id = request.GET.get('id')
+        run = Run.objects.get(id=id)
         context = self.get_context_data(run)
         return render(request, 'results.html', context)
 
@@ -157,8 +156,23 @@ class ResultsView(LoginRequiredMixin, View):
         initialized_result = Result.objects.create(sequence=sequence)
         submitted = timezone.now()
         user = request.user
-        initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
-        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.uuid.hex}
+
+        # Instead of using a full uuid we opt for 8 length string id.
+        # It's highly unlikely to have a confict but if it happens, try up to 5 times to create one
+        retries, created = 5, False
+        while retries:
+            retries -= 1
+            try:
+                initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
+            except:
+                continue
+            else:
+                created = True
+                break
+        if not created:
+            return HttpResponseServerError('No run id could be created')
+
+        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.id}
 
         # send task to knotify service for processing
         app.send_task('predict', (sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
@@ -208,34 +222,34 @@ class InteractiveView(LoginRequiredMixin, View):
 def update_history_view(request):
     '''
         Return json with newest current and previous runs.
-        If latest_history_uuid is provided then all completed runs
+        If latest_history_id is provided then all completed runs
         after the specified will be returned, else return all previous runs
     '''
     user = request.user
     data = json.loads(request.body.decode("utf-8"))
-    latest_history_uuid = data.get('latest_history_uuid')
+    latest_history_id = data.get('latest_history_id')
     current_runs_queryset = (Run.objects
                                 .filter(user=user, status=StatusChoices.ONGOING)
                                 .select_related('result__sequence')
-                                .values_list('uuid', 'result__sequence', 'submitted'))
+                                .values_list('id', 'result__sequence', 'submitted'))
     previous_runs_queryset = (Run.objects
                                  .filter(user=user, status=StatusChoices.COMPLETED))
-    if latest_history_uuid:
-        last_previous_entry = Run.objects.get(pk=latest_history_uuid)
+    if latest_history_id:
+        last_previous_entry = Run.objects.get(pk=latest_history_id)
         completed = last_previous_entry.completed
         previous_runs_queryset = previous_runs_queryset.filter(completed__gt=completed)
     previous_runs_queryset = (previous_runs_queryset.select_related('result__sequence')
-                                                    .values_list('uuid', 'result__sequence', 'result__structure', 'submitted', 'completed'))
+                                                    .values_list('id', 'result__sequence', 'result__structure', 'submitted', 'completed'))
     date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
-    previous_runs = [{'id':str(uuid), 'sequence':sequence, 'structure': structure,'submitted':date_format(submitted), 'completed':date_format(completed)}
-                     for uuid, sequence, structure, submitted, completed in previous_runs_queryset]
+    previous_runs = [{'id':str(id), 'sequence':sequence, 'structure': structure,'submitted':date_format(submitted), 'completed':date_format(completed)}
+                     for id, sequence, structure, submitted, completed in previous_runs_queryset]
     current_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2])} for run in current_runs_queryset]
     try:
-        latest_history_uuid = previous_runs[-1]['id']
+        latest_history_id = previous_runs[-1]['id']
     except:
-        latest_history_uuid = ''
+        latest_history_id = ''
 
-    context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_uuid': latest_history_uuid}
+    context = { 'current_runs': current_runs, 'previous_runs': previous_runs, 'latest_history_id': latest_history_id}
 
     if is_guest_user(user):
         # add flag to trigger notification
@@ -252,10 +266,10 @@ def update_history_view(request):
 @require_http_methods(['POST'])
 def delete_run_view(request):
     body = json.loads(request.body.decode('UTF-8'))
-    run_uuid = body.get('run_uuid', '')
+    run_id = body.get('run_id', '')
     success = True
     try:
-        run = Run.objects.get(pk=run_uuid)
+        run = Run.objects.get(pk=run_id)
         result = run.result
         result.delete() # cascade on delete removes run also
     except:
@@ -311,8 +325,8 @@ def get_varna_arc_diagram(request):
     sequence = body.get('sequence', '')
     sequence = sequence.upper()
     structure = body.get('structure', '')
-    uuid = body.get('uuid', 'filename')
-    filename = uuid + '.svg'
+    id = body.get('id', 'filename')
+    filename = id + '.svg'
     empty = not (sequence or structure)
     contain_unknown_characters = not (set(sequence).issubset({'A','C', 'G', 'U'})
                                       or set(structure).issubset({'(', ')', '[', ']', '.'}))
