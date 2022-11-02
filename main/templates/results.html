@@ -104,8 +104,8 @@
             <div class="tab-pane fade show active" id="naview-tab-panel" role="tabpanel" aria-labelledby="naview-tab" tabindex="0">
                 <div id='rna_ss' class="mb-2"> </div>
 
-                <div class="row my-2">
-                    <div class="col-6 text-start p-0">
+                <div class="d-flex justify-content-between my-2">
+                    <div>
                         <div class="btn-group dropup">
                             <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                 Presentation
@@ -128,14 +128,14 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-6 text-end">
+                    <div>
                         <form action="../interactive/" method="POST" style="display:inline-block;">
                             {% csrf_token %}
                             <input type="hidden" name="sequence" value="{{sequence}}">
                             <input type="hidden" name="structure" value="{{structure}}">
-                            <button type="submit" class="btn btn-success">Interactive Mode</button>
+                            <button type="submit" class="btn btn-success btn-sm">Interactive Mode</button>
                         </form>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>
                     </div>
                 </div>
             </div>
