@@ -26,7 +26,7 @@ class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
         user = request.user
         current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('id', 'result__sequence', 'submitted')
         previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('id', 'result__sequence', 'result__structure', 'submitted', 'completed')
-        date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
+        date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s e')
         previous_runs = [{'id':str(id), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
                          for id, sequence, structure, submitted, completed in previous_runs_queryset]
         previous_runs_ids = [str(run[0]) for run in previous_runs_queryset]
