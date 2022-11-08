@@ -40,3 +40,7 @@ li {
 .presentation-option:hover{
     cursor: pointer;
 }
+
+line.fornac-link[link_type="basepair"]{
+    stroke: #adaba9;
+}
