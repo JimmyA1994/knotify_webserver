@@ -362,17 +362,30 @@ def get_varna_arc_diagram(request):
     with open(filename) as file:
         svg_data = file.read()
 
+    from xml.dom import minidom
+    with minidom.parse(filename) as dom:
+        # match style to that of naview (fornac)
+        for text_elem in dom.getElementsByTagName('text'):
+            text_elem.setAttribute('font-family', 'Tahoma, Geneva, sans-serif')
+            text_elem.setAttribute('font-weight', 'bold')
+        for circle_elem in dom.getElementsByTagName('circle'):
+            circle_elem.setAttribute('stroke-width', '0.8')
+
+        # wrap svg children element around an g (group) element
+        # so that a transform can be applied later by d3.js
+        try:
+            svg_elem = svg_elem = dom.getElementsByTagName('svg')[0]
+        except Exception:
+            return HttpResponseServerError('Varna arc diagram could not be generate svg.')
+        g_elem = minidom.Element('g')
+        g_elem.childNodes = svg_elem.childNodes
+        svg_elem.childNodes = [g_elem]
+
+        svg_data = dom.toxml(encoding='UTF-8').decode('UTF-8')
+
     # delete file
     delete_cmd = f'rm {filename}'
     subprocess.run(delete_cmd.split())
-
-    # Wrap svg elements around a <g> element, so that d3.js can select it.
-    svg_data = svg_data.replace('svg">', 'svg">\n<g>')
-    svg_data = svg_data.replace('</svg>', '</g>\n</svg>')
-
-    # match style to that of naview (fornac)
-    svg_data = svg_data.replace('font-family="Verdana"', 'font-family="Tahoma, Geneva, sans-serif" font-weight="bold"')
-    svg_data = svg_data.replace('stroke-width="1.0"', 'stroke-width="0.8"')
 
     # return svg
     return HttpResponse(svg_data, content_type="image/svg+xml")
