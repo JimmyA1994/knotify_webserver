@@ -26,7 +26,7 @@ class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
         user = request.user
         current_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.ONGOING).select_related('result__sequence').values_list('id', 'result__sequence', 'submitted')
         previous_runs_queryset = Run.objects.filter(user=user, status=StatusChoices.COMPLETED).select_related('result__sequence').values_list('id', 'result__sequence', 'result__structure', 'submitted', 'completed')
-        date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
+        date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s e')
         previous_runs = [{'id':str(id), 'sequence': sequence, 'structure': structure ,'submitted': date_format(submitted), 'completed': date_format(completed)}
                          for id, sequence, structure, submitted, completed in previous_runs_queryset]
         previous_runs_ids = [str(run[0]) for run in previous_runs_queryset]
@@ -333,24 +333,28 @@ def get_varna_arc_diagram(request):
     if empty or contain_unknown_characters:
         return HttpResponseBadRequest('Parameters were not recognised.')
 
-    outline_color = '#ADABA9'
+    OUTLINE_COLOR = '#ADABA9'
+    BASE_PAIR_LINK_COLOR = '#ADABA9'
+    PSEUDOKNOT_LINK_COLOR = '#FF312F'
+    pseudoknot_start_point_indexes = [i+1 for i, char in enumerate(structure) if char == '[']
+    pseudoknot_start_x_points = [index*10.0 for index in pseudoknot_start_point_indexes]
 
     A_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'A'])
-    A_color_args = f'-basesStyle1 fill=#DBDB8D,outline={outline_color} -applyBasesStyle1on {A_indexes} ' if A_indexes else ''
+    A_color_args = f'-basesStyle1 fill=#DBDB8D,outline={OUTLINE_COLOR} -applyBasesStyle1on {A_indexes} ' if A_indexes else ''
 
     C_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'C'])
-    C_color_args = f'-basesStyle2 fill=#98DF8A,outline={outline_color}  -applyBasesStyle2on {C_indexes} ' if C_indexes else ''
+    C_color_args = f'-basesStyle2 fill=#98DF8A,outline={OUTLINE_COLOR}  -applyBasesStyle2on {C_indexes} ' if C_indexes else ''
 
     G_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'G'])
-    G_color_args = f'-basesStyle3 fill=#E19896,outline={outline_color}  -applyBasesStyle3on {G_indexes} ' if G_indexes else ''
+    G_color_args = f'-basesStyle3 fill=#E19896,outline={OUTLINE_COLOR}  -applyBasesStyle3on {G_indexes} ' if G_indexes else ''
 
     U_indexes = ','.join([str(i+1) for i,char in enumerate(sequence) if char == 'U'])
-    U_color_args = f'-basesStyle4 fill=#AEC7E8,outline={outline_color}  -applyBasesStyle4on {U_indexes}'  if U_indexes else ''
+    U_color_args = f'-basesStyle4 fill=#AEC7E8,outline={OUTLINE_COLOR}  -applyBasesStyle4on {U_indexes}'  if U_indexes else ''
 
     # run varna
     cmd = (f'java -cp /usr/share/java/varna.jar fr.orsay.lri.varna.applications.VARNAcmd \
                   -sequenceDBN {sequence} -structureDBN {structure} \
-                  -o {filename} -algorithm line -bpStyle none -bp #ff312f '
+                  -o {filename} -algorithm line -bpStyle none -bp ' + BASE_PAIR_LINK_COLOR + ' '
                  + A_color_args + C_color_args + G_color_args + U_color_args)
     print(cmd)
     import subprocess
@@ -362,17 +366,47 @@ def get_varna_arc_diagram(request):
     with open(filename) as file:
         svg_data = file.read()
 
+    from xml.dom import minidom
+    with minidom.parse(filename) as dom:
+        # match style to that of naview (fornac)
+        for text_elem in dom.getElementsByTagName('text'):
+            text_elem.setAttribute('font-family', 'Tahoma, Geneva, sans-serif')
+            text_elem.setAttribute('font-weight', 'bold')
+        for circle_elem in dom.getElementsByTagName('circle'):
+            circle_elem.setAttribute('stroke-width', '0.8')
+        for path_elem in dom.getElementsByTagName('path'):
+            try:
+                path_start_x_point = float(path_elem.attributes.get('d').value.split(',')[0].split(' ')[1])
+            except Exception:
+                path_start_x_point = None
+            if path_start_x_point and path_start_x_point in pseudoknot_start_x_points:
+                # change pseudoknot links color
+                existing_style_attributes = path_elem.getAttribute('style').split('; ')
+                path_elem.getAttribute('style').split(': ')
+                try:
+                    stroke_index = [i for i, attr in enumerate(existing_style_attributes) if 'stroke:' in attr][0]
+                except Exception:
+                    stroke_index = None
+                    continue
+                existing_style_attributes[stroke_index] = 'stroke: ' + PSEUDOKNOT_LINK_COLOR
+                style_attribute = '; '.join(existing_style_attributes)
+                path_elem.setAttribute('style', style_attribute)
+
+        # wrap svg children element around an g (group) element
+        # so that a transform can be applied later by d3.js
+        try:
+            svg_elem = svg_elem = dom.getElementsByTagName('svg')[0]
+        except Exception:
+            return HttpResponseServerError('Varna arc diagram could not be generate svg.')
+        g_elem = minidom.Element('g')
+        g_elem.childNodes = svg_elem.childNodes
+        svg_elem.childNodes = [g_elem]
+
+        svg_data = dom.toxml(encoding='UTF-8').decode('UTF-8')
+
     # delete file
     delete_cmd = f'rm {filename}'
     subprocess.run(delete_cmd.split())
-
-    # Wrap svg elements around a <g> element, so that d3.js can select it.
-    svg_data = svg_data.replace('svg">', 'svg">\n<g>')
-    svg_data = svg_data.replace('</svg>', '</g>\n</svg>')
-
-    # match style to that of naview (fornac)
-    svg_data = svg_data.replace('font-family="Verdana"', 'font-family="Tahoma, Geneva, sans-serif" font-weight="bold"')
-    svg_data = svg_data.replace('stroke-width="1.0"', 'stroke-width="0.8"')
 
     # return svg
     return HttpResponse(svg_data, content_type="image/svg+xml")

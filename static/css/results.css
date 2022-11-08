@@ -142,3 +142,7 @@ li .nav-link:hover{
     border-width: 0;
     border-bottom: 1px solid #fff7ed;
 }
+
+svg g line[link-type=pseudoknot]{
+    stroke: #ff302e;
+}
