@@ -2,9 +2,11 @@ function createContainer(width, height) {
     var seq = window.sequence;
     var str = window.structure;
     var container = new fornac.FornaContainer("#rna_ss",
-    {'animation': true, 'zoomable': true, 'initialSize':[width, height]});
+                        {'animation': true, 'zoomable': true,
+                         'initialSize':[width, height]});
 
-     var options = {'structure': str,
+    var options = {
+        'structure': str,
         'sequence': seq
     };
     container.addRNA(options.structure, options);
@@ -13,6 +15,8 @@ function createContainer(width, height) {
 
 function init_container() {
     window.container = createContainer(window.width, window.height);
+    // select default color scheme
+    selectColorScheme('sequence');
     setSize();
 }
 
@@ -52,9 +56,20 @@ function setSize() {
     window.container.centerView();
 }
 
-function selectDropdown(item) {
-    /** enforces color scheme selected dropdown item style */
+function selectColorScheme(scheme) {
+    /** enforces color scheme of nucleotides and
+     *  selects corresponding menu item */
+    const scheme_to_item_relationship = {
+        'sequence': 1,
+        'structure': 2,
+        'positions': 3
+    }
+    if (!scheme_to_item_relationship.hasOwnProperty(scheme)){
+        return;
+    }
+    window.container.changeColorScheme(scheme);
 
+    const item = scheme_to_item_relationship[scheme]
     // unset all items
     var item1 = document.getElementById("dropdown-item1");
     item1.style.background = "#FFFFFF";
@@ -67,9 +82,9 @@ function selectDropdown(item) {
     item3.style.color = "#000000";
 
     // set selected item
-    var item = document.getElementById("dropdown-item"+item);
-    item.style.background = "#7A7978";
-    item.style.color = "#FFFFFF";
+    const item_elem = document.getElementById("dropdown-item"+item);
+    item_elem.style.background = "#7A7978";
+    item_elem.style.color = "#FFFFFF";
 }
 
 function reset() {
@@ -82,7 +97,7 @@ function reset() {
     document.querySelector("#linksCheckbox").checked = true;
 
     // default color scheme
-    selectDropdown(2);
+    selectColorScheme('sequence');
 
     // reset graph
     init_container();
@@ -93,7 +108,7 @@ function init(){
     // register plot sizing on every window resizing
     window.addEventListener('resize', setSize);
 
-    // register animation checkbox evenet listener
+    // register animation checkbox event listener
     document.getElementById("animateCheckbox").checked = true;
     var checkbox = document.querySelector("#animateCheckbox");
     checkbox.addEventListener('change', function() {
@@ -104,7 +119,7 @@ function init(){
         }
     });
 
-    // register numbering checkbox evenet listener
+    // register numbering checkbox event listener
     document.getElementById("numberingCheckbox").checked = true;
     var numberingCheckbox = document.querySelector("#numberingCheckbox");
     numberingCheckbox.addEventListener('change', function() {
@@ -115,7 +130,7 @@ function init(){
         }
     });
 
-    // register node label checkbox evenet listener
+    // register node label checkbox event listener
     document.getElementById("nodeLabelCheckbox").checked = true;
     var nodeLabelCheckbox = document.querySelector("#nodeLabelCheckbox");
     nodeLabelCheckbox.addEventListener('change', function() {
@@ -126,7 +141,7 @@ function init(){
         }
     });
 
-    // register pseudoknot links checkbox evenet listener
+    // register pseudoknot links checkbox event listener
     document.getElementById("pseudoknotCheckbox").checked = true;
     var pseudoknotCheckbox = document.querySelector("#pseudoknotCheckbox");
     pseudoknotCheckbox.addEventListener('change', function() {
@@ -137,7 +152,7 @@ function init(){
         }
     });
 
-    // register direction arrows checkbox evenet listener
+    // register direction arrows checkbox event listener
     document.getElementById("directionArrowsCheckbox").checked = true;
     var directionArrowsCheckbox = document.querySelector("#directionArrowsCheckbox");
     directionArrowsCheckbox.addEventListener('change', function() {
@@ -148,7 +163,7 @@ function init(){
         }
     });
 
-    // register direction arrows checkbox evenet listener
+    // register direction arrows checkbox event listener
     document.getElementById("linksCheckbox").checked = true;
     var linksCheckbox = document.querySelector("#linksCheckbox");
     linksCheckbox.addEventListener('change', function() {
