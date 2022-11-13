@@ -199,14 +199,11 @@ function createArcDiagram(){
         const last_svg_element = g_node.children[g_node.childElementCount-1];
         const initial_width = Number(last_svg_element.getAttribute('x'));
         const initial_height = Number(last_svg_element.getAttribute('y'));
-        // calculate the how much we should scale:
-        // intentionally let a 5% smaller scalling to compensate for estimation errors.
-        const scale = window.naview_width/(1.05*initial_width);
-        // calculate how much the svg should move to provide a centered view.
-        const scaled_width = scale*initial_width;
-        const scaled_height = scale*initial_height;
-        const transformed_x = Math.abs(window.naview_width - scaled_width)/4; // a shorter start is required here
-        const transformed_y = Math.abs(window.naview_height - scaled_height)/2;
+
+        const transform_values = getArcDiagramFittingTransform(window.naview_width, initial_width, initial_height)
+        const transformed_x = transform_values.transformed_x;
+        const transformed_y = transform_values.transformed_y;
+        const scale = transform_values.scale;
 
         // zoom+pan event handler
         var transform;
@@ -220,6 +217,26 @@ function createArcDiagram(){
         document.querySelector("#spinner-container").remove();
         document.querySelector('#arc-container').appendChild(final_node);
     });
+}
+
+function getArcDiagramFittingTransform(container_width, svg_width, svg_height){
+    /**
+     * Determine what transform operations are needed for
+     * arc diagram to fill containter's space
+     */
+
+    // calculate the how much we should scale:
+    // intentionally let a 5% smaller scalling to compensate for estimation errors.
+    const scale = container_width/(1.05*svg_width);
+    // calculate how much the svg should move to provide a centered view.
+    const scaled_width = scale*svg_width;
+    const scaled_height = scale*svg_height;
+    const transformed_x = Math.abs(window.naview_width - scaled_width)/4; // a shorter start is required here
+    const transformed_y = Math.abs(window.naview_height - scaled_height)/2;
+    return {transformed_x: transformed_x,
+            transformed_y: transformed_y,
+            scale: scale
+    };
 }
 
 window.onload = init;
