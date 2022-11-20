@@ -14,34 +14,34 @@
     </head>
 
     <body>
-        <!-- <div class="container-fluid vh-100"> -->
-        <!-- <div class="container vh-100 bg-white"> -->
-        <div class="container overflow-auto vh-100 bg-white">
-            <div class="row p-2 navigator">
-                <a href="/" class="col-4" style="width:200px;user-select: none;" draggable="false">
-                    <img id="logo" src="{% static 'images/ntua.svg' %}" alt="NTUA logo" draggable="false" class="img-fluid rounded-circle">
-                </a>
-                <div class="ms-3 col-8">
-                    <div class="row nav-row nav-title">KNOTIFY</div>
-                    <div class="row nav-row nav-subtitle mt-5">An RNA pseudoknot predition tool</div>
-                    <!--<div class="row fs-2">ΕΘΝΙΚΟ ΜΕΤΣΟΒΙΟ ΠΟΛΥΤΕΧΝΕΙΟ</div>
-                    <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
-                    <div class="row">Εργαστήριο DSLab</div>-->
-                    {% if user|is_guest_user %}
-                    <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="convert()" href="#">Convert</a></div>
-                    {% else %}
-                    <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
-                    {% endif %}
+        <div class="container-fluid overflow-auto vh-100">
+            <div class="container bg-white">
+                <div class="row p-2 navigator">
+                    <a href="/" class="col-4" style="width:200px;user-select: none;" draggable="false">
+                        <img id="logo" src="{% static 'images/ntua.svg' %}" alt="NTUA logo" draggable="false" class="img-fluid rounded-circle">
+                    </a>
+                    <div class="ms-3 col-8">
+                        <div class="row nav-row nav-title">KNOTIFY</div>
+                        <div class="row nav-row nav-subtitle mt-5">An RNA pseudoknot predition tool</div>
+                        <!--<div class="row fs-2">ΕΘΝΙΚΟ ΜΕΤΣΟΒΙΟ ΠΟΛΥΤΕΧΝΕΙΟ</div>
+                        <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
+                        <div class="row">Εργαστήριο DSLab</div>-->
+                        {% if user|is_guest_user %}
+                        <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="convert()" href="#">Convert</a></div>
+                        {% else %}
+                        <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
 
-            <div class="row p-4">
-                {% block body%}
-                {% endblock %}
-            </div>
+                <div class="row p-4">
+                    {% block body%}
+                    {% endblock %}
+                </div>
 
+            </div>
         </div>
-        <!-- </div> -->
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
         <script type='text/javascript'>
             function logout(){
