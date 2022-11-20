@@ -1,9 +1,6 @@
 function register_download_events() {
     // initialize download global variables
     window.svg_background = true;
-    // window.width = 1920;
-    // window.height = 1080;
-    // window.size = "1920x1080"
     window.width = 1280;
     window.height = 720;
     window.size = "1280x720"
@@ -12,14 +9,8 @@ function register_download_events() {
     document.getElementById("background-check").checked = true;
     var checkbox = document.querySelector("#background-check");
     checkbox.addEventListener('change', function() {
-        toggle_svg_background();
-        if (this.checked) {
-            // window['container'].startAnimation()
-            console.log("Checkbox is checked..");
-        } else {
-            // window['container'].stopAnimation()
-            console.log("Checkbox is not checked..");
-        }
+        // toggle svg background
+        window.svg_background = !window.svg_background;
     });
 
     var svg_radio = document.querySelector("#svg-radio");
@@ -31,7 +22,6 @@ function register_download_events() {
                 radio.checked = false;
             }
             window.download_format = this.name;
-            // document.querySelector('#modalDownloadButton').onclick = download_svg
         }
     });
 
@@ -48,64 +38,27 @@ function register_download_events() {
             }
             this.checked = true;
             window.download_format = this.name;
-            // switch(this.name){
-            //     case "png":
-            //         document.querySelector('#modalDownloadButton').onclick = download_png
-            //         break;
-            //     case "ps":
-            //         document.querySelector('#modalDownloadButton').onclick = download_ps
-            //         break;
-            //     case "pdf":
-            //         document.querySelector('#modalDownloadButton').onclick = download_pdf
-            //         break;
-            // }
             }
         });
     }
-    // for(var i = 1; i<=5; i++){
-    //     var radio = document.querySelector("#size-radio"+i);
-    //     radio.addEventListener('change', function() {
-    //         if (this.checked) {
-    //             // unset all radio buttons
-    //             for(var j = 1; j<=5; j++){
-    //                 var temp = document.querySelector("#size-radio"+j);
-    //                 temp.checked = false;
-    //             }
-    //             // set the one we selected
-    //             this.checked = true;
-    //             window.size = this.name;
-    //         }
-    //     });
-    // }
-    for(var i = 1; i<=5; i++){
+
+    for(var i = 1; i<=4; i++){
         var radio = document.querySelector("#size-radio"+i);
         radio.addEventListener('change', function() {
             if (this.checked) {
                 // unset all radio buttons
-                for(var j = 1; j<=5; j++){
+                for(var j = 1; j<=4; j++){
                     var temp = document.querySelector("#size-radio"+j);
                     temp.checked = false;
                 }
                 // set the one we selected
                 this.checked = true;
                 window.size = this.name;
-                // enable custom text input
-                if (this.id == 'size-radio5'){
-                    document.querySelector('#size-width').disabled = false;
-                    document.querySelector('#size-height').disabled = false;
-                } else {
-                    // disable custom text input
-                    document.querySelector('#size-width').disabled = true;
-                    document.querySelector('#size-height').disabled = true;
-                }
             }
         });
     }
 }
 
-function toggle_svg_background(){
-    window.svg_background = !window.svg_background;
-}
 
 function display_download_svg_options(){
     var download_img_options = document.getElementById("download-img-options");
@@ -124,32 +77,21 @@ function display_download_img_options(){
 function download_img(){
     // set download_size
     if(window.download_format != "svg"){
-        if(window.size == "custom"){
-            var width = document.querySelector("#size-width").value;
-            var height = document.querySelector("#size-height").value;
-        }else{
-            var resolution = window.size.split("x");
-            var width = resolution[0];
-            var height = resolution[1];
-        }
-        if(window.width != width || window.height != height){
-            window.width = width;
-            window.height = height;
+        var resolution = window.size.split("x");
+        var chosen_width = resolution[0];
+        var chosen_height = resolution[1];
+        if(window.width != chosen_width || window.height != chosen_height){
+            window.width = chosen_width;
+            window.height = chosen_height;
             if(window.plotType == 'static'){
-                clearPlot();
+                clearChart();
                 createChart();
             }else{
                 init_container();
             }
         }
     }
-    // var name;
-    // if (window.plotType == 'interactive'){
-    //     name = 'interactive';
-    // }
-    // else {
     var name = get_filename();
-    // }
     var format = window.download_format;
     if(format == 'svg'){
         var svgData = get_svg_string();
@@ -169,7 +111,6 @@ function download_img(){
         var token = split[1];
 
         var url = window.location.protocol + '//' + window.location.host + '/' + 'convert_svg';
-        // var tuple = fetch('convert_svg',{
         var tuple = fetch(url,{
             method: 'POST',
             headers: {
@@ -225,18 +166,23 @@ function get_svg_string() {
     var css = window.css
     var svg = get_svg();
 
-    //get svg in string format
+    // get svg in string format
     var serializer = new XMLSerializer();
     var svgData = serializer.serializeToString(svg);
 
     // add style element to svg
     var parser = new DOMParser();
     var xmlDoc = parser.parseFromString(svgData, "text/xml");
-    var style = xmlDoc.createElement("style");
-    style.innerHTML = css;
     var svgNode = xmlDoc.childNodes[0];
-    var gNode = xmlDoc.childNodes[0].childNodes[0];
-    svgNode.insertBefore(style, gNode);
+    var gNode = svgNode.childNodes[0];
+    const is_interactive = window.plotType == 'interactive';
+    const is_naview = window.plotType == 'static' && which_graphic_tab() == "naview";
+    // add css styling to forna.js generated charts
+    if (is_interactive || is_naview) {
+        var style = xmlDoc.createElement("style");
+        style.innerHTML = css;
+        svgNode.insertBefore(style, gNode);
+    }
 
     // enforce background
     if (window.svg_background || window.download_format != "svg") {
@@ -262,14 +208,48 @@ function get_svg_string() {
 }
 
 function get_svg(){
-    if(window['plotType'] == 'static'){
-        var div = document.querySelector('.svg-container');
-        var svg = div.childNodes[0];
-        // createChart(window.width, window.height, elementId);
-        // var svg = div.childNodes[0];
+    /* Return the svg element */
+    if(window.plotType == 'static'){
+        const tab = which_graphic_tab();
+        if(tab == 'naview'){
+            var div = document.querySelector('.svg-container');
+            var svg = div.childNodes[0];
+        }
+        else if(tab == "arc"){
+            var div = document.querySelector('#arc-container');
+            var svg_element = div.children[0];
+            // replace scaling attributes with initial scaling
+            var serializer = new XMLSerializer();
+            var svgData = serializer.serializeToString(svg_element);
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(svgData, "text/xml");
+            const svg_root_elem = xmlDoc.children[0];
+            svg_root_elem.attributes.removeNamedItem('viewBox');
+            const g_element = svg_root_elem.children[0];
+            g_element.removeAttribute("transform");
+            const transform_values = getArcDiagramFittingTransform(g_element, window.width, window.height);
+            const transformed_x = transform_values.transformed_x;
+            const transformed_y = transform_values.transformed_y;
+            const scale = transform_values.scale;
+            g_element.setAttribute("transform", "translate("+transformed_x+","+transformed_y+") scale("+scale+")")
+            var svg = svg_root_elem;
+        }
     } else {
         var div = document.querySelector('#rna_ss');
         var svg = div.children[0];
     }
     return svg;
+}
+
+function which_graphic_tab(){
+    const naview_tab = document.querySelector("#naview-tab");
+    const is_naview_displayed = naview_tab.attributes["aria-selected"].value == 'true';
+    if (is_naview_displayed){
+        return 'naview';
+    }
+    const arc_tab = document.querySelector("#arc-tab");
+    const is_arc_displayed = arc_tab.attributes["aria-selected"].value == 'true';
+    if (is_arc_displayed){
+        return 'arc';
+    }
 }

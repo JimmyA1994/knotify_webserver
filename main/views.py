@@ -188,17 +188,19 @@ def convert_svg_view(request):
         body = json.loads(request.body.decode('UTF-8'))
         svg = body['svg']
         format = body['format']
+        width = int(body.get('width', '3840'))
+        height = int(body.get('height', '2160'))
     except:
         return HttpResponseBadRequest('Parameters are not recognisable. Make sure your content is json and includes the following two fields: svg, format')
     if format == 'png':
         from cairosvg import svg2png
-        b64_binary = base64.b64encode(svg2png(svg))
+        b64_binary = base64.b64encode(svg2png(svg, parent_width=width, parent_height=height))
     elif format == 'ps':
         from cairosvg import svg2ps
-        b64_binary = base64.b64encode(svg2ps(svg))
+        b64_binary = base64.b64encode(svg2ps(svg, parent_width=width, parent_height=height))
     elif format == 'pdf':
         from cairosvg import svg2pdf
-        b64_binary = base64.b64encode(svg2pdf(svg))
+        b64_binary = base64.b64encode(svg2pdf(svg, parent_width=width, parent_height=height))
     else:
         return HttpResponseBadRequest('Format is not supported. Please select one of the following formats: png, ps, pdf.')
     return HttpResponse(b64_binary)
@@ -240,7 +242,7 @@ def update_history_view(request):
         previous_runs_queryset = previous_runs_queryset.filter(completed__gt=completed)
     previous_runs_queryset = (previous_runs_queryset.select_related('result__sequence')
                                                     .values_list('id', 'result__sequence', 'result__structure', 'submitted', 'completed'))
-    date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s O e')
+    date_format = lambda x : dateformat.format(x, 'Y-m-d H:i:s e')
     previous_runs = [{'id':str(id), 'sequence':sequence, 'structure': structure,'submitted':date_format(submitted), 'completed':date_format(completed)}
                      for id, sequence, structure, submitted, completed in previous_runs_queryset]
     current_runs = [{'id':str(run[0]), 'sequence':run[1], 'submitted':date_format(run[2])} for run in current_runs_queryset]
