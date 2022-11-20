@@ -127,11 +127,13 @@
                     </div>
                     <div>
                         <label for="max-window-size">max-window-size:</label>
-                        <input type="number" id="max-window-size" name="max_window_size" value="204" min="6" max="1000" style="width:70px" required>
+                        <input type="number" id="max-window-size" name="max_window_size" value="204" max="1000" style="width:70px" required>
+                        {% comment %} <input type="number" id="max-window-size" name="max_window_size" value="204" min="6" max="1000" style="width:70px" required> {% endcomment %}
                     </div>
                     <div>
                         <label for="min-window-size">min-window-size:</label>
-                        <input type="number" id="min-window-size" name="min_window_size" value="6" min="6" max="1000" style="width:70px" required>
+                        <input type="number" id="min-window-size" name="min_window_size" value="6" max="1000" style="width:70px" required>
+                        {% comment %} <input type="number" id="min-window-size" name="min_window_size" value="6" min="6" max="1000" style="width:70px" required> {% endcomment %}
                     </div>
                     <div>
                         <label for="max-stem-allow-smaller">max-stem-allow-smaller:</label>
