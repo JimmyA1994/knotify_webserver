@@ -71,7 +71,6 @@ function reportWindowSize() {
         dot_div.appendChild(dot_content);
         root.appendChild(dot_div)
 
-
         count++;
     }
 }
@@ -144,8 +143,11 @@ function createChart(elementId='rna_ss') {
 
     // remember the size generated
     const node = d3.select('#'+elementId).node()
-    window.naview_height = node.offsetHeight;
-    window.naview_width = node.offsetWidth;
+    if(!window.hasOwnProperty("naview_height") || !window.naview_height){
+        // naview dimensions are used to determine arc diagram's size
+        window.naview_height = node.offsetHeight;
+        window.naview_width = node.offsetWidth;
+    }
 
     return chart;
 }
@@ -194,13 +196,7 @@ function createArcDiagram(){
         const g = svg.select('g');
         var g_node = g.node();
 
-        // get an estimation of initial svg size:
-        // let the last element's position equal roughly to the size of the svg.
-        const last_svg_element = g_node.children[g_node.childElementCount-1];
-        const initial_width = Number(last_svg_element.getAttribute('x'));
-        const initial_height = Number(last_svg_element.getAttribute('y'));
-
-        const transform_values = getArcDiagramFittingTransform(window.naview_width, initial_width, initial_height)
+        const transform_values = getArcDiagramFittingTransform(g_node, window.naview_width, window.naview_height);
         const transformed_x = transform_values.transformed_x;
         const transformed_y = transform_values.transformed_y;
         const scale = transform_values.scale;
@@ -216,23 +212,36 @@ function createArcDiagram(){
         // replace spinner with arc diagram
         document.querySelector("#spinner-container").remove();
         document.querySelector('#arc-container').appendChild(final_node);
+
+        // show arc diagram toolbar
+        document.querySelector('#arc-diagram-toolbar').classList = [];
+
     });
 }
 
-function getArcDiagramFittingTransform(container_width, svg_width, svg_height){
+function getArcDiagramFittingTransform(g_node, container_width, container_height){
     /**
      * Determine what transform operations are needed for
      * arc diagram to fill containter's space
      */
+    // get an estimation of initial svg size:
+    // let the last element's position equal roughly to the size of the svg.
+    // Also, add the font size to pad the svg size and
+    //       allow leeway to fit in the container.
+    const last_svg_element = g_node.children[g_node.childElementCount-1];
+    const last_text_font_size = Number(last_svg_element.getAttribute('font-size'));
+    const svg_width = Number(last_svg_element.getAttribute('x')) + last_text_font_size;
+    const svg_height = Number(last_svg_element.getAttribute('y')) + last_text_font_size;
 
     // calculate the how much we should scale:
-    // intentionally let a 5% smaller scalling to compensate for estimation errors.
-    const scale = container_width/(1.05*svg_width);
+    // select the scalling that will fill the smallest dimension
+    const scale = Math.min(container_width/svg_width, container_height/svg_height);
     // calculate how much the svg should move to provide a centered view.
     const scaled_width = scale*svg_width;
     const scaled_height = scale*svg_height;
-    const transformed_x = Math.abs(window.naview_width - scaled_width)/4; // a shorter start is required here
-    const transformed_y = Math.abs(window.naview_height - scaled_height)/2;
+    const transformed_x = Math.abs(container_width - scaled_width)/2; // a shorter start is required here
+    const transformed_y = Math.abs(container_height - scaled_height)/2;
+
     return {transformed_x: transformed_x,
             transformed_y: transformed_y,
             scale: scale

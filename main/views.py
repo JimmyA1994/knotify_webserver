@@ -188,17 +188,19 @@ def convert_svg_view(request):
         body = json.loads(request.body.decode('UTF-8'))
         svg = body['svg']
         format = body['format']
+        width = int(body.get('width', '3840'))
+        height = int(body.get('height', '2160'))
     except:
         return HttpResponseBadRequest('Parameters are not recognisable. Make sure your content is json and includes the following two fields: svg, format')
     if format == 'png':
         from cairosvg import svg2png
-        b64_binary = base64.b64encode(svg2png(svg))
+        b64_binary = base64.b64encode(svg2png(svg, parent_width=width, parent_height=height))
     elif format == 'ps':
         from cairosvg import svg2ps
-        b64_binary = base64.b64encode(svg2ps(svg))
+        b64_binary = base64.b64encode(svg2ps(svg, parent_width=width, parent_height=height))
     elif format == 'pdf':
         from cairosvg import svg2pdf
-        b64_binary = base64.b64encode(svg2pdf(svg))
+        b64_binary = base64.b64encode(svg2pdf(svg, parent_width=width, parent_height=height))
     else:
         return HttpResponseBadRequest('Format is not supported. Please select one of the following formats: png, ps, pdf.')
     return HttpResponse(b64_binary)
