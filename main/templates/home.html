@@ -236,7 +236,7 @@
             var html = []
             $.each(row, function (key, value) {
                 if(key == 'sequence' || key == 'structure'){
-                    html.push('<p><b class="user-select-none me-1">' + key + ':</b>' + '<span class="user-select-all">' + value + '</span>' + '</p>');
+                    html.push('<p><b class="user-select-none me-1">' + key + ':</b>' + '<span class="user-select-all font-monospace" style="line-break: anywhere;">' + value + '</span>' + '</p>');
                 }
             })
             return html.join('')
