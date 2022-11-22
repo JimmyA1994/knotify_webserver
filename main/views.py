@@ -81,6 +81,10 @@ def process_login_view(request):
     print(f'{password = }')
     user = authenticate(username=username, password=password)
     if user:
+        if is_guest_user(request.user):
+            # migrate Runs to logged user
+            Run.objects.filter(user=request.user).update(user=user)
+            logout(request)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
     else:
