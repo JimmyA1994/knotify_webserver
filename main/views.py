@@ -216,10 +216,11 @@ class InteractiveView(LoginRequiredMixin, View):
         data = request.POST
         sequence = data.get('sequence')
         structure = data.get('structure')
+        id = data.get('id')
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
-        context = {'sequence': sequence, 'structure': structure, 'css': css}
+        context = {'sequence': sequence, 'structure': structure, 'css': css, 'id': id}
         return render(request, 'interactive.html', context)
 
 

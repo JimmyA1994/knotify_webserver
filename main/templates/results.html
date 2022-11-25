@@ -133,6 +133,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="sequence" value="{{sequence}}">
                             <input type="hidden" name="structure" value="{{structure}}">
+                            <input type="hidden" name="id" value="{{id}}">
                             <button type="submit" class="btn btn-success btn-sm">Interactive Mode</button>
                         </form>
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button>

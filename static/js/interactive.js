@@ -20,6 +20,11 @@ function init_container() {
     setSize();
 }
 
+function returnToResults(){
+    var url = window.location.protocol + "//" + window.location.host + "/" + "results/?id=" + window.id;
+    window.location.href = url;
+}
+
 function setSize() {
     /** Replica of forna.setSize that resizes plot to main-body current size */
 
@@ -181,6 +186,7 @@ function init(){
     window.css = document.getElementById("css_text").textContent;
     window.sequence = document.getElementById("sequence").textContent;
     window.structure = document.getElementById("structure").textContent;
+    window.id = document.getElementById("id").textContent;
 
     // get svg from svg_ss element
     window.plotType = 'interactive'
