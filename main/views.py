@@ -17,7 +17,7 @@ import json
 from celery import Celery
 app = Celery("knotify", backend='redis://redis:6379',
                         broker='redis://redis:6379')
-class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
+class HomePageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
     template_name = 'home.html'
@@ -309,9 +309,9 @@ def handle_task_completion(request):
         raise Exception(f'Task returned success=False')
 
     # update result
-    result.pseudoknot_options = data.get('validated_pseudoknot_options', {})
-    result.hairpin_options = data.get('validated_hairpin_options', {})
-    result.energy_options = data.get('validated_energy_options', {})
+    result.pseudoknot_options = data.get('pseudoknot_options', {})
+    result.hairpin_options = data.get('hairpin_options', {})
+    result.energy_options = data.get('energy_options', {})
     result.structure = data.get('structure', '')
     result.save(update_fields=('pseudoknot_options', 'hairpin_options', 'energy_options', 'structure'))
 

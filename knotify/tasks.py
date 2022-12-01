@@ -3,7 +3,7 @@ import requests
 from knotify_client import KnotifyClient
 
 app = Celery("knotify", backend='redis://redis:6379',
-                                  broker='redis://redis:6379')
+                        broker='redis://redis:6379')
 
 @app.task(name='predict')
 def predict(sequence, pseudoknot_options, hairpin_options, energy_options, model_ids):
