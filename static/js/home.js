@@ -433,16 +433,16 @@ function submitFunction() {
 
 window.addEventListener('load', function() {
     console.log('All assets are loaded')
-    var maxWindowSize = document.getElementById("max-window-size");
-    maxWindowSize.addEventListener("change", correctWindowSize);
-    var minWindowSize = document.getElementById("min-window-size");
-    minWindowSize.addEventListener("change", correctWindowSize);
+    // var maxWindowSize = document.getElementById("max-window-size");
+    // maxWindowSize.addEventListener("change", correctWindowSize);
+    // var minWindowSize = document.getElementById("min-window-size");
+    // minWindowSize.addEventListener("change", correctWindowSize);
 
     window.intervalReference = null;
     window.inform_user_completed_runs = [];
 
-    var sequence = document.getElementById("RNA-sequence");
-    sequence.addEventListener("focusout", correctWindowSize);
+    // var sequence = document.getElementById("RNA-sequence");
+    // sequence.addEventListener("focusout", correctWindowSize);
 
     if (window.previous_runs.length > 0) {
         // register show/hide button
@@ -467,4 +467,7 @@ window.addEventListener('load', function() {
         // enable polling for current run completion
         startPolling();
     }
+
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 })

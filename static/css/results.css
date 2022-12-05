@@ -83,11 +83,12 @@
 }
 
 .light-background {
-    background-color: #fff7ed;
+    background-color: #d9e6f2;
 }
 
 hr {
     margin-top: 0;
+    margin-bottom: 0.4em;
 }
 
 .options-title {
@@ -144,4 +145,16 @@ li .nav-link:hover{
 
 svg g line[link-type=pseudoknot]{
     stroke: #ff302e;
+}
+
+#prediction-options {
+    border-radius: 10px;
+}
+
+.horizontally-centered {
+    margin: 0 auto;
+}
+
+.options-title {
+    font-weight: 500;
 }

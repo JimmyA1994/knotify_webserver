@@ -19,14 +19,6 @@
     </div>
     <!-- <div class="base-card overview"> -->
     <div class="card-decor overview">
-        <div>
-            <div>
-                <u class="card-title">Overview</u>
-            </div>
-            <div>
-                <p style="font-size: 14px; margin-left:1em;">This is my diploma thesis</p>
-            </div>
-        </div>
         <div id='history-container'>
             {% if current_runs or previous_runs %}
             <div id="history-title">
@@ -99,93 +91,150 @@
             <hr style="margin:0px;">
         </div>
         <div class="row mt-2 mb-3">
-            <div class="col border">
-                <span class="option-title">Pseudoknot Options</span>
-                <div style="border: 1px solid black;">
-                    <div>Parser:</div>
-                    <div>
-                        <input type="radio" name="parser" value="yaep" id="yaep" checked>
-                        <label for="yaep">yaep</label>
-                        <input type="radio" name="parser" value="bruteforce" id="bruteforce">
-                        <label for="bruteforce">bruteforce</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="allow-ug" name="allow_ug" value="True">
-                        <label for="allow-ug">allow-ug</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="allow-skip-final-au" name="allow_skip_final_au" value="True">
-                        <label for="allow-skip-final-au">allow-skip-final-au</label>
-                    </div>
-                    <div>
-                        <label for="max-dd-size">max-dd-size:</label>
-                        <input type="number" id="max-dd-size" name="max_dd_size" value="2" min="0" max="20" style="width:50px" required>
-                    </div>
-                    <div>
-                        <label for="min-dd-size">min-dd-size:</label>
-                        <input type="number" id="min-dd-size" name="min_dd_size" value="0" min="0" max="20" style="width:50px" required>
-                    </div>
-                    <div>
-                        <label for="max-window-size">max-window-size:</label>
-                        <input type="number" id="max-window-size" name="max_window_size" value="204" max="1000" style="width:70px" required>
-                        {% comment %} <input type="number" id="max-window-size" name="max_window_size" value="204" min="6" max="1000" style="width:70px" required> {% endcomment %}
-                    </div>
-                    <div>
-                        <label for="min-window-size">min-window-size:</label>
-                        <input type="number" id="min-window-size" name="min_window_size" value="6" max="1000" style="width:70px" required>
-                        {% comment %} <input type="number" id="min-window-size" name="min_window_size" value="6" min="6" max="1000" style="width:70px" required> {% endcomment %}
-                    </div>
-                    <div>
-                        <label for="max-stem-allow-smaller">max-stem-allow-smaller:</label>
-                        <input type="number" id="max-stem-allow-smaller" name="max_stem_allow_smaller" value="2" min="0" max="10" style="width:70px" required>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="prune-early" name="prune_early" value="True">
-                        <label for="prune-early">prune-early</label>
+            <!-- <div class="col"> -->
+            <!-- <div class="col-md mb-2"> -->
+            <div class="col-lg mb-2">
+                <div class="border p-1 bg-options-blue">
+                    <span class="options-title">Pseudoknot Options</span>
+                    <div class="options-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Parser details">Parser:</span>
+                            </div>
+                            <div class=" col-auto form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="parser" id="yaep" value="yaep" checked>
+                                <label class="form-check-label" for="yaep">yaep</label>
+                            </div>
+                            <div class="col-auto form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="parser" id="bruteforce" value="bruteforce">
+                                <label class="form-check-label" for="bruteforce">bruteforce</label>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="allow_ug" value="True" id="allow-ug">
+                            <label class="form-check-label" for="allow-ug"><span data-bs-toggle="tooltip" data-bs-placement="top" title="allow-ug details">allow-ug</span></label>
+                        </div>
+                        {% comment %} <div>
+                            <input type="checkbox" id="allow-skip-final-au" name="allow_skip_final_au" value="True">
+                            <label for="allow-skip-final-au">allow-skip-final-au</label>
+                        </div> {% endcomment %}
+                        <!-- <div>
+                            <label for="max-dd-size">max-dd-size:</label>
+                            <input type="number" id="max-dd-size" name="max_dd_size" value="2" min="0" max="20" style="width:50px" required>
+                        </div> -->
+                        <div class="row g-3 align-items-center">
+                            <!-- <label class="col-auto" for="max-dd-size">max-dd-size:</label> -->
+                            <label class="col-auto" for="max-dd-size"><span data-bs-toggle="tooltip" data-bs-placement="top" title="max-dd-size details">max-dd-size:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="max-dd-size" name="max_dd_size" value="2" min="0" max="20" style="width:57px" required>
+                        </div>
+                        <div class="row g-3 align-items-center">
+                            <!-- <label class="col-auto" for="min-dd-size">min-dd-size:</label> -->
+                            <label class="col-auto" for="min-dd-size"><span data-bs-toggle="tooltip" data-bs-placement="top" title="min-dd-size details">min-dd-size:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="min-dd-size" name="min_dd_size" value="0" min="0" max="20" style="width:57px" required>
+                        </div>
+                        {% comment %} <div>
+                            <label for="max-window-size">max-window-size:</label>
+                            <input type="number" id="max-window-size" name="max_window_size" value="204" max="1000" style="width:70px" required>
+                        </div>
+                        <div>
+                            <label for="min-window-size">min-window-size:</label>
+                            <input type="number" id="min-window-size" name="min_window_size" value="6" max="1000" style="width:70px" required>
+                        </div> {% endcomment %}
+                        <div class="row g-3 align-items-center">
+                            <!-- <label class="col-auto" for="max-stem-allow-smaller">max-stem-allow-smaller:</label> -->
+                            <label class="col-auto" for="max-stem-allow-smaller"><span data-bs-toggle="tooltip" data-bs-placement="top" title="max-stem-allow-smaller details">max-stem-allow-smaller:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="max-stem-allow-smaller" name="max_stem_allow_smaller" value="2" min="0" max="10" style="width:57px" required>
+                        </div>
+                        {% comment %} <div>
+                            <input type="checkbox" id="prune-early" name="prune_early" value="True">
+                            <label for="prune-early">prune-early</label>
+                        </div> {% endcomment %}
                     </div>
                 </div>
             </div>
-            <div class="col border">
-                <span class="option-title">Hairpin Options</span>
-                <div style="border: 1px solid black;">
-                    <div>
-                        <input type="checkbox" id="hairpin-grammar" name="hairpin_grammar" value="True">
-                        <label for="hairpin-grammar">hairpin-grammar</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="hairpin-allow-ug" name="hairpin_allow_ug" value="True">
-                        <label for="hairpin-allow-ug">hairpin-allow-ug</label>
-                    </div>
-                    <div>
-                        <label for="min-hairpin-size">min-hairpin-size:</label>
-                        <input type="number" id="min-hairpin-size" name="min_hairpin_size" value="3" min="1" max="10" style="width:70px" required>
-                    </div>
-                    <div>
-                        <label for="min-hairpin-stems">min-hairpin-stems:</label>
-                        <input type="number" id="min-hairpin-stems" name="min_hairpin_stems" value="3" min="1" max="20" style="width:70px" required>
-                    </div>
-                    <div>
-                        <label for="max-hairpins-per-loop">max-hairpins-per-loop:</label>
-                        <input type="number" id="max-hairpins-per-loop" name="max_hairpins_per_loop" value="1" min="0" max="2" style="width:70px" required>
-                    </div>
-                    <div>
-                        <label for="max-hairpin-bulge">max-hairpin-bulge:</label>
-                        <input type="number" id="max-hairpin-bulge" name="max_hairpin_bulge" value="0" min="0" max="5" style="width:70px" required>
+            <!-- <div class="col"> -->
+            <!-- <div class="col-md mb-2"> -->
+            <div class="col-lg mb-2">
+                <div class="border p-1 bg-options-blue">
+                    <span class="options-title">Hairpin Options</span>
+                    {% comment %} <div style="border: 1px solid black;"> {% endcomment %}
+                    <div class="options-body">
+                        <!-- <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="hairpin_grammar" id="hairpin-grammar">
+                            <label class="form-check-label" for="hairpin-grammar"><span data-bs-toggle="tooltip" data-bs-placement="top" title="hairpin-grammar details">hairpin-grammar</span></label>
+                        </div> -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="hairpin_allow_ug" value="True" id="hairpin-allow-ug">
+                            <label class="form-check-label" for="hairpin-allow-ug"><span data-bs-toggle="tooltip" data-bs-placement="top" title="hairpin-allow-ug details">hairpin-allow-ug</span></label>
+                        </div>
+                        <!-- <div>
+                            <label for="min-hairpin-size">min-hairpin-size:</label>
+                            <input type="number" id="min-hairpin-size" name="min_hairpin_size" value="3" min="1" max="10" style="width:70px" required>
+                        </div> -->
+                        <div class="row g-3 align-items-center">
+                            <label class="col-auto" for="min-hairpin-size"><span data-bs-toggle="tooltip" data-bs-placement="top" title="min-hairpin-size details">min-hairpin-size:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="min-hairpin-size" name="min_hairpin_size" value="3" min="1" max="10" style="width:57px" required>
+                        </div>
+                        <!-- <div>
+                            <label for="min-hairpin-stems">min-hairpin-stems:</label>
+                            <input type="number" id="min-hairpin-stems" name="min_hairpin_stems" value="3" min="1" max="20" style="width:70px" required>
+                        </div> -->
+                        <div class="row g-3 align-items-center">
+                            <label class="col-auto" for="min-hairpin-stems"><span data-bs-toggle="tooltip" data-bs-placement="top" title="min-hairpin-stems details">min-hairpin-stems:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="min-hairpin-stems" name="min_hairpin_stems" value="3" min="1" max="20" style="width:57px" required>
+                        </div>
+                        <!-- <div>
+                            <label for="max-hairpins-per-loop">max-hairpins-per-loop:</label>
+                            <input type="number" id="max-hairpins-per-loop" name="max_hairpins_per_loop" value="1" min="0" max="2" style="width:70px" required>
+                        </div> -->
+                        <div class="row g-3 align-items-center">
+                            <label class="col-auto" for="max-hairpins-per-loop"><span data-bs-toggle="tooltip" data-bs-placement="top" title="max-hairpins-per-loop details">max-hairpins-per-loop:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="max-hairpins-per-loop" name="max_hairpins_per_loop" value="1" min="0" max="2" style="width:57px" required>
+                        </div>
+                        <!-- <div>
+                            <label for="max-hairpin-bulge">max-hairpin-bulge:</label>
+                            <input type="number" id="max-hairpin-bulge" name="max_hairpin_bulge" value="0" min="0" max="5" style="width:70px" required>
+                        </div> -->
+                        <div class="row g-3 align-items-center">
+                            <label class="col-auto" for="max-hairpin-bulge"><span data-bs-toggle="tooltip" data-bs-placement="top" title="max-hairpin-bulge details">max-hairpin-bulge:</span></label>
+                            <input class="col-auto form-control form-control-sm" type="number" id="max-hairpin-bulge" name="max_hairpin_bulge" value="0" min="0" max="5" style="width:57px" required>
+                        </div>
                     </div>
                 </div>
-
-                <span class="option-title mt-3 d-block">Energy Options</span>
-                <div style="border: 1px solid black;">
-                    <div>energy:</div>
-                    <div>
-                        <input type="radio" name="energy" value="vienna" id="vienna" checked>
-                        <label for="vienna">vienna</label>
-                        <input type="radio" name="energy" value="pkenergy" id="pkenergy">
-                        <label for="pkenergy">pkenergy</label>
-                    </div>
-                </div>
-
             </div>
+            <!-- <div class="col"> -->
+            <!-- <div class="col-md mb-2"> -->
+            <div class="col-lg mb-2">
+                <div class="border p-1 bg-options-blue">
+                    <span class="options-title d-block">Energy Options</span>
+                    {% comment %} <div style="border: 1px solid black;"> {% endcomment %}
+                    <!-- <div>
+                        <div>energy:</div>
+                        <div>
+                            <input type="radio" name="energy" value="vienna" id="vienna" checked>
+                            <label for="vienna">vienna</label>
+                            <input type="radio" name="energy" value="pkenergy" id="pkenergy">
+                            <label for="pkenergy">pkenergy</label>
+                        </div>
+                    </div> -->
+                    <div class="options-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Energy details">Energy:</span>
+                            </div>
+                            <div class=" col-auto form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="energy" id="vienna" value="vienna" checked>
+                                <label class="form-check-label" for="vienna">vienna</label>
+                            </div>
+                            <div class="col-auto form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="energy" id="pkenergy" value="pkenergy">
+                                <label class="form-check-label" for="pkenergy">pkenergy</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <button type="submit" class="btn btn-primary" id="form-submit-btn">Submit</button>
     </form>

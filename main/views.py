@@ -12,6 +12,9 @@ from main.models import Result, Run, StatusChoices, UserProfile
 from django.utils import timezone, dateformat
 from guest_user.mixins import AllowGuestUserMixin
 from guest_user.models import is_guest_user
+from main.utils import get_pseudoknot_options_from_default_values
+from main.utils import get_hairpin_options_from_default_values
+from main.utils import get_energy_options_from_default_values
 import json
 
 from celery import Celery
@@ -111,10 +114,14 @@ class ResultsView(LoginRequiredMixin, View):
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
+        pseudoknot_options = get_pseudoknot_options_from_default_values(run.result.pseudoknot_options)
+        hairpin_options = get_hairpin_options_from_default_values(run.result.hairpin_options)
+        energy_options = get_energy_options_from_default_values(run.result.energy_options)
         context = {
-            'sequence': run.result.sequence, 'structure': run.result.structure, 'num_of_pseudoknots': run.result.structure.count('['),
-            'id': run.id, 'css': css, 'pseudoknot_options': run.result.pseudoknot_options,
-            'hairpin_options': run.result.hairpin_options, 'energy_options': run.result.energy_options
+            'sequence': run.result.sequence, 'structure': run.result.structure,
+            'num_of_pseudoknots': run.result.structure.count('['),
+            'id': run.id, 'css': css, 'pseudoknot_options': pseudoknot_options,
+            'hairpin_options': hairpin_options, 'energy_options': energy_options
         }
         return context
 
