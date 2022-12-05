@@ -1,5 +1,11 @@
 .card-title {
     font-family: "Aldrich";
+    display: block;
+    margin-bottom: 1em;
+    background-color: antiquewhite;
+    width: 6rem;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .previous-runs, current_runs {
