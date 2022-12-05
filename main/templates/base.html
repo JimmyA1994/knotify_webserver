@@ -14,27 +14,35 @@
     </head>
 
     <body>
-        <div class="container-fluid overflow-auto vh-100">
-            <div class="container bg-white">
-                <div class="row p-2 navigator">
-                    <a href="/" class="col-4" style="width:200px;user-select: none;" draggable="false">
-                        <img id="logo" src="{% static 'images/ntua.svg' %}" alt="NTUA logo" draggable="false" class="img-fluid rounded-circle">
-                    </a>
-                    <div class="ms-3 col-8">
-                        <div class="row nav-row nav-title">KNOTIFY</div>
-                        <div class="row nav-row nav-subtitle mt-5">An RNA pseudoknot predition tool</div>
-                        <!--<div class="row fs-2">ΕΘΝΙΚΟ ΜΕΤΣΟΒΙΟ ΠΟΛΥΤΕΧΝΕΙΟ</div>
-                        <div class="row">Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Ηλεκτρονικών Υπολογιστών</div>
-                        <div class="row">Εργαστήριο DSLab</div>-->
+        <div class="container-fluid overflow-auto vh-100 p-0">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                  <a class="navbar-brand mb-0 h1" href="/">KNOTIFY</a>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                    <span class="navbar-text">An RNA pseudoknot predition tool</span>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                      <li class="nav-item">
+                        <a class="nav-link" href="#">Research Team</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#">Scientific Literature</a>
+                      </li>
+                      <li class="nav-item">
                         {% if user|is_guest_user %}
-                        <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="convert()" href="#">Convert</a></div>
+                        <a class="nav-link" onclick="convert()" href="#">Login</a>
                         {% else %}
-                        <div class="d-flex flex-row-reverse"><a id="logout-anchor" onclick="logout()" href="#">Log out</a></div>
+                        <a class="nav-link" onclick="logout()" href="#">Log out</a>
                         {% endif %}
-                    </div>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-
-                <div class="row p-4">
+              </nav>
+            <div class="container bg-white">
+                <div class="row p-4" style="background-color: #ECF3F8;">
                     {% block body%}
                     {% endblock %}
                 </div>
@@ -67,7 +75,7 @@
             }
             function convert(){
                 base_url = window.location.protocol + '//' + window.location.host + '/';
-                window.location.replace(base_url + 'login/');
+                window.location.href = base_url + 'login/';
             }
         </script>
     </body>
