@@ -1,5 +1,6 @@
 body {
-    background-color: #B3CEE5;
+    /* background-color: #B3CEE5; */
+    background-color: #ECF3F8;
 }
 
 .wallpaper {
@@ -17,6 +18,10 @@ body {
 .nav-row{
     font-family: "Aldrich";
     color: white;
+}
+
+.navbar-brand, .navbar-text{
+    font-family: "Aldrich";
 }
 
 .nav-title {

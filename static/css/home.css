@@ -1,13 +1,11 @@
-/* .base-card {
-    background-color: #B3CEE5;
-} */
-
-/* .overview {
-    height: 200px;;
-} */
-
 .card-title {
     font-family: "Aldrich";
+    display: block;
+    margin-bottom: 1em;
+    background-color: antiquewhite;
+    width: 6rem;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .previous-runs, current_runs {
@@ -60,4 +58,18 @@ mark {
 
 .alert-link:hover {
     color: #346898;
+}
+
+.bg-options-blue {
+    background-color: #d9e6f2;
+    border-radius: 10px;
+}
+
+.options-title {
+    font-weight: 500;
+}
+
+.options-body {
+    border-top: 1px solid #aab4be;
+    padding-top: 5px;
 }

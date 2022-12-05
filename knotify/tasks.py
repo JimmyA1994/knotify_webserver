@@ -3,7 +3,7 @@ import requests
 from knotify_client import KnotifyClient
 
 app = Celery("knotify", backend='redis://redis:6379',
-                                  broker='redis://redis:6379')
+                        broker='redis://redis:6379')
 
 base_url = 'https://knotify.dslab.ece.ntua.gr' # protocol + hostname
 

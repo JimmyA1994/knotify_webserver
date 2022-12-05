@@ -12,12 +12,15 @@ from main.models import Result, Run, StatusChoices, UserProfile
 from django.utils import timezone, dateformat
 from guest_user.mixins import AllowGuestUserMixin
 from guest_user.models import is_guest_user
+from main.utils import get_pseudoknot_options_from_default_values
+from main.utils import get_hairpin_options_from_default_values
+from main.utils import get_energy_options_from_default_values
 import json
 
 from celery import Celery
 app = Celery("knotify", backend='redis://redis:6379',
                         broker='redis://redis:6379')
-class HomePageView(AllowGuestUserMixin, LoginRequiredMixin,TemplateView):
+class HomePageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
     # supress passing next field in login redirect
     redirect_field_name=None
     template_name = 'home.html'
@@ -81,6 +84,10 @@ def process_login_view(request):
     print(f'{password = }')
     user = authenticate(username=username, password=password)
     if user:
+        if is_guest_user(request.user):
+            # migrate Runs to logged user
+            Run.objects.filter(user=request.user).update(user=user)
+            logout(request)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return JsonResponse({'status':'good'})
     else:
@@ -107,10 +114,14 @@ class ResultsView(LoginRequiredMixin, View):
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
+        pseudoknot_options = get_pseudoknot_options_from_default_values(run.result.pseudoknot_options)
+        hairpin_options = get_hairpin_options_from_default_values(run.result.hairpin_options)
+        energy_options = get_energy_options_from_default_values(run.result.energy_options)
         context = {
-            'sequence': run.result.sequence, 'structure': run.result.structure, 'num_of_pseudoknots': run.result.structure.count('['),
-            'id': run.id, 'css': css, 'pseudoknot_options': run.result.pseudoknot_options,
-            'hairpin_options': run.result.hairpin_options, 'energy_options': run.result.energy_options
+            'sequence': run.result.sequence, 'structure': run.result.structure,
+            'num_of_pseudoknots': run.result.structure.count('['),
+            'id': run.id, 'css': css, 'pseudoknot_options': pseudoknot_options,
+            'hairpin_options': hairpin_options, 'energy_options': energy_options
         }
         return context
 
@@ -212,10 +223,11 @@ class InteractiveView(LoginRequiredMixin, View):
         data = request.POST
         sequence = data.get('sequence')
         structure = data.get('structure')
+        id = data.get('id')
         with open('static/css/fornac_min.css') as f:
             lines = f.readlines()
         css = lines[0] # pass css to include in svg
-        context = {'sequence': sequence, 'structure': structure, 'css': css}
+        context = {'sequence': sequence, 'structure': structure, 'css': css, 'id': id}
         return render(request, 'interactive.html', context)
 
 
@@ -304,9 +316,9 @@ def handle_task_completion(request):
         raise Exception(f'Task returned success=False')
 
     # update result
-    result.pseudoknot_options = data.get('validated_pseudoknot_options', {})
-    result.hairpin_options = data.get('validated_hairpin_options', {})
-    result.energy_options = data.get('validated_energy_options', {})
+    result.pseudoknot_options = data.get('pseudoknot_options', {})
+    result.hairpin_options = data.get('hairpin_options', {})
+    result.energy_options = data.get('energy_options', {})
     result.structure = data.get('structure', '')
     result.save(update_fields=('pseudoknot_options', 'hairpin_options', 'energy_options', 'structure'))
 
