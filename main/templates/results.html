@@ -224,9 +224,10 @@
                     </div>
                     <div class="row my-2">
                         <div class="d-inline-block">
-                            Name:
-                            <input type="text" id="name-input" maxlength="32" oninput="this.value = this.value.replace(/[^a-zA-Z_0-9 ]/g, '')">
-                            <button id="clear-name-button" onclick="clear_name()">&#10006;</button>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="File name" aria-label="filename" aria-describedby="button-addon2" id="name-input" oninput="this.value = this.value.replace(/[^a-zA-Z_0-9 ]/g, '')">
+                                <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="clear_name()">&#10006;</button>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
