@@ -18,7 +18,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <!-- <div class="base-card overview"> -->
-    <div class="card-decor overview">
+    <div class="card-decor" id="overview">
         <div id='history-container'>
             {% if current_runs or previous_runs %}
             <div id="history-title">
@@ -280,6 +280,14 @@
         window.is_guest_user = false;
         {% endif %}
 
+        if(window.previous_runs.length > 0 || window.current_runs.length) {
+            // reveal whole overview card
+            document.querySelector("#overview").style.display = null;
+        } else{
+            // hide whole overview card
+            document.querySelector("#overview").style.display = "none";
+        }
+
         /** format previous runs table detail view */
         function detailFormatter(index, row) {
             var html = []
@@ -366,6 +374,8 @@
                             removeAllChildNodes(previous_runs_container);
                             var current_runs_container = document.querySelector('#current-runs-container');
                             removeAllChildNodes(current_runs_container);
+                            // hide whole overview card
+                            document.querySelector("#overview").style.display = "none";
                         } else{ // remove just the previous runs section
                             var previous_runs_container = document.querySelector('#previous-runs-container');
                             removeAllChildNodes(previous_runs_container);

@@ -58,6 +58,8 @@ function createHistorySection(previous_runs, current_runs){
     var previousSection = document.querySelector("#previous-runs-container");
 
     if(currentSection.childElementCount == 0 && previousSection.childElementCount == 0){
+        // reveal whole overview card
+        document.querySelector("#overview").style.display = null;
         // add History title above tables
         var labelDiv = document.createElement("div");
         labelDiv.setAttribute("id", "history-title");
