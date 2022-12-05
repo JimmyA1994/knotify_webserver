@@ -99,11 +99,12 @@
         </div>
         <p>Below is a 2D representation of the predicted rna secondary structure:</p>
         <ul class="nav nav-tabs" id="graphicsTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="naview-tab" data-bs-toggle="tab" data-bs-target="#naview-tab-panel" type="button" role="tab" aria-controls="naview-tab-panel" aria-selected="true">NAView</button>
+            <!-- match-class is an empty class used to match these nav-items and not navbars'. -->
+            <li class="nav-item match-class" role="presentation">
+                <button class="nav-link match-class active" id="naview-tab" data-bs-toggle="tab" data-bs-target="#naview-tab-panel" type="button" role="tab" aria-controls="naview-tab-panel" aria-selected="true">NAView</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="arc-tab" data-bs-toggle="tab" data-bs-target="#arc-tab-panel" type="button" role="tab" aria-controls="arc-tab-panel" aria-selected="false">Arc</button>
+            <li class="nav-item match-class" role="presentation">
+                <button class="nav-link match-class" id="arc-tab" data-bs-toggle="tab" data-bs-target="#arc-tab-panel" type="button" role="tab" aria-controls="arc-tab-panel" aria-selected="false">Arc</button>
             </li>
         </ul>
         <div class="tab-content" id="graphicsTabContent">

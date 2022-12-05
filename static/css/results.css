@@ -95,10 +95,6 @@ hr {
     font-size: 18px;
 }
 
-li {
-    padding: 5px;
-}
-
 .dropdown-header {
     font-size: 16px;
 }
@@ -120,20 +116,21 @@ li {
     border: 0;
 }
 
-.nav-item {
-    padding-bottom: 0;
+.nav-item.match-class {
     font-family: "Aldrich";
+    padding: 5px;
+    padding-bottom: 0;
 }
 
 .nav-tabs{
     border-width: 0;
 }
 
-li .nav-link{
+li .nav-link.match-class{
     color: #fff7ed;
 }
 
-li .nav-link:hover{
+li .nav-link.match-class:hover{
     color: #495057;
 }
 
