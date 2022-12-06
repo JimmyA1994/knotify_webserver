@@ -473,3 +473,77 @@ window.addEventListener('load', function() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 })
+
+
+function deleteHistoryEntry(){
+    $('#delete-history-entry-modal').modal('hide');
+    if(!window.history_entry_id){
+        return
+    }
+    const row_id = window.history_entry_id;
+
+    var $table = $('#previous-runs-table');
+    $table.bootstrapTable('showLoading');
+    // delete entry on server
+    var cookie = document.cookie;
+    var split = cookie.split("=");
+    var token = split[1];
+    var url = window.location.protocol + "//" + window.location.host + '/delete_run/';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token,
+        },
+        body: JSON.stringify({'run_id':row_id})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(!data['success']){
+            // error handling
+            triggerPopUp('Run could not be deleted. <i class="bi bi-emoji-frown text-danger"></i>');
+            $table.bootstrapTable('hideLoading');
+            return;
+        }
+        $table.bootstrapTable('remove', {
+            field: 'id',
+            values: [row_id]
+        });
+        // remove element from window.previous_runs_ids and update window.latest_history_id
+        window.previous_runs_ids.delete(row_id);
+        var previous_runs = $table.bootstrapTable('getData');
+        if(previous_runs.length == 0){ // no more previous runs left on the table
+            window.latest_history_id = "";
+
+            var current_runs_table = document.querySelector('#current-runs-table');
+            if(!current_runs_table){ // no current nor previous runs left to display. Remove history section
+                var historyTitle = document.querySelector("#history-title");
+                historyTitle.remove();
+                var previous_runs_container = document.querySelector('#previous-runs-container');
+                removeAllChildNodes(previous_runs_container);
+                var current_runs_container = document.querySelector('#current-runs-container');
+                removeAllChildNodes(current_runs_container);
+                // hide whole overview card
+                document.querySelector("#overview").style.display = "none";
+            } else{ // remove just the previous runs section
+                var previous_runs_container = document.querySelector('#previous-runs-container');
+                removeAllChildNodes(previous_runs_container);
+            }
+        }else {
+            if(window.latest_history_id == row_id){ // latest_history_id needs updating
+                // find latest completed
+                var latest_id = previous_runs.at(0)["id"];
+                var latest_completed = previous_runs.at(0)["completed"];
+                previous_runs.forEach(obj => {
+                    if(obj.completed > latest_completed){
+                        latest_completed = obj.completed;
+                        latest_id = obj.id;
+                    }
+                });
+                window.latest_history_id = latest_id;
+            }
+            $table.bootstrapTable('hideLoading');
+        }
+        delete window.history_entry_id
+    });
+}
