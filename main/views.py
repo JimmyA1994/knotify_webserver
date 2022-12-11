@@ -45,6 +45,15 @@ class HomePageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
 class LoginView(TemplateView):
     template_name = 'login.html'
 
+class TeamPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
+    # supress passing next field in login redirect
+    redirect_field_name=None
+    template_name = 'team.html'
+
+class ResearchPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
+    # supress passing next field in login redirect
+    redirect_field_name=None
+    template_name = 'research.html'
 
 @require_http_methods(['POST'])
 def process_signup_view(request):
