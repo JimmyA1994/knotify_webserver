@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load guest_user %}
+{% block head %}
+    <title>Team</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/team.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .card{
+            transition: .3s;
+        }
+        .card:hover{
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="text-center mt-2">
+    <!-- <h1 class="animate__animated animate__bounce" style="font-size: 10rem;">Meet The Team</h1> -->
+    <div class="animate__animated animate__bounce display-1">Meet The Team</div>
+</div>
+<div class="container-fluid p-5">
+    <div class="row justify-content-around">
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Andrikos C.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">PhD candidate at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Kolaitis A.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">PhD candidate at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Makris E.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">PhD candidate at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Rassias G.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">PhD candidate at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Moulos V.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">PhD candidate at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Pavlatos C.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Teaching Laboratory Stuff at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Tsanakas P.</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Professor at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-5">
+            <div class="card" style="width: 18rem;">
+                <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Adamis D.</h5>
+                    <!-- <h6 class="card-subtitle mb-2 text-muted">Undergraduate student at NTUA</h6> -->
+                    <h6 class="card-subtitle mb-2 text-muted">Undergraduate student at <abbr title="National and Technical University of Athens" >NTUA</abbr></h6>
+                    <p class="card-text">More info will be available soon enough.</p>
+                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
