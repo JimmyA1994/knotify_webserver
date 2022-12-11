@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load guest_user %}
+{% block head %}
+    <title>Research</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        .list-background {
+            background-color: #d9e6f2;
+        }
+        .centered-row {
+            margin:0 auto;
+        }
+        .up-rounded {
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+        .down-rounded {
+            border-bottom-left-radius: 10px !important;
+            border-bottom-right-radius: 10px !important;
+        }
+        a {
+            color:#346998;
+        }
+        a:hover {
+            color: #1a354c;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="row my-2 card-decor">
+        <div class="row">
+            <u class="card-tab col-2 text-center">Research</u>
+        </div>
+        <div class="row centered-row">
+            <h2>Selected Related Publications</h2>
+            <hr>
+            <figure>
+                <blockquote class="blockquote">
+                  <p>Knotify: An Efficient Parallel Platform for RNA Pseudoknot Prediction Using Syntactic Pattern Recognition.<sup><a href="https://www.mdpi.com/2409-9279/5/1/14" target="_blank">[1]</a></sup></p>
+                </blockquote>
+                <figcaption class="blockquote-footer">
+                    <em>Andrikos C., Makris E., Kolaitis A., Rassias G., Pavlatos C. & Tsanakas P.</em>
+                </figcaption>
+                <figcaption class="blockquote-footer">
+                    Methods 321 And Protocols. 5 (2022)
+                </figcaption>
+            </figure>
+            <figure>
+                <blockquote class="blockquote">
+                  <p>An Intelligent Grammar-Based Platform for RNA H-type Pseudoknot Prediction.<sup><a href="https://link.springer.com/chapter/10.1007/978-3-031-08341-9_15" target="_blank">[2]</a></sup></p>
+                </blockquote>
+                <figcaption class="blockquote-footer">
+                    <em>Makris E., Kolaitis A., Andrikos C., Moulos V., Tsanakas P., Pavlatos C.</em>
+                </figcaption>
+                <figcaption class="blockquote-footer">
+                    Artificial Intelligence Applications and Innovations. AIAI 2022 IFIP WG 12.5 International Workshops. AIAI 2022. IFIP Advances in Information and Communication Technology 2022, vol 652, Springer
+                </figcaption>
+            </figure>
+        </div>
+        <div class="row centered-row mb-3">
+            <h2>Databases</h2>
+            <hr>
+            <ul class="list-group list-group-flush pe-0">
+                <li class="list-group-item list-background up-rounded"><a href="https://rnavlab.utep.edu/database" target="_blank">PseudoBase++2.0 Database</a></li>
+                <li class="list-group-item list-background down-rounded"><a href="https://bprna.cgrb.oregonstate.edu/" target="_blank">Protein Geometry Database</a></li>
+            </ul>
+        </div>
+        <div class="row centered-row  mb-3">
+            <h2>Software</h2>
+            <hr>
+            <ul class="list-group list-group-flush mb-2 pe-0">
+                <li class="list-group-item list-background up-rounded down-rounded"><a href="https://github.com/ntua-dslab/knotify" target="_blank">Knotify</a></li>
+        </div>
+    </div>
+</div>
+{% endblock %}

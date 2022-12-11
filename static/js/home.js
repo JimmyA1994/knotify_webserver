@@ -64,7 +64,7 @@ function createHistorySection(previous_runs, current_runs){
         var labelDiv = document.createElement("div");
         labelDiv.setAttribute("id", "history-title");
         var label = document.createElement("u");
-        label.setAttribute("class", "card-title col-2 text-center");
+        label.setAttribute("class", "card-tab col-2 text-center");
         label.innerText = "History"
         labelDiv.appendChild(label);
 
