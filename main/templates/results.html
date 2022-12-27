@@ -33,10 +33,13 @@
             </div>
         </div>
         <div class="row horizontally-centered">
-            <div class="d-flex flex-row-reverse">
-                <a  tabindex="0" role="button" id="copy-btn" class="copy btn btn-link" onclick="copyOutput()"
+            <div class="d-flex flex-row-reverse p-0">
+                <a  tabindex="0" role="button" id="copy-structure-btn" class="copy btn btn-link" onclick="copyStructure()"
+                data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus"
+                data-bs-placement="top" data-bs-content="Structure copied!">(copy structure)</a>
+                <a  tabindex="0" role="button" id="copy-sequence-btn" class="copy btn btn-link" onclick="copySequence()"
                     data-bs-container="body" data-bs-toggle="popover" data-bs-trigger="focus"
-                    data-bs-placement="top" data-bs-content="Copied!">(copy output)</a>
+                    data-bs-placement="top" data-bs-content="Sequence copied!">(copy sequence)</a>
             </div>
         </div>
         <hr>

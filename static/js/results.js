@@ -1,8 +1,11 @@
 function init(){
     // Enable popover
-    var popover = new bootstrap.Popover(document.querySelector('#copy-btn'), {
+    var popover = new bootstrap.Popover(document.querySelector('#copy-structure-btn'), {
         trigger: 'focus'
-      })
+    })
+    var popover = new bootstrap.Popover(document.querySelector('#copy-sequence-btn'), {
+        trigger: 'focus'
+    })
 
     window.sequence = document.querySelector('#sequence').textContent;
     window.structure = document.querySelector('#structure').textContent;
@@ -103,8 +106,13 @@ function registerPresentationButtons(){
     });
 }
 
-function copyOutput(){
-    console.log('Result copied!');
+function copySequence(){
+    console.log('Sequence copied!');
+    navigator.clipboard.writeText(window.sequence)
+}
+
+function copyStructure(){
+    console.log('Structure copied!');
     navigator.clipboard.writeText(window.structure)
 }
 
