@@ -116,6 +116,161 @@ function copyStructure(){
     navigator.clipboard.writeText(window.structure)
 }
 
+function unset_active_file_format_links() {
+    const anchors = document.querySelectorAll("#file-format-anchors a");
+    anchors.forEach(anchor => anchor.classList.remove('active'));
+}
+
+function selectVIENNA() {
+    // unset all active links
+    unset_active_file_format_links();
+
+    // set vienna as active link
+    const anchor = document.querySelector("#vienna-anchor");
+    anchor.classList.add('active')
+
+    const span = document.querySelector("#file-format-span");
+    span.innerHTML = "VIENNA";
+
+    const download_btn = document.querySelector("#download-output-btn");
+    download_btn.onclick = downloadVIENNA;
+
+}
+
+function downloadVIENNA() {
+    console.log('download VIENNA');
+    var txt = "> " + window.id + "\n";
+    txt += window.sequence + "\n" + window.structure;
+
+    const fileData = new Blob([txt], {type: 'text/plain'});
+    const textFileUrl = window.URL.createObjectURL(fileData);
+
+    var downloadLink = document.createElement("a");
+    downloadLink.href = textFileUrl;
+    downloadLink.download = window.id + ".vienna"
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function selectBPSEQ() {
+    // unset all active links
+    unset_active_file_format_links();
+
+    // set BPSEQ as active link
+    const anchor = document.querySelector("#bpseq-anchor");
+    anchor.classList.add('active')
+
+    const span = document.querySelector("#file-format-span");
+    span.innerHTML = "BPSEQ";
+
+    const download_btn = document.querySelector("#download-output-btn");
+    download_btn.onclick = downloadBPSEQ;
+
+}
+
+function get_sequence_pairs(structure) {
+    /**
+     * Generate an array containing the links of an rna structure,
+     * based on the dot bracket structure of the result.
+     */
+    var pairs = []
+    var links_queue = []
+    var pseudoknots_queue = []
+    for (var i=0; i<structure.length; i++) {
+        var pair = -1; // base case: nucleotide has no pair
+        if (structure[i] == "[") {
+            pseudoknots_queue.push(i);
+        }
+        else if (structure[i] == "]") {
+            pair = pseudoknots_queue.pop();
+            pairs[pair] = i;
+        }
+        else if (structure[i] == "(") {
+            links_queue.push(i);
+        }
+        else if (structure[i] == ")") {
+            pair = links_queue.pop();
+            pairs[pair] = i;
+        }
+        else if (structure[i] == ".") {
+            ; // should correspond to zero
+        }
+        else {
+            console.error('get_sequence_pairs encountered unknown character: ' + structure[i]);
+            return [];
+        }
+        pairs.push(pair)
+    }
+
+    // account for bpseq, ct indexing
+    // starting from 1 not 0
+    // also, all unpaired nucleotides have 0 value
+    return pairs.map(x => x+1)
+}
+
+function downloadBPSEQ() {
+    console.log('download BPSEQ');
+    var txt = "";
+    const length = window.sequence.length
+    const bpseq_pairs = get_sequence_pairs(window.structure);
+    for(var idx=0; idx<length; idx++) {
+        txt += (idx+1).toString() + " " + window.sequence[idx] + " " + bpseq_pairs[idx] + "\n";
+    }
+    const fileData = new Blob([txt], {type: 'text/plain'});
+    const textFileUrl = window.URL.createObjectURL(fileData);
+
+    var downloadLink = document.createElement("a");
+    downloadLink.href = textFileUrl;
+    downloadLink.download = window.id + ".bpseq"
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function selectCT() {
+    // unset all active links
+    unset_active_file_format_links();
+
+    // set CT as active link
+    const anchor = document.querySelector("#ct-anchor");
+    anchor.classList.add('active')
+
+    const span = document.querySelector("#file-format-span");
+    span.innerHTML = "CT";
+
+    const download_btn = document.querySelector("#download-output-btn");
+    download_btn.onclick = downloadCT;
+
+}
+
+function downloadCT() {
+    /**
+     * Documentation of CT format can be found here:
+     * http://nestedalign.lri.fr/infos.php
+     */
+    console.log('download CT');
+    const pairs = get_sequence_pairs(window.structure);
+    const length = window.structure.length;
+
+    var txt = length + " " + window.id + '\n';
+    for(var i=0; i<length; i++) {
+        // format should be:
+        // 1-based index | ith nucleotide | 5'-connecting base index (i-1) | 3' connecting base index (i+1) | paired base index | base index in the original sequence
+        txt += (i+1).toString() + " " + window.sequence[i] + " " + i.toString() + " " + ((i+2)%(length+1)).toString() + " " + pairs[i] + " " + (i+1).toString() + "\n";
+    }
+
+    const fileData = new Blob([txt], {type: 'text/plain'});
+    const textFileUrl = window.URL.createObjectURL(fileData);
+
+    var downloadLink = document.createElement("a");
+    downloadLink.href = textFileUrl;
+    downloadLink.download = window.id + ".ct"
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
 function createChart(elementId='rna_ss') {
     var rna1 = {'structure': window.structure,
                 'sequence': window.sequence,
