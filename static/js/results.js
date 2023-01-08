@@ -38,6 +38,14 @@ function reportWindowSize() {
         root.children[0].remove();
     }
 
+    if (window.description) {
+        var description_div = document.createElement('div');
+        description_div.setAttribute("class", "results mb-1");
+        description_div.setAttribute("style", "line-break: anywhere; white-space: unset; font-size: 16px;");
+        description_div.innerHTML = window.description;
+        root.appendChild(description_div);
+    }
+
     var count = 1;
     for(i=0; i<=window['input-size']; i+=n){
         // create sequence line and append it
@@ -139,15 +147,16 @@ function selectVIENNA() {
 
 function downloadVIENNA() {
     console.log('download VIENNA');
-    var txt = "> " + window.id + "\n";
-    txt += window.sequence + "\n" + window.structure;
+    var txt = window.description ? window.description : "> " + window.id;
+    txt += "\n" + window.sequence + "\n" + window.structure;
 
     const fileData = new Blob([txt], {type: 'text/plain'});
     const textFileUrl = window.URL.createObjectURL(fileData);
 
     var downloadLink = document.createElement("a");
     downloadLink.href = textFileUrl;
-    downloadLink.download = window.id + ".vienna"
+    const filename = window.description ? window.description.slice(1).trim() : window.id;
+    downloadLink.download = filename + ".vienna";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -222,7 +231,8 @@ function downloadBPSEQ() {
 
     var downloadLink = document.createElement("a");
     downloadLink.href = textFileUrl;
-    downloadLink.download = window.id + ".bpseq"
+    const filename = window.description ? window.description.slice(1).trim() : window.id;
+    downloadLink.download = filename + ".bpseq";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -253,7 +263,8 @@ function downloadCT() {
     const pairs = get_sequence_pairs(window.structure);
     const length = window.structure.length;
 
-    var txt = length + " " + window.id + '\n';
+    const filename = window.description ? window.description.slice(1).trim() : window.id;
+    var txt = length + " " + filename + '\n';
     for(var i=0; i<length; i++) {
         // format should be:
         // 1-based index | ith nucleotide | 5'-connecting base index (i-1) | 3' connecting base index (i+1) | paired base index | base index in the original sequence
@@ -265,7 +276,7 @@ function downloadCT() {
 
     var downloadLink = document.createElement("a");
     downloadLink.href = textFileUrl;
-    downloadLink.download = window.id + ".ct"
+    downloadLink.download = filename + ".ct";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);

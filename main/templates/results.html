@@ -29,6 +29,7 @@
             <div id="root">
                 <div id="sequence" class="results invisible">{{ sequence }}</div>
                 <div id="structure" class="results invisible">{{ structure }}</div>
+                <div id="description" class="results invisible">{{ description }}</div>
                 <div id="run_id" class="results invisible">{{ id }}</div>
             </div>
         </div>
@@ -268,6 +269,8 @@
         window['input-size'] = window['sequence'].length
         var structure = document.querySelector('#structure').textContent;
         window['structure'] = structure;
+        var description = document.querySelector('#description').textContent;
+        window['description'] = description;
         var request_id =  document.querySelector('#request_id').textContent.replace("Request id: ", "");
         window.request_id = request_id;
         window.css = document.getElementById("css_text").textContent;
