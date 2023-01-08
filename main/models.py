@@ -10,6 +10,7 @@ class Result(Model):
     hairpin_options = JSONField(null=True, blank=True, default=dict)
     energy_options = JSONField(null=True, blank=True, default=dict)
     structure = CharField(max_length=1024)
+    description = CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.sequence

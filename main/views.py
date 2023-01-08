@@ -117,7 +117,10 @@ def logout_view(request):
 class ResultsView(LoginRequiredMixin, View):
     redirect_field_name = None
 
-    def process_sequence(self, request, sequence):
+    def process_sequence(self, request, input):
+        sequence = input["sequence"]
+        description = input["description"]
+
         PSEUDOKNOT_OPTIONS_FIELDS = [
             'parser', 'allow_ug', 'allow_skip_final_au', 'max_dd_size',
             'min_dd_size', 'max_window_size', 'min_window_size',
@@ -143,7 +146,10 @@ class ResultsView(LoginRequiredMixin, View):
         energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
 
         # initialize result and run on db, so that polling can check for process status
-        initialized_result = Result.objects.create(sequence=sequence)
+        args = {'sequence': sequence}
+        if description:
+            args['description'] = description[:100]
+        initialized_result = Result.objects.create(**args)
         submitted = timezone.now()
         user = request.user
 
@@ -180,7 +186,8 @@ class ResultsView(LoginRequiredMixin, View):
             'sequence': run.result.sequence, 'structure': run.result.structure,
             'num_of_pseudoknots': run.result.structure.count('['),
             'id': run.id, 'css': css, 'pseudoknot_options': pseudoknot_options,
-            'hairpin_options': hairpin_options, 'energy_options': energy_options
+            'hairpin_options': hairpin_options, 'energy_options': energy_options,
+            'description': run.result.description or ""
         }
         return context
 
@@ -213,7 +220,7 @@ class ResultsView(LoginRequiredMixin, View):
 
         # process inputs
         for input in inputs:
-            self.process_sequence(request, input["sequence"])
+            self.process_sequence(request, input)
 
         return JsonResponse({'success': 'OK'})
 
