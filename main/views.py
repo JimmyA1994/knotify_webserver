@@ -117,6 +117,56 @@ def logout_view(request):
 class ResultsView(LoginRequiredMixin, View):
     redirect_field_name = None
 
+    def process_sequence(self, request, sequence):
+        PSEUDOKNOT_OPTIONS_FIELDS = [
+            'parser', 'allow_ug', 'allow_skip_final_au', 'max_dd_size',
+            'min_dd_size', 'max_window_size', 'min_window_size',
+            'max_window_size_ratio', 'min_window_size_ratio',
+            'max_stem_allow_smaller', 'prune_early'
+        ]
+        pseudoknot_options = {key:request.POST[key] for key in PSEUDOKNOT_OPTIONS_FIELDS if key in request.POST}
+
+        HAIRPIN_OPTIONS_FIELDS = [
+            'hairpin_grammar', 'hairpin_allow_ug',
+            'min_hairpin_size', 'min_hairpin_stems',
+            'max_hairpins_per_loop', 'max_hairpin_bulge'
+        ]
+        hairpin_options = {key:request.POST[key] for key in HAIRPIN_OPTIONS_FIELDS if key in request.POST}
+        # translate hairpin_grammar checkbox to the corresponding library
+        if 'hairpin_grammar' in hairpin_options:
+            if hairpin_options['hairpin_grammar']:
+                hairpin_options['hairpin_grammar'] = './libhairpin.so'
+            else:
+                del hairpin_options['hairpin_grammar']
+
+        ENERGY_OPTIONS_FIELDS = ['energy']
+        energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
+
+        # initialize result and run on db, so that polling can check for process status
+        initialized_result = Result.objects.create(sequence=sequence)
+        submitted = timezone.now()
+        user = request.user
+
+        # Instead of using a full uuid we opt for 8 length string id.
+        # It's highly unlikely to have a conflict but if it happens, try up to 5 times to create one
+        retries, created = 5, False
+        while retries:
+            retries -= 1
+            try:
+                initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
+            except:
+                continue
+            else:
+                created = True
+                break
+        if not created:
+            return HttpResponseServerError('No run id could be created')
+
+        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.id}
+
+        # send task to knotify service for processing
+        app.send_task('predict', (sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
+
     def get_context_data(self, run):
         if not run:
             return
@@ -143,59 +193,27 @@ class ResultsView(LoginRequiredMixin, View):
 
     def post(self, request):
         """Return results page for a newly requested sequence"""
+
         try:
-            sequence = request.POST['sequence'].upper()
+            # we expect a list of dict: {description:str, sequence:str}
+            inputs = json.loads(request.POST['input'])
+            if not inputs:
+                raise Exception
         except:
-            return HttpResponseBadRequest('sequence parameter was not received.')
+            return HttpResponseBadRequest('Sequence parameter was not received.')
 
-        PSEUDOKNOT_OPTIONS_FIELDS = [
-            'parser', 'allow_ug', 'allow_skip_final_au', 'max_dd_size',
-            'min_dd_size', 'max_window_size', 'min_window_size',
-            'max_window_size_ratio', 'min_window_size_ratio',
-            'max_stem_allow_smaller', 'prune_early'
-        ]
-        pseudoknot_options = {key:request.POST[key] for key in PSEUDOKNOT_OPTIONS_FIELDS if key in request.POST}
+        # validate that all inputs are made of permitted characters
+        for input in inputs:
+            if not {'sequence','description'} <= input.keys():
+                return HttpResponseBadRequest('Sequence input json lacks keys "sequence" or "description".')
+            # capitalize all characters for parity
+            input['sequence'] = input['sequence'].upper()
+            if not set(input['sequence']) <= {'A', 'C', 'G', 'U'}:
+                return HttpResponseBadRequest('Sequence character was not recognized.')
 
-        HAIRPIN_OPTIONS_FIELDS = [
-            'hairpin_grammar', 'hairpin_allow_ug',
-            'min_hairpin_size', 'min_hairpin_stems',
-            'max_hairpins_per_loop', 'max_hairpin_bulge'
-        ]
-        hairpin_options = {key:request.POST[key] for key in HAIRPIN_OPTIONS_FIELDS if key in request.POST}
-        # traslate hairpin_grammar checkbox to the corresponding library
-        if 'hairpin_grammar' in hairpin_options:
-            if hairpin_options['hairpin_grammar']:
-                hairpin_options['hairpin_grammar'] = './libhairpin.so'
-            else:
-                del hairpin_options['hairpin_grammar']
-
-        ENERGY_OPTIONS_FIELDS = ['energy']
-        energy_options = {key:request.POST[key] for key in ENERGY_OPTIONS_FIELDS if key in request.POST}
-
-        # initialize result and run on db, so that polling can check for process status
-        initialized_result = Result.objects.create(sequence=sequence)
-        submitted = timezone.now()
-        user = request.user
-
-        # Instead of using a full uuid we opt for 8 length string id.
-        # It's highly unlikely to have a confict but if it happens, try up to 5 times to create one
-        retries, created = 5, False
-        while retries:
-            retries -= 1
-            try:
-                initialized_run = Run.objects.create(user=user, result=initialized_result, submitted=submitted)
-            except:
-                continue
-            else:
-                created = True
-                break
-        if not created:
-            return HttpResponseServerError('No run id could be created')
-
-        model_ids = {'result_id': initialized_result.id, 'run_id':initialized_run.id}
-
-        # send task to knotify service for processing
-        app.send_task('predict', (sequence, pseudoknot_options, hairpin_options, energy_options, model_ids))
+        # process inputs
+        for input in inputs:
+            self.process_sequence(request, input["sequence"])
 
         return JsonResponse({'success': 'OK'})
 
