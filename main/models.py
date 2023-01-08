@@ -45,7 +45,7 @@ class UserProfile(Model):
     guest_notified_for_conversion = BooleanField(default=False)
 
 
-# define post_save signal of user to automatically create coressponding profile
+# define post_save signal of user to automatically create corresponding profile
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)

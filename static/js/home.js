@@ -405,9 +405,243 @@ function triggerGuestHistoryAlert() {
     alert.classList.replace('collapse', 'show');
 }
 
+function clearInput() {
+    // reset textarea
+    const textarea = document.getElementById("RNA-sequence");
+    textarea.value = "";
+    textarea.classList.remove('is-invalid');
+
+    // reset file input
+    clearFileInput();
+
+    // remove error alert
+    const input_error_alert = document.getElementById("input-error-alert");
+    input_error_alert.classList.add('d-none');
+
+    // reset pseudoknot options
+    const yaep = document.getElementById("yaep");
+    yaep.checked = true;
+
+    const allow_ug = document.getElementById("allow-ug");
+    allow_ug.checked = false;
+
+    const max_dd_size = document.getElementById("max-dd-size");
+    max_dd_size.value = "2";
+
+    const min_dd_size = document.getElementById("min-dd-size");
+    min_dd_size.value = "0";
+
+    const max_stem_allow_smaller = document.getElementById("max-stem-allow-smaller");
+    max_stem_allow_smaller.value = "2";
+
+    // reset hairpin options
+    const hairpin_allow_ug = document.getElementById("hairpin-allow-ug");
+    hairpin_allow_ug.checked = false;
+
+    const min_hairpin_size = document.getElementById("min-hairpin-size");
+    min_hairpin_size.value = "3";
+
+    const min_hairpin_stems = document.getElementById("min-hairpin-stems");
+    min_hairpin_stems.value = "3";
+
+    const max_hairpins_per_loop = document.getElementById("max-hairpins-per-loop");
+    max_hairpins_per_loop.value = "1";
+
+    const max_hairpin_bulge = document.getElementById("max-hairpin-bulge");
+    max_hairpin_bulge.value = "0";
+
+    // reset energy options
+    const vienna = document.getElementById("vienna");
+    vienna.checked = true;
+}
+
+function clearFileInput() {
+    const file_input = document.querySelector("#formFile");
+    file_input.value = null;
+    file_input.classList.remove('is-invalid');
+}
+
+function show_textarea_invalid_error() {
+    const textarea = document.getElementById("RNA-sequence");
+    textarea.classList.add('is-invalid');
+}
+
+function show_fileinput_invalid_error() {
+    const fileinput = document.getElementById("formFile");
+    fileinput.classList.add('is-invalid');
+}
+
+function display_input_error_alert(msgs) {
+    /**
+     * Triggers the error alert when the prediction input provided is invalid.
+     * Returns null and expects an array of messages.
+     * */
+    if (msgs.length == 0) {
+        return;
+    }
+    // pass the messages
+    const input_error_list = document.getElementById("input-error-list");
+    var innerHTML = "";
+    msgs.forEach(msg => {
+        innerHTML += "<li>"+msg+"</li>";
+    });
+    input_error_list.innerHTML = innerHTML;
+
+    // display alert
+    const input_error_alert = document.getElementById("input-error-alert");
+    input_error_alert.classList.remove('d-none');
+}
+
+function validate_fasta(txt) {
+    /**
+    Return true and the sequences if txt is a valid fasta formatted text, else returns false and error messages.
+     */
+    if (!txt) { return false;}
+
+    // split on newlines, remove space around, filter out empty strings or fasta comments
+	var lines = txt.split('\n').map(str => str.trim()).filter(str => str);
+    // find where sequences start
+    sequence_indexes = [];
+    for (var i=0; i<lines.length;i++) {
+        var line = lines[i]
+        if (line[0] == '>'){
+            sequence_indexes.push(i);
+        }
+    }
+
+    var sequences = [];
+    const allowed_sequence_chars = new Set(['a', 'A', 'c', 'C', 'g', 'G', 'u', 'U']);
+    if (sequence_indexes.length == 0) {
+        // check if it is plain sequence separated by newlines
+        const sequence_candidate = lines.join("");
+        const characters = new Set(sequence_candidate);
+        var unexpected_chars = [];
+        characters.forEach(char => {
+            if (!allowed_sequence_chars.has(char)){
+                unexpected_chars.push(char)
+            }
+        });
+        if (unexpected_chars.length > 0){
+            var msg = "There were characters on your input that weren't recognized (e.g. \'" +
+                      unexpected_chars.slice(0,3).join("\', \'") +
+                      "\'). Try submitting sequences consisting only of 'A', 'C', 'G', 'U' characters.";
+            return {is_valid:false, error_msg:msg}
+        }
+        sequences.push({description:"", sequence: sequence_candidate});
+    }
+    else {
+        for (var i=0; i<sequence_indexes.length; i++) {
+            var cur_seq_index = sequence_indexes[i] + 1;
+            var next_descr_index = (i+1<sequence_indexes.length) ? sequence_indexes[i+1] : lines.length;
+            if (next_descr_index - cur_seq_index < 1) {
+                // continuous FASTA descriptions without sequence in between
+                var msg = "The FASTA formatted text provided lacks sequence.";
+                return {is_valid:false, error_msg:msg}
+            }
+            var sequence = lines.slice(cur_seq_index, next_descr_index).join('');
+            // check if sequence has unsupported characters
+            var unexpected_chars = [];
+            new Set(sequence).forEach(char => {
+                if (!allowed_sequence_chars.has(char)){
+                    unexpected_chars.push(char)
+                }
+            });
+            if (unexpected_chars.length > 0){
+                // var msg = "There were characters on your input that weren't recognized. Try submitting sequences consisting of A,C,G,U characters.";
+                var msg = "There were characters on your input that weren't recognized (e.g. \'" +
+                          unexpected_chars.slice(0,3).join("\', \'") +
+                          "\'). Try submitting sequences consisting only of 'A', 'C', 'G', 'U' characters.";
+                return {is_valid:false, error_msg:msg}
+            }
+            else {
+                sequences.push({
+                    description: lines[sequence_indexes[i]],
+                    sequence: sequence
+                })
+            }
+        }
+    }
+
+    return {is_valid: true, sequences: sequences}
+}
+
 function submitFunction() {
+    /**
+     * Validates inputs and sends them for processing.
+     * Also, handles input error messages.
+     * Note: if both text and file were given, we process both.
+     * */
+
+    // check if input was provided, otherwise throw error
+    const textarea = document.getElementById("RNA-sequence");
+    input_text = textarea.value.trim(); // remove spaces around main body
+    const file_input = document.querySelector("#formFile");
+    if (input_text == "" && file_input.value == "") {
+        const msg = "No sequence or file was provided.";
+        display_input_error_alert([msg]);
+        show_textarea_invalid_error();
+        return;
+    }
+
+    // Check if input is properly FASTA formatted.
+    // We follow this simple fasta format documentation:
+    // https://bioperl.org/formats/sequence_formats/FASTA_sequence_format
+    var validation;
+    if (input_text != ""){
+        validation = validate_fasta(input_text);
+        validation.display_error_function = show_textarea_invalid_error;
+        if (validation.is_valid) {
+            // clear previous error messages
+            const input_error_alert = document.getElementById("input-error-alert");
+            input_error_alert.classList.add('d-none');
+
+            sendInput(validation.sequences);
+        }else {
+            // show error messages
+            const msg = validation.error_msg
+            display_input_error_alert([msg]);
+            show_textarea_invalid_error();
+            return;
+        }
+    }
+
+    // check if file is FASTA formatted.
+    if (file_input.value != "") {
+        const file = file_input.files[0];
+        const extension = file.name.split('.').pop()
+        if (extension != 'fasta') {
+            const msg = 'File uploaded does not have a .fasta extension.'
+            display_input_error_alert([msg]);
+            show_fileinput_invalid_error();
+            return;
+        }
+
+        file.text().then((text) => {
+            validation = validate_fasta(text);
+            if (validation.is_valid) {
+                // clear previous error messages
+                const input_error_alert = document.getElementById("input-error-alert");
+                input_error_alert.classList.add('d-none');
+
+                sendInput(validation.sequences);
+            }else {
+                // show error messages
+                const msg = validation.error_msg
+                display_input_error_alert([msg]);
+                show_fileinput_invalid_error();
+                return;
+            }
+        })
+    }
+}
+
+function sendInput(sequences) {
     var form = document.querySelector('form');
     var formData = new FormData(form);
+    const serialized_sequences = JSON.stringify(sequences)
+    formData.delete('sequence');
+    formData.set("input", serialized_sequences);
+
     fetch('results/', {
         method: 'POST',
         body: formData,
@@ -415,12 +649,10 @@ function submitFunction() {
     .then(response => response.json())
     .then(data => {
         if(data.hasOwnProperty('success') && data['success']){
-            // document.querySelector('#submit-modal-text').innerText = 'Your request has been submitted for prediction.';
             var message = 'Your request has been submitted for prediction.';
             triggerPopUp(message);
             startPolling();
         }else {
-            // document.querySelector('#submit-modal-text').innerText = 'Something when wrong...';
             var message = 'Something when wrong...';
             triggerPopUp(message);
         }

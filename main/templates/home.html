@@ -89,8 +89,21 @@
             {% comment %} <form class="p-2 mt-5 card-decor" onsubmit="submitFunction(); return false;">{% csrf_token %} {% endcomment %}
             <form class="pe-0" onsubmit="submitFunction(); return false;">{% csrf_token %}
                 <div class="form-group">
-                    <div>Enter your RNA sequence here.</div>
-                    <input type="text" class="form-control my-2" id="RNA-sequence" name="sequence" placeholder="" oninput="this.value = this.value.replace(/[^aAuUgGcC]/g, '');" required>
+                    <div>Enter your RNA sequence here. It can be a single sequence or multiple sequences in FASTA format.</div>
+                    <textarea class="form-control form-control-sm my-2" rows="4" id="RNA-sequence" name="sequence" placeholder="" onfocusout="this.classList.remove('is-invalid');"></textarea>
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control form-control-sm" id="formFile" onfocusout="this.classList.remove('is-invalid');" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" id="inputGroupFileAddon04" onclick="clearFileInput()">Clear</button>
+                    </div>
+                </div>
+                <input type="hidden" id="description" value="">
+                <div class="alert alert-danger d-none" role="alert" id="input-error-alert">
+                    <!-- Input Validation Errors are displayed here -->
+                    <div>Please, fix the following errors to continue:</div>
+                    <ul id="input-error-list">
+                        <li>File attached is not a FASTA file.</li>
+                        <li>There were characters on your input that weren't recognized. Try submitting sequences comprising of A, C, G, U characters</li>
+                    </ul>
                 </div>
                 <div>
                     <h5>Options</h5>
@@ -244,6 +257,7 @@
                 </div>
                 <div class="d-flex flex-row-reverse mx-0 mb-2">
                     <button type="submit" class="btn btn-primary" id="form-submit-btn">Submit</button>
+                    <button type="button" class="btn btn-outline-secondary me-2" onclick="clearInput()">Reset Input</button>
                 </div>
             </form>
         </div>
