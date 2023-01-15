@@ -1,88 +1,49 @@
-html, body {
-    height:100%;
+html,
+body {
+    height: 100%;
 }
 
-.login-background {
-    background-color:#fff7ed;
+body {
+    display: flex;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #fff7ed;
 }
 
 .login-card {
-    background-color: white;
-    height: 400px;
-    width: 590px;
+    max-width: 350px;
+    background-color: #ecf3f8;
     border-radius: 32px;
-    -webkit-box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
-    -moz-box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
-    box-shadow: 10px 10px 16px 0px rgba(0,0,0,0.22);
-}
-
-.login-card-banner {
-    background-color: #B3CEE5;
-    border-radius: 32px;
-    height:400px;
-}
-
-.login-card-details {
-    background-color: white;
-    /* border-radius: 32px; */
-    /* height:400px; */
-}
-
-#logo {
-    width:200px;
-    height:200px;
-    margin: 0 auto;
-}
-
-.nav-row {
-    font-family: "Aldrich";
-    color: white;
-}
-
-.nav-title {
-    font-size: 39px;
-    /* font-size: 3vw; */
-}
-
-.nav-subtitle {
-    font-size: 16px;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.22);
 }
 
 .title {
     font-family: "Aldrich";
-    font-size: 48px;
+    font-size: 24px;
 }
 
-.login-form-inline {
-    height:24px;
-    background-color: #C4C4C4;
-    border: none;
+.card-header {
+    background-color: #b3cee5;
+    padding: 15px;
+    border-top-left-radius: 32px !important;
+    border-top-right-radius: 32px !important;
 }
 
-.login-form-inline:focus {
-    outline: none !important;
-    border:1px solid #B3CEE5;
-    box-shadow: 0 0 10px #B3CEE5;
+.card-body {
+    padding: 20px;
 }
 
-.login-form-label {
-    background-color: #fff7ed;
-    padding: 2px 4px 2px 2px;
-    color: black;
-    height: max-content;
+.logo-title {
+    font-size: 50px;
+    color: #fff;
     font-family: "Aldrich";
-    width: 86px;
 }
 
-label {
-    margin-top: 30px;
-}
-
-#button {
+.logo-subtitle {
+    font-size: 15px;
+    color: #fff;
     font-family: "Aldrich";
-    background-color: #B3CEE5;
-    border:none;
-    width:80px;
 }
 
 .toggle-text {
@@ -92,13 +53,13 @@ label {
 .toggle-link {
     display: inline-block;
     position: relative;
-    color: #B3CEE5;
+    color: #2E5C85;
     cursor: pointer;
     text-decoration: none;
 }
 
 .toggle-link:hover {
-    color: #B3CEE5;
+    color: #21425f;
 }
 
 .toggle-link:after {
@@ -109,7 +70,7 @@ label {
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #B3CEE5;
+    background-color: #21425f;
     transform-origin: bottom right;
     transition: transform 0.25s ease-out;
 }
@@ -117,4 +78,16 @@ label {
 .toggle-link:hover:after {
     transform: scaleX(1);
     transform-origin: bottom left;
+}
+
+.submit-button {
+    font-family: "Aldrich";
+    background-color: #FE6D73;
+    border: none;
+    width: 90px;
+    border-radius: 0;
+}
+
+.submit-button:hover {
+    background-color: #fe4d53;
 }
