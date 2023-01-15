@@ -78,7 +78,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    if(data.hasOwnProperty('status') && data['status']=='good'){
+                    if(data.hasOwnProperty('status') && data['status']=='OK'){
                         window.location.replace(base_url + 'login/');
                     }
                 });

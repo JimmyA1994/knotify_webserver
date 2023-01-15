@@ -16,12 +16,13 @@ from main.utils import get_pseudoknot_options_from_default_values
 from main.utils import get_hairpin_options_from_default_values
 from main.utils import get_energy_options_from_default_values
 import json
+import re
 
 from celery import Celery
 app = Celery("knotify", backend='redis://redis:6379',
                         broker='redis://redis:6379')
 class HomePageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
-    # supress passing next field in login redirect
+    # suppress passing next field in login redirect
     redirect_field_name=None
     template_name = 'home.html'
 
@@ -45,24 +46,46 @@ class HomePageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
 class LoginView(TemplateView):
     template_name = 'login.html'
 
+    def get(self, request):
+        context = {'current_year': timezone.now().year}
+        return render(request, self.template_name, context)
+
 class TeamPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
-    # supress passing next field in login redirect
+    # suppress passing next field in login redirect
     redirect_field_name=None
     template_name = 'team.html'
 
 class ResearchPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
-    # supress passing next field in login redirect
-    redirect_field_name=None
+    # suppress passing next field in login redirect
+    redirect_field_name = None
     template_name = 'research.html'
 
 @require_http_methods(['POST'])
 def process_signup_view(request):
     body = json.loads(request.body.decode('UTF-8'))
     if not {'email', 'password'}.issubset(body.keys()):
-        return HttpResponseBadRequest('No username or password was provided.')
+        return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
     email = body.get('email', '')
+    valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
+    is_valid_email = (valid_email_matches and
+                      len(valid_email_matches) and
+                      valid_email_matches[0] == email)
+    if not is_valid_email:
+        return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
     username = email.split('@')[0]
     password = body.get('password', '')
+
+    # check if user already exists
+    user = authenticate(username=username, password=password)
+    if user:
+        if is_guest_user(request.user):
+            # migrate Runs to logged user
+            Run.objects.filter(user=request.user).update(user=user)
+            logout(request)
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return JsonResponse({'status':'OK'})
+
+    # create user and respond
     user = User.objects.create_user(username=username, email=email, password=password)
     if user:
         if is_guest_user(request.user):
@@ -78,19 +101,25 @@ def process_signup_view(request):
 
             logout(request)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'status':'good'})
+        return JsonResponse({'status':'OK'})
     else:
-        return JsonResponse({'status':'bad'})
+        return JsonResponse({'status':'ERROR', 'reason': 'user_could_not_be_created'})
 
 
 @require_http_methods(['POST'])
 def process_login_view(request):
     body = json.loads(request.body.decode('UTF-8'))
+    if not {'email', 'password'}.issubset(body.keys()):
+        return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
     email = body.get('email', '')
+    valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
+    is_valid_email = (valid_email_matches and
+                      len(valid_email_matches) and
+                      valid_email_matches[0] == email)
+    if not is_valid_email:
+        return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
     username = email.split('@')[0]
     password = body.get('password', '')
-    print(f'{email = }')
-    print(f'{password = }')
     user = authenticate(username=username, password=password)
     if user:
         if is_guest_user(request.user):
@@ -98,9 +127,9 @@ def process_login_view(request):
             Run.objects.filter(user=request.user).update(user=user)
             logout(request)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'status':'good'})
+        return JsonResponse({'status':'OK'})
     else:
-        return JsonResponse({'status':'bad'})
+        return JsonResponse({'status':'ERROR', 'reason': 'user_not_found'})
 
 
 @login_required(redirect_field_name=None)
@@ -109,9 +138,9 @@ def logout_view(request):
     try:
         logout(request)
     except:
-        return JsonResponse({'status':'bad'})
+        return JsonResponse({'status':'ERROR'})
     else:
-        return JsonResponse({'status':'good'})
+        return JsonResponse({'status':'OK'})
 
 
 class ResultsView(LoginRequiredMixin, View):
@@ -236,7 +265,7 @@ def convert_svg_view(request):
         width = int(body.get('width', '3840'))
         height = int(body.get('height', '2160'))
     except:
-        return HttpResponseBadRequest('Parameters are not recognisable. Make sure your content is json and includes the following two fields: svg, format')
+        return HttpResponseBadRequest('Parameters are not recognizable. Make sure your content is json and includes the following two fields: svg, format')
     if format == 'png':
         from cairosvg import svg2png
         b64_binary = base64.b64encode(svg2png(svg, parent_width=width, parent_height=height))
@@ -379,7 +408,7 @@ def get_varna_arc_diagram(request):
     contain_unknown_characters = not (set(sequence).issubset({'A','C', 'G', 'U'})
                                       or set(structure).issubset({'(', ')', '[', ']', '.'}))
     if empty or contain_unknown_characters:
-        return HttpResponseBadRequest('Parameters were not recognised.')
+        return HttpResponseBadRequest('Parameters were not recognized.')
 
     OUTLINE_COLOR = '#ADABA9'
     BASE_PAIR_LINK_COLOR = '#ADABA9'
