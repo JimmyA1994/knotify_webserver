@@ -4,7 +4,6 @@
 {% block head %}
     <title>Team</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'css/team.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         .card{
@@ -23,9 +22,10 @@
     <div class="animate__animated animate__bounce display-1">Meet The Team</div>
 </div>
 <div class="container-fluid p-5">
-    <div class="row justify-content-around">
+    <div class="row justify-content-between">
+    {% comment %} <div class="row justify-content-evenly"> {% endcomment %}
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Andrikos C.</h5>
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Kolaitis A.</h5>
@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Makris E.</h5>
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Rassias G.</h5>
@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Moulos V.</h5>
@@ -80,7 +80,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Pavlatos C.</h5>
@@ -91,7 +91,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Tsanakas P.</h5>
@@ -102,7 +102,7 @@
             </div>
         </div>
         <div class="col-lg-4 mb-5">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 14em;">
                 <img src="https://www.w3schools.com/howto/img_avatar.png" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">Adamis D.</h5>
