@@ -26,62 +26,68 @@
             <div id="rna_ss" class="mb-2"></div>
         </div>
         <div class="footer">
-            <button type="button" class="btn btn-danger btn-sm ms-1" onclick="returnToResults()">Return</button>
-            <div class="btn-group dropup">
-                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    Presentation
+            <div class="btn-group flex-wrap d-inline-flex" data-toggle="buttons">
+                <button type="button" class="btn btn-danger btn-sm m-1" onclick="returnToResults()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                    Return
                 </button>
-                <ul class="dropdown-menu">
-                    <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
-                    <li class="li-hr"><hr class="dropdown-divider"></li>
-                    <li class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="numberingCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="numberingCheckbox">Numbering</label>
-                        </div>
-                    </li>
-                    <li class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="nodeLabelCheckbox">Node Label</label>
-                        </div>
-                    </li>
-                    <li class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="pseudoknotCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="pseudoknotCheckbox">Pseudoknot Links</label>
-                        </div>
-                    </li>
-                    <li class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="directionArrowsCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="directionArrowsCheckbox">Direction Arrows</label>
-                        </div>
-                    </li>
-                    <li class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="linksCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="linksCheckbox">Links</label>
-                        </div>
-                    </li>
-                    <li class="li-hr"><hr class="dropdown-divider"></li>
-                    <li class="li-dropdown-header"><h6 class="dropdown-header">Color Scheme</h6></li>
-                    <li class="li-hr"><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" id="dropdown-item1" onclick="selectColorScheme('sequence');">Sequence</a></li>
-                    <li><a class="dropdown-item" id="dropdown-item2" onclick="selectColorScheme('structure');">Structure</a></li>
-                    <li><a class="dropdown-item" id="dropdown-item3" onclick="selectColorScheme('positions');">Positions</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li  class="presentation-li">
-                        <div class="form-check form-check-inline form-switch">
-                            <input class="form-check-input presentation-option" role="switch" type="checkbox" id="animateCheckbox" checked>
-                            <label class="form-check-label presentation-option" for="animateCheckbox">Animate</label>
-                        </div>
-                    </li>
-                </ul>
+                <div class="btn-group dropup m-1">
+                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        Presentation
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="li-dropdown-header"><h6 class="dropdown-header">Display</h6></li>
+                        <li class="li-hr"><hr class="dropdown-divider"></li>
+                        <li class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="numberingCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="numberingCheckbox">Numbering</label>
+                            </div>
+                        </li>
+                        <li class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="nodeLabelCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="nodeLabelCheckbox">Node Label</label>
+                            </div>
+                        </li>
+                        <li class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="pseudoknotCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="pseudoknotCheckbox">Pseudoknot Links</label>
+                            </div>
+                        </li>
+                        <li class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="directionArrowsCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="directionArrowsCheckbox">Direction Arrows</label>
+                            </div>
+                        </li>
+                        <li class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="linksCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="linksCheckbox">Links</label>
+                            </div>
+                        </li>
+                        <li class="li-hr"><hr class="dropdown-divider"></li>
+                        <li class="li-dropdown-header"><h6 class="dropdown-header">Color Scheme</h6></li>
+                        <li class="li-hr"><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" id="dropdown-item1" onclick="selectColorScheme('sequence');">Sequence</a></li>
+                        <li><a class="dropdown-item" id="dropdown-item2" onclick="selectColorScheme('structure');">Structure</a></li>
+                        <li><a class="dropdown-item" id="dropdown-item3" onclick="selectColorScheme('positions');">Positions</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li  class="presentation-li">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input presentation-option" role="switch" type="checkbox" id="animateCheckbox" checked>
+                                <label class="form-check-label presentation-option" for="animateCheckbox">Animate</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm m-1" onclick="window.container.centerView()">Re-center</button>
+                <button type="button" class="btn btn-primary btn-sm m-1" onclick="reset()">Reset</button>
             </div>
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.container.centerView()">Center molecules</button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="reset()">Reset</button>
-            {% comment %} <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#downloadModal">Download</button> {% endcomment %}
         </div>
 
         <!-- Download Modal -->
