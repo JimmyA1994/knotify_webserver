@@ -32,7 +32,7 @@
                       </li>
                       <li class="nav-item">
                         {% if user|is_guest_user %}
-                        <a class="nav-link" onclick="convert()" href="#">Login</a>
+                        <a class="nav-link" onclick="signup()" href="#">Sign up</a>
                         {% else %}
                         <a class="nav-link" onclick="logout()" href="#">Log out</a>
                         {% endif %}
@@ -83,9 +83,9 @@
                     }
                 });
             }
-            function convert(){
+            function signup(){
                 base_url = window.location.protocol + '//' + window.location.host + '/';
-                window.location.href = base_url + 'login/';
+                window.location.href = base_url + 'signup/';
             }
         </script>
     </body>

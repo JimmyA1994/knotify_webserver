@@ -42,7 +42,7 @@ body {
 
 .logo-subtitle {
     font-size: 15px;
-    color: #fff;
+    color: #484848;
     font-family: "Aldrich";
 }
 
@@ -83,9 +83,8 @@ body {
 .submit-button {
     font-family: "Aldrich";
     background-color: #FE6D73;
+    margin-left: 2px;
     border: none;
-    width: 90px;
-    border-radius: 0;
 }
 
 .submit-button:hover {
