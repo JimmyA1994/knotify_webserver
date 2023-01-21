@@ -115,7 +115,10 @@ function toggleLogin(){
     var signupSpan = document.querySelector('#toggle-signup-span');
     signupSpan.style = "display:visible";
 
-    // change the title
+    // change the tab title
+    document.querySelector('title').innerText = 'Login';
+
+    // change the card title
     const title = document.querySelector('#title');
     title.innerHTML = 'Login';
 
@@ -142,7 +145,10 @@ function toggleSignup(){
     var loginSpan = document.querySelector('#toggle-login-span');
     loginSpan.style = "display:visible";
 
-    // change the title
+    // change the tab title
+    document.querySelector('title').innerText = 'Signup';
+
+    // change the card title
     const title = document.querySelector('#title');
     title.innerHTML = 'Create an account';
 
