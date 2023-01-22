@@ -291,15 +291,21 @@ function areArraysEqual(a, b){
     return a.every((elem) => b.includes(elem));
 }
 
-function startPolling(){
+function startPolling(msec=1000){
     if(!window.intervalReference){
-        window.intervalReference = setInterval(polling, 1000);
+        window.intervalReference = setInterval(polling, msec);
     }
+}
+
+function resetPolling(msec=1000){
+    clearInterval(window.intervalReference);
+    window.intervalReference = setInterval(polling, msec);
 }
 
 function stopPolling(){
     clearInterval(window.intervalReference);
     window.intervalReference = null;
+    window.polling_count = null;
 }
 
 function removeAllChildNodes(parent) {
@@ -361,6 +367,20 @@ function polling(){
                 if(replace){
                     $current_table.bootstrapTable('load', current_runs);
                     window.current_runs = current_runs;
+                }
+                // adjust polling interval
+                // for the first 5 polling executions, poll each second
+                // for 6th, 7th, 8th polling executions, poll every 5 seconds
+                // for more than that, poll every 10 seconds
+                if(window.polling_count == null) { // first time polling
+                    window.polling_count = 1;
+                }else{
+                    window.polling_count++;
+                    if(window.polling_count == 5) {
+                        resetPolling(5000);
+                    }else if(window.polling_count == 8){
+                        resetPolling(10000);
+                    }
                 }
             }
         }
