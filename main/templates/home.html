@@ -91,10 +91,13 @@
                 <div class="form-group">
                     <div>Enter your RNA sequence here. It can be a single sequence or multiple sequences in FASTA format.</div>
                     <textarea class="form-control form-control-sm my-2" rows="4" id="RNA-sequence" name="sequence" placeholder="" onfocusout="this.classList.remove('is-invalid');"></textarea>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-2">
                         <input type="file" class="form-control form-control-sm" id="formFile" onfocusout="this.classList.remove('is-invalid');" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
                         <button class="btn btn-sm btn-outline-secondary" type="button" id="inputGroupFileAddon04" onclick="clearFileInput()">Clear</button>
                     </div>
+                </div>
+                <div class="mb-3">
+                <span>Alternatively, you can <a class="example-link" href="javascript:;" onclick="fillInExample()">try out an example</a>.</span>
                 </div>
                 <input type="hidden" id="description" value="">
                 <div class="alert alert-danger d-none" role="alert" id="input-error-alert">
