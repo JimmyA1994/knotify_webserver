@@ -73,3 +73,11 @@ mark {
     border-top: 1px solid #aab4be;
     padding-top: 5px;
 }
+
+.example-link {
+    color:#346998;
+}
+
+.example-link:hover {
+    color: #1a354c;
+}

@@ -779,3 +779,10 @@ function deleteHistoryEntry(){
         delete window.history_entry_id
     });
 }
+
+function fillInExample(){
+    clearInput();
+
+    const textArea = document.querySelector('#RNA-sequence');
+    textArea.value = "> Example Input\nAAAAAACUAAUAGAGGGGGGACUUAGCGCCCCCCAAACCGUAACCCC";
+}
