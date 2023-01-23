@@ -50,6 +50,81 @@ class LoginView(TemplateView):
         context = {'current_year': timezone.now().year}
         return render(request, self.template_name, context)
 
+    def post(self, request):
+        body = json.loads(request.body.decode('UTF-8'))
+        if not {'email', 'password'}.issubset(body.keys()):
+            return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
+        email = body.get('email', '')
+        valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
+        is_valid_email = (valid_email_matches and
+                        len(valid_email_matches) and
+                        valid_email_matches[0] == email)
+        if not is_valid_email:
+            return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
+        username = email.split('@')[0]
+        password = body.get('password', '')
+        user = authenticate(username=username, password=password)
+        if user:
+            if is_guest_user(request.user):
+                # migrate Runs to logged user
+                Run.objects.filter(user=request.user).update(user=user)
+                logout(request)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return JsonResponse({'status':'OK'})
+        else:
+            return JsonResponse({'status':'ERROR', 'reason': 'user_not_found'})
+
+class SignupView(TemplateView):
+    template_name = 'login.html'
+
+    def get(self, request):
+        context = {'current_year': timezone.now().year}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        body = json.loads(request.body.decode('UTF-8'))
+        if not {'email', 'password'}.issubset(body.keys()):
+            return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
+        email = body.get('email', '')
+        valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
+        is_valid_email = (valid_email_matches and
+                        len(valid_email_matches) and
+                        valid_email_matches[0] == email)
+        if not is_valid_email:
+            return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
+        username = email.split('@')[0]
+        password = body.get('password', '')
+
+        # check if user already exists
+        user = authenticate(username=username, password=password)
+        if user:
+            if is_guest_user(request.user):
+                # migrate Runs to logged user
+                Run.objects.filter(user=request.user).update(user=user)
+                logout(request)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return JsonResponse({'status':'OK'})
+
+        # create user and respond
+        user = User.objects.create_user(username=username, email=email, password=password)
+        if user:
+            if is_guest_user(request.user):
+                # migrate Runs to new user
+                Run.objects.filter(user=request.user).update(user=user)
+
+                # migrate UserProfile to new user
+                guest_user__user_profile_values = UserProfile.objects.filter(user=request.user).values().first()
+                del guest_user__user_profile_values['id']
+                del guest_user__user_profile_values['user_id']
+                UserProfile.objects.filter(user=user).update(**guest_user__user_profile_values)
+                User.objects.get(pk=request.user.id).delete() # delete guest user
+
+                logout(request)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return JsonResponse({'status':'OK'})
+        else:
+            return JsonResponse({'status':'ERROR', 'reason': 'user_could_not_be_created'})
+
 class TeamPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
     # suppress passing next field in login redirect
     redirect_field_name=None
@@ -59,77 +134,6 @@ class ResearchPageView(AllowGuestUserMixin, LoginRequiredMixin, TemplateView):
     # suppress passing next field in login redirect
     redirect_field_name = None
     template_name = 'research.html'
-
-@require_http_methods(['POST'])
-def process_signup_view(request):
-    body = json.loads(request.body.decode('UTF-8'))
-    if not {'email', 'password'}.issubset(body.keys()):
-        return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
-    email = body.get('email', '')
-    valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
-    is_valid_email = (valid_email_matches and
-                      len(valid_email_matches) and
-                      valid_email_matches[0] == email)
-    if not is_valid_email:
-        return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
-    username = email.split('@')[0]
-    password = body.get('password', '')
-
-    # check if user already exists
-    user = authenticate(username=username, password=password)
-    if user:
-        if is_guest_user(request.user):
-            # migrate Runs to logged user
-            Run.objects.filter(user=request.user).update(user=user)
-            logout(request)
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'status':'OK'})
-
-    # create user and respond
-    user = User.objects.create_user(username=username, email=email, password=password)
-    if user:
-        if is_guest_user(request.user):
-            # migrate Runs to new user
-            Run.objects.filter(user=request.user).update(user=user)
-
-            # migrate UserProfile to new user
-            guest_user__user_profile_values = UserProfile.objects.filter(user=request.user).values().first()
-            del guest_user__user_profile_values['id']
-            del guest_user__user_profile_values['user_id']
-            UserProfile.objects.filter(user=user).update(**guest_user__user_profile_values)
-            User.objects.get(pk=request.user.id).delete() # delete guest user
-
-            logout(request)
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'status':'OK'})
-    else:
-        return JsonResponse({'status':'ERROR', 'reason': 'user_could_not_be_created'})
-
-
-@require_http_methods(['POST'])
-def process_login_view(request):
-    body = json.loads(request.body.decode('UTF-8'))
-    if not {'email', 'password'}.issubset(body.keys()):
-        return JsonResponse({'status':'ERROR', 'reason': 'no_username_or_password_was_provided'})
-    email = body.get('email', '')
-    valid_email_matches = re.findall(r'[\w\d_+.-]+@[\w]+[.][A-Za-z]+', email)
-    is_valid_email = (valid_email_matches and
-                      len(valid_email_matches) and
-                      valid_email_matches[0] == email)
-    if not is_valid_email:
-        return JsonResponse({'status':'ERROR', 'reason': 'invalid_email'})
-    username = email.split('@')[0]
-    password = body.get('password', '')
-    user = authenticate(username=username, password=password)
-    if user:
-        if is_guest_user(request.user):
-            # migrate Runs to logged user
-            Run.objects.filter(user=request.user).update(user=user)
-            logout(request)
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        return JsonResponse({'status':'OK'})
-    else:
-        return JsonResponse({'status':'ERROR', 'reason': 'user_not_found'})
 
 
 @login_required(redirect_field_name=None)
