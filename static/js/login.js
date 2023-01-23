@@ -8,7 +8,7 @@ function signup(){
         return false;
     }
 
-    var url = 'signup/';
+    var url = '';
     var cookie = document.cookie;
     var split = cookie.split("=");
     var token = split[1];
@@ -63,7 +63,7 @@ function login(){
         return false;
     }
 
-    var url = 'login/';
+    var url = '';
     var cookie = document.cookie;
     var split = cookie.split("=");
     var token = split[1];
@@ -109,65 +109,9 @@ function login(){
 }
 
 function toggleLogin(){
-    // toggle the signup auxiliary prompt
-    var loginSpan = document.querySelector('#toggle-login-span');
-    loginSpan.style = "display:none";
-    var signupSpan = document.querySelector('#toggle-signup-span');
-    signupSpan.style = "display:visible";
-
-    // change the tab title
-    document.querySelector('title').innerText = 'Login';
-
-    // change the card title
-    const title = document.querySelector('#title');
-    title.innerHTML = 'Login';
-
-    // change the CTA Button text
-    var button = document.querySelector('#cta-button');
-    button.innerHTML = "Log in!";
-
-    // change the form action
-    var form = document.querySelector('form');
-    form.onsubmit = login;
-
-    // clear previous error messages on inputs
-    form.classList.remove('was-validated');
-
-    // remove error message
-    const error_alert = document.querySelector("#error-alert");
-    error_alert.classList.add('d-none');
+    window.location.replace(window.location.protocol + '//' + window.location.host + '/login/');
 }
 
 function toggleSignup(){
-    // toggle the login auxiliary prompt
-    var signupSpan = document.querySelector('#toggle-signup-span');
-    signupSpan.style = "display:none";
-    var loginSpan = document.querySelector('#toggle-login-span');
-    loginSpan.style = "display:visible";
-
-    // change the tab title
-    document.querySelector('title').innerText = 'Signup';
-
-    // change the card title
-    const title = document.querySelector('#title');
-    title.innerHTML = 'Create an account';
-
-    // change the CTA Button text
-    var button = document.querySelector('#cta-button');
-    button.innerHTML = "Sign up!";
-
-    // change the form action
-    var form = document.querySelector('form');
-    form.onsubmit = signup;
-
-    // clear previous error messages on inputs
-    form.classList.remove('was-validated');
-
-    // remove error message
-    const error_alert = document.querySelector("#error-alert");
-    error_alert.classList.add('d-none');
-}
-
-function goToHome() {
-    window.location.replace(window.location.protocol + '//' + window.location.host + '/');
+    window.location.replace(window.location.protocol + '//' + window.location.host + '/signup/');
 }

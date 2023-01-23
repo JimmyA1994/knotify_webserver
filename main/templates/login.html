@@ -26,7 +26,7 @@
     </div>
     <div class="card-body">
       <h1 class="h3 mb-3 title" id="title">{% if 'login' in request.get_full_path %}Login{% else %}Create an account{% endif %}</h1>
-      <form method="post" class="needs-validation" onsubmit="{% if 'login' in request.get_full_path %}login(){% else %}signup{% endif %}; return false;" novalidate>{% csrf_token %}
+      <form method="post" class="needs-validation" onsubmit="{% if 'login' in request.get_full_path %}login(){% else %}signup(){% endif %}; return false;" novalidate>{% csrf_token %}
         <div class="form-floating mb-1">
           <input type="email" class="form-control" id="EmailInput" placeholder=""
             pattern='[\w\d_+.-]+@[\w]+[.][A-Za-z]+' required>
