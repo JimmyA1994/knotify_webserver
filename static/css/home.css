@@ -1,5 +1,6 @@
 .card-tab {
     font-family: "Aldrich";
+    font-display: swap;
     display: block;
     margin-bottom: 1em;
     background-color: antiquewhite;
@@ -8,7 +9,7 @@
     padding-right: 0;
 }
 
-.previous-runs, current_runs {
+.completed-runs, current_runs {
     margin-bottom: 0.5em;
 }
 

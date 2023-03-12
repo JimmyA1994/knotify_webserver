@@ -3,6 +3,7 @@
 {% load guest_user %}
 {% block head %}
     <title>Knotify</title>
+    <meta name="description" content="knotify, a secondary rna structure prediction tool for pseudoknots">
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
@@ -20,7 +21,7 @@
     <!-- <div class="base-card overview"> -->
     <div class="row my-2 card-decor" id="overview">
         <div id='history-container'>
-            {% if current_runs or previous_runs %}
+            {% if current_runs or completed_runs %}
             <div class="row" id="history-title">
                 <u class="card-tab col-2 text-center">History</u>
             </div>
@@ -32,7 +33,7 @@
                         <div>Current Runs</div>
                         <a data-bs-toggle="collapse" href="#current-runs" role="button" aria-expanded="true" aria-controls="current-runs" id="current-runs-button">Hide</a>
                     </div>
-                    <div class="table-responsive collapse show" id="current-runs">
+                    <div class="table-responsive collapse show mb-3" id="current-runs">
                         <table class="table table-hover table-bordered table-sm" id="current-runs-table" data-height="240">
                             <thead>
                                 <tr>
@@ -45,15 +46,15 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="previous-runs" id="previous-runs-container">
-                    {% if previous_runs %}
+                <div class="completed-runs" id="completed-runs-container">
+                    {% if completed_runs %}
                     <div class="d-flex justify-content-between">
-                        <div>Previous Runs</div>
-                        <a data-bs-toggle="collapse" href="#previous-runs" role="button" aria-expanded="true" aria-controls="previous-runs" id="previous-runs-button">Hide</a>
+                        <div>Completed Runs</div>
+                        <a data-bs-toggle="collapse" href="#completed-runs" role="button" aria-expanded="true" aria-controls="completed-runs" id="completed-runs-button">Hide</a>
                     </div>
-                    <div class="table-responsive collapse show" id="previous-runs">
+                    <div class="table-responsive collapse show" id="completed-runs">
                         <div id="toolbar"></div>
-                        <table class="table table-hover table-bordered table-sm" id="previous-runs-table" data-toggle="previous-runs-table"
+                        <table class="table table-hover table-bordered table-sm" id="completed-runs-table" data-toggle="completed-runs-table"
                                data-pagination="true" data-page-list="[10, 25, 50, 100, 200, All]"
                                data-detail-view="true" data-detail-view-icon="false" data-detail-formatter="detailFormatter"
                                data-buttons-prefix="btn-sm btn" data-show-columns="true"
@@ -304,13 +305,13 @@
 
 
     <script>
-        // Note: previous_runs and current_runs are used only for table initialization
-        {% if previous_runs %}
-        window.previous_runs = {{ previous_runs | safe }}; // used only to initialize previous runs table
-        window.previous_runs_ids = new Set({{ previous_runs_ids | safe }});
+        // Note: completed_runs and current_runs are used only for table initialization
+        {% if completed_runs %}
+        window.completed_runs = {{ completed_runs | safe }}; // used only to initialize completed runs table
+        window.completed_runs_ids = new Set({{ completed_runs_ids | safe }});
         {% else %}
-        window.previous_runs = []; // used only to initialize previous runs table
-        window.previous_runs_ids = new Set();
+        window.completed_runs = []; // used only to initialize completed runs table
+        window.completed_runs_ids = new Set();
         {% endif %}
         {% if current_runs %}
         window.current_runs = {{ current_runs | safe }};
@@ -328,7 +329,7 @@
         window.is_guest_user = false;
         {% endif %}
 
-        if(window.previous_runs.length > 0 || window.current_runs.length) {
+        if(window.completed_runs.length > 0 || window.current_runs.length) {
             // reveal whole overview card
             document.querySelector("#overview").style.display = null;
         } else{
@@ -336,7 +337,7 @@
             document.querySelector("#overview").style.display = "none";
         }
 
-        /** format previous runs table detail view */
+        /** format completed runs table detail view */
         function detailFormatter(index, row) {
             var html = []
             $.each(row, function (key, value) {
@@ -347,7 +348,7 @@
             return html.join('')
         }
 
-        /** define previous runs table header presentation */
+        /** define completed runs table header presentation */
         function headerStyle(column) {
             return {
                 operate: {
@@ -363,10 +364,10 @@
                     '<a class="expand" href="javascript:void(0)" title="Expand Entry">',
                         '<i class="bi bi-arrow-down-left-square"></i>',
                     '</a>  ',
-                    '<a class="result" href="results/?id='+row.id+'" title="Go to">',
+                    '<a class="result" href="results/?id='+row.id+'" title="Go to" style="color:#1D7874;">',
                         '<i class="bi bi-box-arrow-in-up-right"></i>',
                     '</a>  ',
-                    '<a class="remove" href="javascript:void(0)" title="Remove">',
+                    '<a class="remove" href="javascript:void(0)" title="Remove" style="color:#dc3545;">',
                         '<i class="bi bi-trash-fill"></i>',
                     '</a>',
                 '</div>'
@@ -375,7 +376,7 @@
         // define actions column functionality
         window.operateEvents = {
             'click .expand': function (e, value, row, index) {
-                var $table = $('#previous-runs-table');
+                var $table = $('#completed-runs-table');
                 $table.bootstrapTable('toggleDetailView', index)
             },
             'click .result': function (e, value, row, index) {
