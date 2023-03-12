@@ -75,10 +75,12 @@ TEMPLATES = [
     },
 ]
 
+REDIS_LOCATION = 'redis://redis:6379'
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6379',
+        'LOCATION': REDIS_LOCATION,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
