@@ -3,6 +3,9 @@ services:
     container_name: redis
     restart: always
     image: redis:latest
+    volumes:
+    - ./knotify_webserver/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
   db:
     container_name: db
     restart: always
@@ -28,6 +31,8 @@ services:
       - db
       - redis
       - knotify
+    environment:
+      - DJANGO_SETTINGS_MODULE=knotify_webserver.settings
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.delete_expired_users.schedule: "@daily"
