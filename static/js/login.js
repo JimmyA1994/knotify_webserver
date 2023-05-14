@@ -25,7 +25,7 @@ function signup(){
     .then(data => {
         console.log(data);
         if(data.hasOwnProperty('status') && data['status']=='OK'){
-            window.location.replace(window.location.protocol + '//' + window.location.host + '/');
+           goToHome();
         }else {
             var msg;
             if (data['reason'] == 'invalid_email') {
@@ -80,7 +80,7 @@ function login(){
     .then(data => {
         console.log(data);
         if(data.hasOwnProperty('status') && data['status']=='OK'){
-            window.location.replace(window.location.protocol + '//' + window.location.host + '/');
+            goToHome();
         }else {
             var msg;
             if (data['reason'] == 'invalid_email') {
@@ -114,4 +114,8 @@ function toggleLogin(){
 
 function toggleSignup(){
     window.location.replace(window.location.protocol + '//' + window.location.host + '/signup/');
+}
+
+function goToHome(){
+    window.location.replace(window.location.protocol + '//' + window.location.host + '/');
 }
