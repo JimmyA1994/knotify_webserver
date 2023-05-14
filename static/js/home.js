@@ -25,14 +25,14 @@ function correctWindowSize(){
     if (minWindowSize.valueAsNumber > N) minWindowSize.value = N;
 }
 
-function previousRunsToggleEvent() {
-    var previous_runs_toggle = document.getElementById("previous-runs-button");
-    var text = previous_runs_toggle.innerText;
+function completedRunsToggleEvent() {
+    var completed_runs_toggle = document.getElementById("completed-runs-button");
+    var text = completed_runs_toggle.innerText;
     if (text == 'Show') {
-        previous_runs_toggle.innerText = 'Hide';
+        completed_runs_toggle.innerText = 'Hide';
     }
     else {
-        previous_runs_toggle.innerText = 'Show';
+        completed_runs_toggle.innerText = 'Show';
     }
 }
 
@@ -52,12 +52,12 @@ function resetInformCompleted(){
     window.inform_user_completed_runs = [];
 }
 
-function createHistorySection(previous_runs, current_runs){
+function createHistorySection(completed_runs, current_runs){
     var historySection = document.querySelector("#history-container");
     var currentSection = document.querySelector("#current-runs-container");
-    var previousSection = document.querySelector("#previous-runs-container");
+    var completedSection = document.querySelector("#completed-runs-container");
 
-    if(currentSection.childElementCount == 0 && previousSection.childElementCount == 0){
+    if(currentSection.childElementCount == 0 && completedSection.childElementCount == 0){
         // reveal whole overview card
         document.querySelector("#overview").style.display = null;
         // add History title above tables
@@ -76,9 +76,9 @@ function createHistorySection(previous_runs, current_runs){
         createCurrentRunsSection(current_runs);
     }
 
-    if(previousSection.childElementCount == 0 && previous_runs.length > 0){
-        // create previous section
-        createPreviousRunsSection(previous_runs);
+    if(completedSection.childElementCount == 0 && completed_runs.length > 0){
+        // create completed section
+        createCompletedRunsSection(completed_runs);
     }
 }
 
@@ -101,7 +101,7 @@ function createCurrentRunsSection(current_runs){
     upperDiv.appendChild(hideAnchor);
 
     var tableDiv = document.createElement("div");
-    tableDiv.setAttribute("class", "table-responsive collapse show");
+    tableDiv.setAttribute("class", "table-responsive collapse show mb-3");
     tableDiv.setAttribute("id", "current-runs");
     var table = document.createElement("table");
     table.setAttribute("class", "table table-hover table-bordered table-sm");
@@ -139,34 +139,34 @@ function createCurrentRunsSection(current_runs){
 }
 
 
-function createPreviousRunsSection(previous_runs){
-    var previousSection = document.querySelector("#previous-runs-container");
+function createCompletedRunsSection(completed_runs){
+    var completedSection = document.querySelector("#completed-runs-container");
 
     var upperDiv = document.createElement("div");
     upperDiv.setAttribute("class", "d-flex justify-content-between");
     var titleDiv = document.createElement("div");
-    titleDiv.innerText = "Previous Runs";
+    titleDiv.innerText = "Completed Runs";
     var hideAnchor = document.createElement("a");
     hideAnchor.setAttribute("data-bs-toggle", "collapse");
-    hideAnchor.setAttribute("href", "#previous-runs");
+    hideAnchor.setAttribute("href", "#completed-runs");
     hideAnchor.setAttribute("role", "button");
     hideAnchor.setAttribute("aria-expanded", "true");
-    hideAnchor.setAttribute("aria-controls", "previous-runs");
-    hideAnchor.setAttribute("id", "previous-runs-button");
+    hideAnchor.setAttribute("aria-controls", "completed-runs");
+    hideAnchor.setAttribute("id", "completed-runs-button");
     hideAnchor.innerText = "Hide";
     upperDiv.appendChild(titleDiv);
     upperDiv.appendChild(hideAnchor);
 
     var tableDiv = document.createElement("div");
     tableDiv.setAttribute("class", "table-responsive collapse show");
-    tableDiv.setAttribute("id", "previous-runs");
+    tableDiv.setAttribute("id", "completed-runs");
     var toolbarDiv = document.createElement("div");
     toolbarDiv.setAttribute("id", "toolbar");
     tableDiv.appendChild(toolbarDiv);
     var table = document.createElement("table");
     table.setAttribute("class", "table table-hover table-bordered table-sm");
-    table.setAttribute("id", "previous-runs-table");
-    table.setAttribute("data-toggle", "previous-runs-table");
+    table.setAttribute("id", "completed-runs-table");
+    table.setAttribute("data-toggle", "completed-runs-table");
     table.setAttribute("data-pagination", "true");
     table.setAttribute("data-page-list", "[10, 25, 50, 100, 200, All]");
     table.setAttribute("data-detail-view", "true");
@@ -223,16 +223,16 @@ function createPreviousRunsSection(previous_runs){
     th.innerText = "Actions";
     tr.appendChild(th);
 
-    previousSection.appendChild(upperDiv);
-    previousSection.appendChild(tableDiv);
+    completedSection.appendChild(upperDiv);
+    completedSection.appendChild(tableDiv);
 
-    var previous_runs_toggle = document.getElementById("previous-runs-button");
-    previous_runs_toggle.addEventListener("click", previousRunsToggleEvent);
+    var completed_runs_toggle = document.getElementById("completed-runs-button");
+    completed_runs_toggle.addEventListener("click", completedRunsToggleEvent);
 
     // populate table
-    if(previous_runs){
-        var $table = $('#previous-runs-table');
-        $table.bootstrapTable({data: previous_runs})
+    if(completed_runs){
+        var $table = $('#completed-runs-table');
+        $table.bootstrapTable({data: completed_runs})
     }
 }
 
@@ -253,7 +253,7 @@ function triggerPopUp(message, completed_runs=[]){
 
         var tds = ""
         completed_runs.forEach(obj => {
-            tds += '<tr><td>'+obj.id+'</td><td>'+obj.sequence+'</td><td><a href="results/?id='+obj.id+'"<i class="bi bi-box-arrow-in-up-right"></i></td></tr>';
+            tds += '<tr><td>'+obj.id+'</td><td>'+obj.sequence+'</td><td><a href="results/?id='+obj.id+'" style="color:#1D7874;"><i class="bi bi-box-arrow-in-up-right"></i></td></tr>';
         });
         var html =  '<span>The following runs have been completed:</span>' +
                     '<table class="table table-sm" style="border: 1px solid #ffd199;">' +
@@ -317,7 +317,7 @@ function removeAllChildNodes(parent) {
 /** Check if any current run is finished, trigger popup and update relevant tables */
 function polling(){
     console.log('polling...');
-    // Request update for new current runs and previous runs after run specified by window.latest_history
+    // Request update for new current runs and completed runs after run specified by window.latest_history
     var url = 'update_history/';
     var cookie = document.cookie;
     var split = cookie.split("=");
@@ -338,17 +338,17 @@ function polling(){
         // polling data parsing
         // ====================
         var $current_table = $('#current-runs-table');
-        var $previous_table = $('#previous-runs-table');
-        // 1. check previous runs,
+        var $completed_table = $('#completed-runs-table');
+        // 1. check completed runs,
         //    determine if they already exist in table and
         //    add new to a list for updating after showing the pop up
-        var previous_runs = data['previous_runs'];
-        var update_previous_runs_table = []
-        previous_runs.forEach(run =>{
-            // check in previous table if run already exists
+        var completed_runs = data['completed_runs'];
+        var update_completed_runs_table = []
+        completed_runs.forEach(run =>{
+            // check in completed table if run already exists
             id = run['id'];
-            if(!window.previous_runs_ids.has(id)){
-                update_previous_runs_table.push(run);
+            if(!window.completed_runs_ids.has(id)){
+                update_completed_runs_table.push(run);
             }
         });
         // 2. stop polling when there are no other current runs
@@ -384,20 +384,20 @@ function polling(){
                 }
             }
         }
-        if(update_previous_runs_table.length > 0){
+        if(update_completed_runs_table.length > 0){
             // 3. trigger pop up
             // Note: for pop up inform user purposes. So that we can inform dynamically the user if the modal is still open
-            window.inform_user_completed_runs = window.inform_user_completed_runs.concat(update_previous_runs_table);
+            window.inform_user_completed_runs = window.inform_user_completed_runs.concat(update_completed_runs_table);
             triggerPopUp('', window.inform_user_completed_runs);
 
-            // 4. update previous table
-            if ($previous_table.length == 0){
-                createHistorySection(update_previous_runs_table, []);
+            // 4. update completed table
+            if ($completed_table.length == 0){
+                createHistorySection(update_completed_runs_table, []);
             }else {
-                $previous_table.bootstrapTable('append', update_previous_runs_table);
+                $completed_table.bootstrapTable('append', update_completed_runs_table);
             }
-            // add new previous entries ids to window.previous_runs_ids set
-            extract_ids(update_previous_runs_table).forEach(item => window.previous_runs_ids.add(item));
+            // add new completed entries ids to window.completed_runs_ids set
+            extract_ids(update_completed_runs_table).forEach(item => window.completed_runs_ids.add(item));
             if(data['latest_history_id'] && data['latest_history_id'] != window.latest_history_id){
                 window.latest_history_id = data['latest_history_id'];
             }
@@ -611,7 +611,7 @@ function submitFunction() {
         validation = validate_fasta(input_text);
         validation.display_error_function = show_textarea_invalid_error;
         if (validation.is_valid) {
-            // clear previous error messages
+            // clear completed error messages
             const input_error_alert = document.getElementById("input-error-alert");
             input_error_alert.classList.add('d-none');
 
@@ -639,7 +639,7 @@ function submitFunction() {
         file.text().then((text) => {
             validation = validate_fasta(text);
             if (validation.is_valid) {
-                // clear previous error messages
+                // clear completed error messages
                 const input_error_alert = document.getElementById("input-error-alert");
                 input_error_alert.classList.add('d-none');
 
@@ -698,15 +698,15 @@ window.addEventListener('load', function() {
     // var sequence = document.getElementById("RNA-sequence");
     // sequence.addEventListener("focusout", correctWindowSize);
 
-    if (window.previous_runs.length > 0) {
+    if (window.completed_runs.length > 0) {
         // register show/hide button
-        var previous_runs_toggle = document.getElementById("previous-runs-button");
-        previous_runs_toggle.addEventListener("click", previousRunsToggleEvent);
+        var completed_runs_toggle = document.getElementById("completed-runs-button");
+        completed_runs_toggle.addEventListener("click", completedRunsToggleEvent);
 
         // initialize table
-        var $table = $('#previous-runs-table');
-        $table.bootstrapTable({data: window.previous_runs});
-        delete window.previous_runs;
+        var $table = $('#completed-runs-table');
+        $table.bootstrapTable({data: window.completed_runs});
+        delete window.completed_runs;
     }
     if (window.current_runs.length > 0) {
         // register show/hide button
@@ -734,7 +734,7 @@ function deleteHistoryEntry(){
     }
     const row_id = window.history_entry_id;
 
-    var $table = $('#previous-runs-table');
+    var $table = $('#completed-runs-table');
     $table.bootstrapTable('showLoading');
     // delete entry on server
     var cookie = document.cookie;
@@ -761,32 +761,32 @@ function deleteHistoryEntry(){
             field: 'id',
             values: [row_id]
         });
-        // remove element from window.previous_runs_ids and update window.latest_history_id
-        window.previous_runs_ids.delete(row_id);
-        var previous_runs = $table.bootstrapTable('getData');
-        if(previous_runs.length == 0){ // no more previous runs left on the table
+        // remove element from window.completed_runs_ids and update window.latest_history_id
+        window.completed_runs_ids.delete(row_id);
+        var completed_runs = $table.bootstrapTable('getData');
+        if(completed_runs.length == 0){ // no more completed runs left on the table
             window.latest_history_id = "";
 
             var current_runs_table = document.querySelector('#current-runs-table');
-            if(!current_runs_table){ // no current nor previous runs left to display. Remove history section
+            if(!current_runs_table){ // no current nor completed runs left to display. Remove history section
                 var historyTitle = document.querySelector("#history-title");
                 historyTitle.remove();
-                var previous_runs_container = document.querySelector('#previous-runs-container');
-                removeAllChildNodes(previous_runs_container);
+                var completed_runs_container = document.querySelector('#completed-runs-container');
+                removeAllChildNodes(completed_runs_container);
                 var current_runs_container = document.querySelector('#current-runs-container');
                 removeAllChildNodes(current_runs_container);
                 // hide whole overview card
                 document.querySelector("#overview").style.display = "none";
-            } else{ // remove just the previous runs section
-                var previous_runs_container = document.querySelector('#previous-runs-container');
-                removeAllChildNodes(previous_runs_container);
+            } else{ // remove just the completed runs section
+                var completed_runs_container = document.querySelector('#completed-runs-container');
+                removeAllChildNodes(completed_runs_container);
             }
         }else {
             if(window.latest_history_id == row_id){ // latest_history_id needs updating
                 // find latest completed
-                var latest_id = previous_runs.at(0)["id"];
-                var latest_completed = previous_runs.at(0)["completed"];
-                previous_runs.forEach(obj => {
+                var latest_id = completed_runs.at(0)["id"];
+                var latest_completed = completed_runs.at(0)["completed"];
+                completed_runs.forEach(obj => {
                     if(obj.completed > latest_completed){
                         latest_completed = obj.completed;
                         latest_id = obj.id;
